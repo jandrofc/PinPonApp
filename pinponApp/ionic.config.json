@@ -1,7 +1,0 @@
-{
-  "name": "pinponApp",
-  "integrations": {
-    "capacitor": {}
-  },
-  "type": "angular-standalone"
-}
