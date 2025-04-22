@@ -1,0 +1,11 @@
+Se instala libreria personalisada capacitor para usarlo dentro de android, zxing/broser para probar el codigo de lectura para la ip webcam desde la web
+
+npm install @capacitor-mlkit/barcode-scanning
+
+npm install @zxing/browser
+
+Al exportar el codigo, se borra las dependencias muertas de npm install, reduciendo la carga al dispositivo
+
+
+AndroidManifest.xml
+<uses-permission android:name="android.permission.CAMERA" />
