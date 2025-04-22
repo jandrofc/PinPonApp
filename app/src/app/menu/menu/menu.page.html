@@ -1,0 +1,24 @@
+<ion-header>
+  <ion-toolbar class="toolbar-color">
+    <ion-title>Menú</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="menu-container">
+    <!-- Logo de la aplicación -->
+    <div class="logo-container">
+      <img src="assets/logo/logo.png" alt="Logo" class="logo">
+      <h1 class="app-name">Minimarket</h1>
+    </div>
+
+    <!-- Botones del menú -->
+    <div class="menu-buttons">
+      <button class="menu-button" [routerLink]="('/tabs/tab1')">Inventario</button>
+      <hr>
+      <button class="menu-button" [routerLink]="('/tabs/tab2')">Reportes</button>
+      <hr>
+      <button class="menu-button" [routerLink]="('/tabs/tab3')">Carrito</button>
+    </div>
+  </div>
+</ion-content>
