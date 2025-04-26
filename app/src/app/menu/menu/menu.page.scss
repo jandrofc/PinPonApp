@@ -1,0 +1,55 @@
+.menu-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Centra verticalmente */
+    height: 100%; /* Ocupa toda la altura de la pantalla */
+    padding: 20px;
+    background-color: #EBF3F5; /* Color de fondo claro */
+  }
+  
+  .logo-container {
+    margin-bottom: 110px;
+  }
+  
+  .logo {
+    width: 200px;
+    height: auto;
+  }
+  
+  .menu-buttons {
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  .menu-button {
+    width: 100%;
+    padding: 15px;
+    font-size: 16px;
+    background-color: #EBF3F5;
+    color: rgb(0, 0, 0);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+  }
+  
+  .menu-button:hover {
+    background-color: #3171e0;
+  }
+  
+  hr {
+    border: none;
+    border-top: 1px solid #ccc;
+    margin: 10px 0;
+  }
+
+  .app-name {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #000000; /* Color del texto */
+  }
