@@ -9,10 +9,10 @@ import { CommonModule } from '@angular/common';
 import { ConexionBackendService} from 'src/app/services/conexion-backend.service';
 
 export interface Producto {
-  id: number;
-  nombre: string;
-  cantidad: number;
-  fecha: string;
+  nombre_producto: string;
+  categoria: string;
+  cantidad: string;
+  precio: string;
   imagen: string;
 }
 
@@ -28,55 +28,33 @@ export class Tab1Page implements OnInit{
 
 
   ngOnInit() {
-    this.obtenerDatos();
+    this.obtenerProductos();
   }
 
-  productos: Producto[] = [
-    {
-      id: 1,
-      nombre: 'Doritos',
-      cantidad: 5,
-      fecha: '12/10/2021',
-      imagen: 'assets/images/placeholder.svg',
-    },
-    {
-      id: 2,
-      nombre: 'Bebida',
-      cantidad: 10,
-      fecha: '12/10/2021',
-      imagen: 'assets/images/placeholder.svg',
-    },
-    {
-      id: 3,
-      nombre: 'Bebida 2',
-      cantidad: 7,
-      fecha: '12/10/2021',
-      imagen: 'assets/images/placeholder.svg',
-    },
-  ];
 
+  productos: Producto[] = [];
+
+  obtenerProductos() : void {
+    // Llamar al servicio para obtener los productos
+    this.apiService.getListaProducto('get/lista_productos','todas', 'DESC').subscribe(
+      (response: any) => {
+        if (response.success) {
+          this.productos = response.productos; // Asignar los productos a la variable
+          console.log('Productos obtenidos:', this.productos);
+        }
+      },
+      error => {
+        console.error('Error al obtener productos:', error);
+      }
+    );
+  }
   searchQuery: string = '';
 
   get filteredProducts() {
     return this.productos.filter(producto =>
-      producto.nombre.toLowerCase().includes(this.searchQuery.toLowerCase())
+      producto.nombre_producto.toLowerCase().includes(this.searchQuery.toLowerCase())
     );
   }
 
-
-  
-
-  obtenerDatos() {
-    this.apiService.getData('')
-      .subscribe({
-        next: (data) => {
-          console.log('Datos recibidos:', data);
-          // Maneja los datos aquÃ
-        },
-        error: (err) => {
-          console.error('Error al obtener datos:', err);
-        }
-      });
-  }
 }
 

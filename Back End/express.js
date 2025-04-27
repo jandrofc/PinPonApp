@@ -34,9 +34,10 @@ app.get('/api/get/lista_productos', (req, res) => {
   const orden = req.query.orden === 'desc' ? 'DESC' : 'ASC'; // ascendente por defecto
   let query = `
     SELECT 
-      FT.nombre,
-      C.nombre,
-      FT.cantidad
+      FT.nombre as nombre_producto,
+      C.nombre as categoria,
+      FT.cantidad as cantidad,
+      FT.precio_unitario as precio
     FROM fichatecnica AS FT
     INNER JOIN producto AS P
     USING (ficha_id)

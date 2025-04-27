@@ -5,7 +5,7 @@
     min-height: 100vh;
     background-color: #f8fafc; /* bg-slate-50 */
   }
-  
+
   /* Header */
   .header {
     background-color: #4f46e5; /* bg-indigo-600 */
@@ -19,12 +19,12 @@
     z-index: 10;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   }
-  
+
   .header-title {
     font-size: 1.25rem;
     font-weight: 600;
   }
-  
+
   .icon-button {
     background: none;
     color: #4f46e5;
@@ -36,15 +36,15 @@
     justify-content: center;
     font-size: 1.5rem;
   }
-  
+
   .icon-button:hover {
     background-color: #4338ca;
   }
-  
+
   .notification-button {
     position: relative;
   }
-  
+
   .notification-dot {
     position: absolute;
     top: 0.25rem;
@@ -54,7 +54,7 @@
     background-color: #ef4444; /* bg-red-500 */
     border-radius: 9999px;
   }
-  
+
   /* Main content */
   .main-content {
     flex: 1;
@@ -62,32 +62,32 @@
     max-width: 768px;
     margin: 0 auto;
   }
-  
+
   .section-header {
     display: flex;
     align-items: center;
     margin-bottom: 1.5rem;
   }
-  
+
   .back-button {
     margin-right: 0.5rem;
     color: #4f46e5;
     background: none;
     font-size: 1.5rem;
   }
-  
+
   .section-title {
     font-size: 1.875rem;
     font-weight: 700;
     color: #4f46e5;
   }
-  
+
   /* Search */
   .search-wrapper {
     position: relative;
     margin-bottom: 1.5rem;
   }
-  
+
   .search-input {
     width: 100%;
     padding: 0.75rem 1rem 0.75rem 2.5rem;
@@ -97,12 +97,12 @@
     box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     color: black
   }
-  
+
   .search-input:focus {
     border-color: #c7d2fe;
     box-shadow: 0 0 0 3px rgba(199, 210, 254, 0.5);
   }
-  
+
   .search-icon {
     position: absolute;
     top: 50%;
@@ -110,7 +110,7 @@
     transform: translateY(-50%);
     color: #94a3b8;
   }
-  
+
   /* Product List */
   .product-list {
     background-color: white;
@@ -119,7 +119,7 @@
     box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     margin-bottom: 1.5rem;
   }
-  
+
   .product-list-header {
     display: grid;
     grid-template-columns: 6fr 3fr 3fr;
@@ -129,7 +129,7 @@
     font-weight: 500;
     text-align: center;
   }
-  
+
   .product-row {
     display: grid;
     grid-template-columns: 6fr 3fr 3fr;
@@ -137,21 +137,21 @@
     align-items: center;
     border-bottom: 1px solid #e5e7eb;
   }
-  
+
   .product-row.even {
     background-color: #eef2ff; /* bg-indigo-50 */
   }
-  
+
   .product-row.odd {
     background-color: white;
   }
-  
+
   .product-info {
     display: flex;
     align-items: center;
     gap: 0.75rem;
   }
-  
+
   .product-image-wrapper {
     height: 3rem;
     width: 3rem;
@@ -162,27 +162,27 @@
     align-items: center;
     justify-content: center;
   }
-  
+
   .product-image {
     height: 2.5rem;
     width: 2.5rem;
     object-fit: contain;
   }
-  
+
   .product-name {
     font-weight: 500;
     color: #1e293b;
   }
-  
-  .product-date {
+
+  .product-precio {
     font-size: 0.75rem;
     color: #64748b;
   }
-  
+
   .product-quantity {
     text-align: center;
   }
-  
+
   .badge {
     display: inline-block;
     padding: 0.25rem 0.75rem;
@@ -193,24 +193,24 @@
     font-size: 1rem;
     border: 1px solid #a49fe5;
   }
-  
+
   .product-edit {
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
   }
-  
+
   .edit-button:hover {
     background-color: #eef2ff;
   }
-  
+
   .no-products {
     padding: 2rem;
     text-align: center;
     color: #64748b;
   }
-  
+
   /* Add Product Button */
   .add-product-button {
     width: 100%;
@@ -226,11 +226,11 @@
     justify-content: center;
     gap: 0.5rem;
   }
-  
+
   .add-product-button:hover {
     background-color: #4338ca;
   }
-  
+
   /* Bottom Navigation */
   .bottom-nav {
     position: sticky;
@@ -239,13 +239,13 @@
     border-top: 1px solid #e2e8f0;
     box-shadow: 0 -1px 2px rgba(0,0,0,0.05);
   }
-  
+
   .bottom-nav-buttons {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     height: 4rem;
   }
-  
+
   .bottom-button {
     display: flex;
     align-items: center;
@@ -253,9 +253,8 @@
     background: none;
     border: none;
   }
-  
+
   .bottom-button:hover {
     background-color: #eef2ff;
     color: #4f46e5;
   }
-  
