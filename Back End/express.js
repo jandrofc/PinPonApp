@@ -18,7 +18,7 @@ const db = mysql.createPool({
 });
 
 // Ruta de prueba para comprobar conexión
-app.get('/test-db', (req, res) => {
+app.get('/api', (req, res) => {
   db.query('SELECT * FROM producto WHERE id = 1', (err, result) => {
     if (err) {
       console.error('Error conectando a MySQL:', err);
@@ -27,6 +27,39 @@ app.get('/test-db', (req, res) => {
     res.json({ success: true, resultado: result[0] });
   });
 });
+
+
+app.get('/api/get/lista_productos', (req, res) => {
+  const categoria = req.query.categoria || 'todas';
+  const orden = req.query.orden === 'desc' ? 'DESC' : 'ASC'; // ascendente por defecto
+  let query = `
+    SELECT 
+      FT.nombre,
+      C.nombre,
+      FT.cantidad
+    FROM fichatecnica AS FT
+    INNER JOIN producto AS P
+    USING (ficha_id)
+    INNER JOIN CATEGORIA AS C
+    USING (categoria_id)
+  `;
+  const parametros= [];
+
+  if(categoria!=='todas'){
+    query +=`WHERE C.nombre = ?`;
+    parametros.push(categoria);
+  }
+  query +=`ORDER BY FT.cantidad ${orden}`;
+  db.query(query,parametros,(err, results) => {
+      if (err) {
+        console.error('Error al obtener productos:', err);
+        return res.status(500).json({ error: 'Error al obtener productos' });
+      }
+      res.json({ success: true, productos: results });
+    }
+  );
+});
+
 
 // Arrancar el servidor
 const PORT = process.env.PORT || 3000;

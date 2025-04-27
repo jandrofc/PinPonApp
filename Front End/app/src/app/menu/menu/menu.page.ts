@@ -6,7 +6,7 @@ import { IonicModule } from '@ionic/angular';
 import { ExploreContainerComponent } from 'src/app/explore-container/explore-container.component';
 import { TabsPage } from 'src/app/tabs/tabs.page';
 import { RouterModule } from '@angular/router';
-import { ConexionBackendService} from 'src/app/services/conexion-backend.service'; // Importa la función getData desde el servicio
+
 
 @Component({
   selector: 'app-menu',
@@ -17,22 +17,9 @@ import { ConexionBackendService} from 'src/app/services/conexion-backend.service
 })
 export class MenuPage implements OnInit {
 
-  constructor(private apiService: ConexionBackendService) { }
+  constructor() { }
 
   ngOnInit() {
-    this.obtenerDatos();
-  }
-
-  obtenerDatos() {
-    this.apiService.getData('')
-      .subscribe({
-        next: (data) => {
-          console.log('Datos recibidos:', data);
-          // Maneja los datos aquÃ
-        },
-        error: (err) => {
-          console.error('Error al obtener datos:', err);
-        }
-      });
+    
   }
 }
