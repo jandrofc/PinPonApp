@@ -1,0 +1,26 @@
+ion-content, .full-screen-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Asegura que el video se ajuste al contenedor */
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+.linea {
+    position: absolute;
+    top: 50%; /* Centra la línea verticalmente */
+    left: 10%; /* Ajusta el margen izquierdo si es necesario */
+    width: 80%; /* Ajusta el ancho de la línea */
+    height: 2px; /* Grosor de la línea */
+    background-color: red; /* Color de la línea */
+}
+
+.boton-confirmar {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: block; /* Asegúrate de que el botón sea visible */
+  }

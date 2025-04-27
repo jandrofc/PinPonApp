@@ -18,9 +18,9 @@ export class BarcodeScannerService {
     this.zxingReader = new BrowserMultiFormatReader();
   }
 
-  async scanBarcode(): Promise<string | null> {
+  async scanBarcode(onResult: (value: string) => void): Promise<string | null> {
     if (Capacitor.getPlatform() === 'web') {
-      return this.scanWithZXing();
+      return this.scanWithZXing(onResult);
     } else {
       return this.scanWithMLKit();
     }
@@ -36,7 +36,7 @@ export class BarcodeScannerService {
     }
   }
 
-  private async scanWithZXing(): Promise<string | null> {
+  private async scanWithZXing(onResult: (value: string) => void): Promise<string | null> {
     try {
       const devices = await BrowserMultiFormatReader.listVideoInputDevices();
       const selectedDeviceId = devices[0]?.deviceId;
@@ -48,7 +48,8 @@ export class BarcodeScannerService {
           console.log('Obteniendo ',result,err)
           if (result) {
             const value = result.getText();
-            this.stopWebScanner(videoElement); // Detiene la cámara
+            onResult(value); // Llama a la función de callback con el resultado
+            // this.stopWebScanner(videoElement); // Detiene la cámara
             resolve(value);
           }
           if (err && err.name !== 'NotFoundException') {

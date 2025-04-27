@@ -1,6 +1,5 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/angular/standalone';
-import { ExploreContainerComponent } from '../explore-container/explore-container.component';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -17,7 +16,7 @@ export interface Producto {
   templateUrl: 'tab1.page.html',
   styleUrls: ['tab1.page.scss'],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, FormsModule, CommonModule, ExploreContainerComponent],
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, FormsModule, CommonModule],
 })
 export class Tab1Page {
   constructor() {}

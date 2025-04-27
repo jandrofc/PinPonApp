@@ -6,7 +6,11 @@
 </ion-header>
 
 <ion-content>
-  <video #video autoplay muted playsinline width="1280" height="720"></video>
+  <video #video autoplay muted playsinline class="full-screen-video"></video>
+  <div class="linea"></div>
+  <button *ngIf="botonMostrar" (click)="confirmarScan()" expand="block" class="boton-confirmar">
+    Confirmar Escaneo
+  </button>
 </ion-content>
 
 
