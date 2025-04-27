@@ -39,8 +39,8 @@
   
   /* Estilos globales para ion-toolbar */
   ion-toolbar {
-    --background: #89C2EB; /* Asegura que el color de fondo sea el deseado */
-    --ion-background-color: #89C2EB; /* Sobrescribe el color de fondo */
+    --background: #3D59C7; /* Asegura que el color de fondo sea el deseado */
+    --ion-background-color: #3D59C7; /* Sobrescribe el color de fondo */
     --ion-text-color: rgb(0, 0, 0); /* Asegura que el texto sea blanco */
     --ion-box-shadow: none; /* Elimina la sombra */
     --border-width: 0px; /* Elimina cualquier borde */
@@ -59,4 +59,8 @@
   ion-header {
     box-shadow: none !important;
     --box-shadow: none !important;
+  }
+
+  ion-title {
+    color: #ffffff; /* Color del texto del título */
   }
