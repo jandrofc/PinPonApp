@@ -22,19 +22,40 @@ export class BarcodeScannerPage implements AfterViewInit {
   @ViewChild('video', { static: false }) videoRef!: ElementRef<HTMLVideoElement>; 
   // result: string | null = null;
   // isScanning: boolean = false;  // Para controlar si estamos escaneando
-  botonMostrar: boolean = false;
+
+  // Variables para los mensajes
+  scanSuccess: boolean = false;
+  scanError: boolean = false;
+  scanDuplicate: boolean = false;
+
+  private scannedCodes: Set<string> = new Set(); // Para almacenar códigos escaneados y evitar duplicados
 
   //Detectamos en que plataforma se esta ejecutando con la funcion de capacitor
   async ngAfterViewInit(): Promise<void> {
-    if (Capacitor.getPlatform() == "web"){
+    if (Capacitor.getPlatform() == "web") {
       await this.startStreamFromWebCam();
-      await this.barcodeScannerService.scanBarcode((result) => {
-        this.botonMostrar = true; // Muestra el botón después del escaneo
-        this.cdr.detectChanges(); // Detecta cambios para actualizar la vista
+      await this.barcodeScannerService.scanBarcode(async (result) => {
+        if (result) {
+          console.log('Código escaneado:', result);
+          if (this.scannedCodes.has(result)) {
+            this.showWarningMessage(); // Código duplicado
+          } else {
+            this.scannedCodes.add(result);
+            this.showSuccessMessage(); // Escaneo exitoso
+          }
+        } else {
+          this.showErrorMessage(); // Error en el escaneo
+        }
+        await this.delay(10000);
+        this.cdr.detectChanges();
       });
     } else {
       // Ejecutar la cámara con Capacitor
     }
+  }
+
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
   
   constructor(
@@ -64,8 +85,25 @@ export class BarcodeScannerPage implements AfterViewInit {
     }
   }
 
+  private showSuccessMessage() {
+    this.scanSuccess = true;
+    this.scanError = false;
+    this.scanDuplicate = false;
+  }
+
+  private showErrorMessage() {
+    this.scanSuccess = false;
+    this.scanError = true;
+    this.scanDuplicate = false;
+  }
+
+  private showWarningMessage() {
+    this.scanSuccess = false;
+    this.scanError = false;
+    this.scanDuplicate = true;
+  }
+
   confirmarScan() {
-    console.log('Escaneo confirmado');
     this.router.navigate(['/tabs/tab1']);
   }
 
@@ -82,7 +120,6 @@ export class BarcodeScannerPage implements AfterViewInit {
   
       // Detener el escáner ZXing si es necesario
       this.barcodeScannerService.stopWebScanner(videoElement);
-      console.log('Cámara y escáner detenidos al salir de la página');
     }
   }
 }

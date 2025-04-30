@@ -7,12 +7,15 @@ import { BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
 
 // Import ZXing para web
 import { BrowserMultiFormatReader} from '@zxing/browser';
+import { IScannerControls } from '@zxing/browser';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BarcodeScannerService {
   private zxingReader: BrowserMultiFormatReader;
+  private activeScan: IScannerControls | null = null;
+
 
   constructor() {
     this.zxingReader = new BrowserMultiFormatReader();
@@ -42,33 +45,49 @@ export class BarcodeScannerService {
       const selectedDeviceId = devices[0]?.deviceId;
       if (!selectedDeviceId) throw new Error('No camera found');
   
+      const videoElement = document.getElementById('video') as HTMLVideoElement;
+  
       return new Promise((resolve, reject) => {
-        const videoElement = document.getElementById('video') as HTMLVideoElement;
-        this.zxingReader.decodeFromVideoDevice(selectedDeviceId, videoElement, (result, err) => {
-          console.log('Obteniendo ',result,err)
-          if (result) {
-            const value = result.getText();
-            onResult(value); // Llama a la función de callback con el resultado
-            // this.stopWebScanner(videoElement); // Detiene la cámara
-            resolve(value);
-          }
-          if (err && err.name !== 'NotFoundException') {
-            console.error('ZXing scan error:', err);
-            reject(err);
-          }
-        });
+        this.zxingReader
+          .decodeFromVideoDevice(selectedDeviceId, videoElement, (result, err, controls) => {
+            if (!this.activeScan && controls) {
+              this.activeScan = controls;
+            }
+  
+            if (result) {
+              const value = result.getText();
+              onResult(value);
+              resolve(value);
+            }
+  
+            if (err && err.name !== 'NotFoundException') {
+              console.error('ZXing scan error:', err);
+              reject(err);
+            }
+          });
       });
     } catch (error) {
       console.error('ZXing setup error:', error);
       return null;
     }
   }
+  
+  
 
   stopWebScanner(videoElement: HTMLVideoElement) {
     const stream = videoElement.srcObject as MediaStream;
     if (stream) {
-      stream.getTracks().forEach(track => track.stop()); // Stop all tracks
-      videoElement.srcObject = null; // Clear the video source
+      stream.getTracks().forEach(track => track.stop());
+      videoElement.srcObject = null;
     }
-  }
-}
+  
+    try {
+      if (this.activeScan) {
+        this.activeScan.stop();
+        this.activeScan = null;
+        console.log('Escáner ZXing detenido correctamente');
+      }
+    } catch (error) {
+      console.error('Error al detener el escáner ZXing:', error);
+    }
+  }}
