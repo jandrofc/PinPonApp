@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS formato_producto (
     id INT AUTO_INCREMENT PRIMARY KEY,
     producto_id INT NOT NULL,
     formato VARCHAR(100) NOT NULL,
+    cantidad INT DEFAULT 0,
     codigo_barra VARCHAR(50) NOT NULL UNIQUE,
     precio DECIMAL(10, 2) NOT NULL,
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
