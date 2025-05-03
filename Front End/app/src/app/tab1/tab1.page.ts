@@ -1,6 +1,5 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit} from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/angular/standalone';
-
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
