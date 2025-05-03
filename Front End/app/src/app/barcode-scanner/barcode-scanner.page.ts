@@ -4,8 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 
 import { BarcodeScannerService } from '../services/barcode-scanner.service';  //servicio de scnaeo
-import { ElementRef,ViewChild } from '@angular/core'; //obtener informacion de los elementos
+import { ElementRef,ViewChild, ChangeDetectorRef } from '@angular/core'; //obtener informacion de los elementos
 import { Capacitor } from '@capacitor/core';  //conocer donde se esta ejecutando
+import { Router } from '@angular/router'; //navegacion entre paginas
+
 @Component({
   selector: 'app-barcode-scanner',
   templateUrl: './barcode-scanner.page.html',
@@ -21,18 +23,46 @@ export class BarcodeScannerPage implements AfterViewInit {
   // result: string | null = null;
   // isScanning: boolean = false;  // Para controlar si estamos escaneando
 
+  // Variables para los mensajes
+  scanSuccess: boolean = false;
+  scanError: boolean = false;
+  scanDuplicate: boolean = false;
+
+  private scannedCodes: Set<string> = new Set(); // Para almacenar códigos escaneados y evitar duplicados
+
   //Detectamos en que plataforma se esta ejecutando con la funcion de capacitor
   async ngAfterViewInit(): Promise<void> {
-    if (Capacitor.getPlatform() == "web"){
-      await this.startStreamFromWebCam()
-      this.barcodeScannerService.scanBarcode()
-    } else{
-      //ejecutar la camara con capacitor
+    if (Capacitor.getPlatform() == "web") {
+      await this.startStreamFromWebCam();
+      await this.barcodeScannerService.scanBarcode(async (result) => {
+        if (result) {
+          console.log('Código escaneado:', result);
+          if (this.scannedCodes.has(result)) {
+            this.showWarningMessage(); // Código duplicado
+          } else {
+            this.scannedCodes.add(result);
+            this.showSuccessMessage(); // Escaneo exitoso
+          }
+        } else {
+          this.showErrorMessage(); // Error en el escaneo
+        }
+        await this.delay(10000);
+        this.cdr.detectChanges();
+      });
+    } else {
+      // Ejecutar la cámara con Capacitor
     }
-    
+  }
+
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
   
-  constructor(private barcodeScannerService: BarcodeScannerService) {}
+  constructor(
+    private barcodeScannerService: BarcodeScannerService,
+    private cdr: ChangeDetectorRef,
+    private router: Router
+  ) {}
   
   //Le entregamos el link de referencia a la tag img del html leyendo su interior
   async startStreamFromWebCam() {
@@ -55,10 +85,44 @@ export class BarcodeScannerPage implements AfterViewInit {
     }
   }
 
+  private showSuccessMessage() {
+    this.scanSuccess = true;
+    this.scanError = false;
+    this.scanDuplicate = false;
+  }
+
+  private showErrorMessage() {
+    this.scanSuccess = false;
+    this.scanError = true;
+    this.scanDuplicate = false;
+  }
+
+  private showWarningMessage() {
+    this.scanSuccess = false;
+    this.scanError = false;
+    this.scanDuplicate = true;
+  }
+
+  confirmarScan() {
+    this.router.navigate(['/tabs/tab1']);
+  }
 
 
-
-
+  ionViewWillLeave(): void {
+    if (this.videoRef && this.videoRef.nativeElement) {
+      const videoElement = this.videoRef.nativeElement;
+      const stream = videoElement.srcObject as MediaStream;
+  
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop()); // Detener todos los tracks de la cámara
+        videoElement.srcObject = null; // Limpiar el video source
+      }
+  
+      // Detener el escáner ZXing si es necesario
+      this.barcodeScannerService.stopWebScanner(videoElement);
+    }
+  }
+}
 
   // Método para iniciar el escaneo
   // async startScan() {
@@ -83,4 +147,4 @@ export class BarcodeScannerPage implements AfterViewInit {
   // }
 
   
-}
+

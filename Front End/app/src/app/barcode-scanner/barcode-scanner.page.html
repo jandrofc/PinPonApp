@@ -1,12 +1,32 @@
 <!-- src/app/scan/scan.page.html -->
 <ion-header>
   <ion-toolbar>
-    <ion-title>Escanear Código de Barras</ion-title>
+    <ion-title>Escaneo Código QR</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <video #video autoplay muted playsinline width="1280" height="720"></video>
+  <video #video ID="video" autoplay muted playsinline class="full-screen-video"></video>
+
+  <div id="message-container">
+    <!-- Mensaje de éxito -->
+    <div class="messageSuccess" *ngIf="scanSuccess">
+      Código escaneado correctamente.
+    </div>
+    <!-- Mensaje de error -->
+    <div class="messageError" *ngIf="scanError">
+      Error al escanear el código. Inténtalo de nuevo.
+    </div>
+    <!-- Mensaje de código ya escaneado -->
+    <div class="messageWarning" *ngIf="scanDuplicate">
+      Este código ya fue escaneado.
+    </div>
+  </div>
+
+  <div class="linea"></div>
+  <button (click)="confirmarScan()" expand="block" class="boton-confirmar">
+    Confirmar Escaneo
+  </button>
 </ion-content>
 
 
