@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS formato_producto (
     formato VARCHAR(100) NOT NULL,
     cantidad INT DEFAULT 0,
     codigo_barra VARCHAR(50) NOT NULL UNIQUE,
-    precio DECIMAL(10, 2) NOT NULL,
+    precio INT NOT NULL,
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     fecha_actualizado TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (producto_id) REFERENCES producto(id) ON DELETE CASCADE
