@@ -1,87 +1,21 @@
-<<<<<<< HEAD
-CREATE TABLE ficha_tecnica (
-    ficha_id         INTEGER NOT NULL,
-    sku              VARCHAR2(50) NOT NULL,
-    nombre           VARCHAR2(100) NOT NULL,
-    descripcion      CLOB,
-    precio_unitario  NUMBER NOT NULL
-);
+-- Crear tabla de productos (genéricos)
+CREATE TABLE IF NOT EXISTS producto (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    producto VARCHAR(255) NOT NULL,
+    marca VARCHAR(255) NOT NULL,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizado TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
-ALTER TABLE ficha_tecnica ADD CONSTRAINT ficha_tecnica_pk PRIMARY KEY ( ficha_id );
-
-CREATE TABLE producto (
-    id                      INTEGER NOT NULL,
-    producto_id             INTEGER NOT NULL,
-    ficha_id                INTEGER NOT NULL,
-    codigo_barras           VARCHAR2(100),
-    fecha_ingreso           DATE NOT NULL,
-    ficha_tecnica_ficha_id  INTEGER NOT NULL
-);
-
-ALTER TABLE producto ADD CONSTRAINT producto_pk PRIMARY KEY ( id );
-
-CREATE TABLE transaccion (
-    trans_id         INTEGER NOT NULL,
-    producto_id      INTEGER NOT NULL,
-    fecha_trans      DATE NOT NULL,
-    tipo             VARCHAR2(50) NOT NULL,
-    cantidad         INTEGER NOT NULL,
-    precio_unitario  NUMBER NOT NULL,
-    usuario          VARCHAR2(50) NOT NULL,
-    producto_id2     INTEGER NOT NULL
-);
-
-ALTER TABLE transaccion ADD CONSTRAINT transaccion_pk PRIMARY KEY ( trans_id,
-                                                                    producto_id2 );
-
-ALTER TABLE producto
-    ADD CONSTRAINT producto_ficha_tecnica_fk FOREIGN KEY ( ficha_tecnica_ficha_id )
-        REFERENCES ficha_tecnica ( ficha_id );
-
-ALTER TABLE transaccion
-    ADD CONSTRAINT transaccion_producto_fk FOREIGN KEY ( producto_id2 )
-        REFERENCES producto ( id );
-=======
-CREATE TABLE ficha_tecnica (
-    ficha_id         INTEGER NOT NULL,
-    sku              VARCHAR2(50) NOT NULL,
-    nombre           VARCHAR2(100) NOT NULL,
-    descripcion      CLOB,
-    precio_unitario  NUMBER NOT NULL
-);
-
-ALTER TABLE ficha_tecnica ADD CONSTRAINT ficha_tecnica_pk PRIMARY KEY ( ficha_id );
-
-CREATE TABLE producto (
-    id                      INTEGER NOT NULL,
-    producto_id             INTEGER NOT NULL,
-    ficha_id                INTEGER NOT NULL,
-    codigo_barras           VARCHAR2(100),
-    fecha_ingreso           DATE NOT NULL,
-    ficha_tecnica_ficha_id  INTEGER NOT NULL
-);
-
-ALTER TABLE producto ADD CONSTRAINT producto_pk PRIMARY KEY ( id );
-
-CREATE TABLE transaccion (
-    trans_id         INTEGER NOT NULL,
-    producto_id      INTEGER NOT NULL,
-    fecha_trans      DATE NOT NULL,
-    tipo             VARCHAR2(50) NOT NULL,
-    cantidad         INTEGER NOT NULL,
-    precio_unitario  NUMBER NOT NULL,
-    usuario          VARCHAR2(50) NOT NULL,
-    producto_id2     INTEGER NOT NULL
-);
-
-ALTER TABLE transaccion ADD CONSTRAINT transaccion_pk PRIMARY KEY ( trans_id,
-                                                                    producto_id2 );
-
-ALTER TABLE producto
-    ADD CONSTRAINT producto_ficha_tecnica_fk FOREIGN KEY ( ficha_tecnica_ficha_id )
-        REFERENCES ficha_tecnica ( ficha_id );
-
-ALTER TABLE transaccion
-    ADD CONSTRAINT transaccion_producto_fk FOREIGN KEY ( producto_id2 )
-        REFERENCES producto ( id );
->>>>>>> bdf2866af614f5477ab527297d0ffac5c74a69a1
+-- Crear tabla de variantes de productos (formato específico con código de barras)
+CREATE TABLE IF NOT EXISTS formato_producto (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    producto_id INT NOT NULL,
+    formato VARCHAR(100) NOT NULL,
+    cantidad INT DEFAULT 0,
+    codigo_barra VARCHAR(50) NOT NULL UNIQUE,
+    precio INT NOT NULL,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizado TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (producto_id) REFERENCES producto(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;

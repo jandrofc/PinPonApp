@@ -1,7 +1,11 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit} from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/angular/standalone';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+
+
+
+import { ConexionBackendService} from 'src/app/services/conexion-backend.service';
 
 export interface Producto {
   id: number;
@@ -18,8 +22,14 @@ export interface Producto {
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [IonHeader, IonToolbar, IonTitle, IonContent, FormsModule, CommonModule],
 })
-export class Tab1Page {
-  constructor() {}
+export class Tab1Page implements OnInit{
+  constructor(private apiService: ConexionBackendService) {}
+
+
+  ngOnInit() {
+    this.obtenerDatos();
+  }
+
   productos: Producto[] = [
     {
       id: 1,
@@ -50,6 +60,22 @@ export class Tab1Page {
     return this.productos.filter(producto =>
       producto.nombre.toLowerCase().includes(this.searchQuery.toLowerCase())
     );
+  }
+
+
+  
+
+  obtenerDatos() {
+    this.apiService.getData('')
+      .subscribe({
+        next: (data) => {
+          console.log('Datos recibidos:', data);
+          // Maneja los datos aquÃ
+        },
+        error: (err) => {
+          console.error('Error al obtener datos:', err);
+        }
+      });
   }
 }
 
