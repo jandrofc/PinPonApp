@@ -101,6 +101,7 @@ app.post('/api/post/producto', (request, response) => {
   });
 });
 
+
 app.post('/api/post/formato',(request,response)=>{
   const {producto_id,formato,cantidad,codigo_barra,precio}  = request.body;
   if (!producto_id){
