@@ -6,12 +6,19 @@ import { ActivatedRoute, Router } from '@angular/router'; //navegacion entre pag
 
 
 import { ConexionBackendService} from 'src/app/services/conexion-backend.service';
+import { IonicModule } from '@ionic/angular';
 
 export interface Producto {
+  id_formato:  number;
+  producto_id: number;
   nombre_producto: string;
-  categoria: string;
+  formato: string;
+  marca: string;
   cantidad: string;
   precio: string;
+  codigo: string;
+  fecha_creacion: string;
+  fecha_actualizacion: string;
   imagen: string;
 }
 
@@ -20,7 +27,7 @@ export interface Producto {
   templateUrl: 'tab1.page.html',
   styleUrls: ['tab1.page.scss'],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, FormsModule, CommonModule],
+  imports: [    FormsModule, CommonModule,IonicModule],
 })
 export class Tab1Page implements OnInit{
   constructor(
@@ -33,12 +40,27 @@ export class Tab1Page implements OnInit{
     this.obtenerProductos();
   }
 
-
+  modoEdicion: boolean = false;
   productos: Producto[] = [];
+
+  productoSeleccionado: Producto = {
+  id_formato: 0,
+  producto_id: 0,
+  nombre_producto: '',
+  formato: '',
+  marca: '',
+  cantidad: '',
+  precio: '',
+  codigo: '',
+  fecha_creacion: '',
+  fecha_actualizacion: '',
+  imagen: '',
+};
+  searchQuery: string = '';
 
   obtenerProductos() : void {
     // Llamar al servicio para obtener los productos
-    this.apiService.getListaProducto('get/lista_productos','todas', 'DESC').subscribe(
+    this.apiService.getListaProducto('get/lista_productos','desc').subscribe(
       (response: any) => {
         if (response.success) {
           this.productos = response.productos; // Asignar los productos a la variable
@@ -50,7 +72,6 @@ export class Tab1Page implements OnInit{
       }
     );
   }
-  searchQuery: string = '';
 
   get filteredProducts() {
     return this.productos.filter(producto =>
@@ -71,5 +92,37 @@ export class Tab1Page implements OnInit{
 
   }
 
+  activarEdicion(producto: Producto) {
+    this.productoSeleccionado = { ...producto }; // Clonar el producto para evitar modificarlo directamente
+    this.modoEdicion = true; // Activa el modo de edición
+  }
+
+  guardarCambios() {
+    if (!this.productoSeleccionado) return;
+
+    // Llamamos al PUT
+    this.apiService.putData('put/formato', this.productoSeleccionado)
+      .subscribe({
+        next: (res: any) => {
+          if (res.success) {
+            // Opción A: volver a cargar lista desde el back
+            this.obtenerProductos();
+            // Opción B: actualizar sólo localmente:
+             const idx = this.productos.findIndex(p => p.id_formato === this.productoSeleccionado.id_formato);
+            if (idx > -1) this.productos[idx] = { ...this.productoSeleccionado };
+
+            this.modoEdicion = false;
+            console.log('Formato actualizado correctamente');
+          }
+        },
+        error: err => {
+          console.error('Error al actualizar formato:', err);
+        }
+      });
+  }
+
+  cancelarEdicion() {
+    this.modoEdicion = false; // Cancela la edición y vuelve a la lista
+  }
 }
 

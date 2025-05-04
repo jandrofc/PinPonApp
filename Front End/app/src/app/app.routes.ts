@@ -33,5 +33,4 @@ export const routes: Routes = [
       },
     ],
   }
-
 ];

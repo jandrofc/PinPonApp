@@ -8,15 +8,15 @@ import { Observable , catchError, throwError } from 'rxjs';
 export class ConexionBackendService {
 
   // Mejor práctica: Considera usar environment variables para la URL
-  private apiUrl = 'http://localhost:3000/api/';
+  private apiUrl = 'https://localhost:3000/api/';
 
   constructor(private http: HttpClient) { }
 
   // Método GET genérico
-  getListaProducto(endponit: string = "",categoria: string = 'todas', orden: string = 'asc'): Observable<any> {
+  getListaProducto(endponit: string = "", orden: string = 'asc'): Observable<any> {
     // Construir la URL completa
     const url = `${this.apiUrl}${endponit}`; // URL del endpoint
-    const params = { categoria, orden }; // Parámetros de consulta
+    const params = {   orden }; // Parámetros de consulta
     return this.http.get(url, { params }).pipe(
     );
   }
@@ -26,6 +26,12 @@ export class ConexionBackendService {
     return this.http.post(`${this.apiUrl}${endpoint}`, data).pipe(
       catchError(this.handleError)
     );
+  }
+
+   // Método PUT genérico
+   putData(endpoint: string, data: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}${endpoint}`, data)
+      .pipe(catchError(this.handleError));
   }
 
   // Manejo de errores

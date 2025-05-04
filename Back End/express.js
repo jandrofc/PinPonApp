@@ -36,7 +36,7 @@ app.get('/api/get/lista_productos', (request, response) => {
   let query= `SELECT 
                     FP.id AS id_formato,
                     FP.producto_id,
-                    P.producto,
+                    P.producto AS nombre_producto,
                     FP.formato,
                     P.marca,
                     FP.cantidad,
@@ -135,6 +135,60 @@ app.post('/api/post/formato',(request,response)=>{
   });
 });
 
+//Para actualizar los datos del producto
+app.put('/api/put/formato', (req, res) => {
+  const {
+    id_formato,
+    producto_id,
+    nombre_producto,  // <-- nombre que quieres dejar en producto.producto
+    formato,
+    cantidad,
+    codigo_barra,
+    precio
+  } = req.body;
+
+  if (!id_formato) {
+    return res.status(400).json({ error: 'Falta el id_formato' });
+  }
+
+  const updateQuery = `
+    UPDATE formato_producto AS fp
+    JOIN producto AS p
+      ON fp.producto_id = p.id
+    SET
+      fp.producto_id       = ?,
+      fp.formato           = ?,
+      fp.cantidad          = ?,
+      fp.codigo_barra      = ?,
+      fp.precio            = ?,
+      fp.fecha_actualizado = NOW(),
+      p.producto           = ?
+    WHERE fp.id = ?
+  `;
+
+  const params = [
+    producto_id,
+    formato,
+    cantidad,
+    codigo_barra,
+    precio,
+    nombre_producto,
+    id_formato
+  ];
+
+  db.query(updateQuery, params, (err, result) => {
+    if (err) {
+      console.error('Error al actualizar:', err);
+      return res
+        .status(500)
+        .json({ error: 'Error al actualizar formato y producto', consoleErr: err });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Formato o producto no encontrado' });
+    }
+    res.json({ success: true, message: 'Formato y nombre de producto actualizados correctamente' });
+  });
+});
 
 // Middleware para manejar rutas no definidas
 app.use((req, res) => {
