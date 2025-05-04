@@ -57,6 +57,19 @@ export class Tab1Page implements OnInit{
       producto.nombre_producto.toLowerCase().includes(this.searchQuery.toLowerCase())
     );
   }
+  escanear_Productos_Nuevos(){
+
+
+    this.router.navigate(['/barcode-scanner'], {
+
+
+      queryParams: { modo: 'Agregar Producto', routingbefore: '/tabs/tab1' }
+
+
+    });
+
+
+  }
 
 }
 

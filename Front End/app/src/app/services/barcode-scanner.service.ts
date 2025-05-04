@@ -72,8 +72,6 @@ export class BarcodeScannerService {
     }
   }
   
-  
-
   stopWebScanner(videoElement: HTMLVideoElement) {
     const stream = videoElement.srcObject as MediaStream;
     if (stream) {
@@ -90,4 +88,23 @@ export class BarcodeScannerService {
     } catch (error) {
       console.error('Error al detener el escáner ZXing:', error);
     }
-  }}
+  }
+  async restartWebScanner(videoElement: HTMLVideoElement): Promise<void> {
+  try {
+    // Accede a la cámara
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+
+    // Asigna el stream al elemento <video>
+    videoElement.srcObject = stream;
+    videoElement.play(); // Inicia la reproducción del video
+    console.log('Stream de la cámara iniciado correctamente');
+  } catch (error) {
+    console.error('Error al reiniciar el stream de la cámara:', error);
+  }
+}
+
+
+
+}
+  
+  
