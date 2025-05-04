@@ -90,10 +90,10 @@
         placeholder="Buscar producto..."
       ></ion-searchbar>
 
-      <button *ngIf="!modoEdicion" class="add-product-button">
+      <button *ngIf="!modoEdicion" class="add-product-button" (click)="escanear_Productos_Nuevos()">
         <ion-icon name="add"></ion-icon>
         Agregar Productos / Buscar por BARRAS
-      </button>
+      </button>  
       <br>
 
       <!-- Encabezado de la tabla -->

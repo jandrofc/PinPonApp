@@ -32,9 +32,5 @@ export const routes: Routes = [
         pathMatch: 'full',
       },
     ],
-  },  {
-    path: 'editar',
-    loadComponent: () => import('./formularios/editar/editar.page').then( m => m.EditarPage)
-  },
-
+  }
 ];

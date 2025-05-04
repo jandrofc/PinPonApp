@@ -44,6 +44,7 @@ ion-content, .full-screen-video {
   width: 90%;
   z-index: 100;
   text-align: center;
+  pointer-events: none;
 }
   
   /* Estilo para mensajes de éxito */
@@ -75,3 +76,53 @@ ion-content, .full-screen-video {
   margin-bottom: 20px;
   border-radius: 5px;
 }
+//gpt
+
+
+
+.message {
+  padding: 10px 20px;
+  border-radius: 5px;
+  margin: 10px auto;
+  color: white;
+  width: fit-content;
+  transition: opacity 0.6s ease-in-out;
+  opacity: 0;
+}
+
+.visible {
+  opacity: 1;
+}
+
+.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.messageSuccess {
+  background-color: #28a745;
+}
+
+.messageError {
+  background-color: #dc3545;
+}
+
+.messageWarning {
+  background-color: #ffc107;
+  color: black;
+}
+
+//vercel
+// Estilos opcionales para tu formulario
+ion-item {
+  --padding-start: 0;
+  margin-bottom: 8px;
+}
+
+ion-text[color="danger"] {
+  font-size: 12px;
+  display: block;
+  margin-bottom: 16px;
+}
+
+
