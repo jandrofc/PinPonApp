@@ -221,12 +221,30 @@ app.use((req, res) => {
 
 const https = require('https');
 const fs = require('fs');
+const os = require('os');
 
 const options = {
   key: fs.readFileSync('firma_openssl/key.pem'),
   cert: fs.readFileSync('firma_openssl/cert.pem')
 };
 
-https.createServer(options, app).listen(3000, () => {
-  console.log('Servidor escuchando en https://localhost:3000');
+function getIPv4Address() {
+  const networkInterfaces = os.networkInterfaces();
+
+  for (const interfaceName in networkInterfaces) {
+    const interfaces = networkInterfaces[interfaceName];
+
+    for (const iface of interfaces) {
+      if (iface.family === 'IPv4' && !iface.internal) {
+        return iface.address;
+      }
+    }
+  }
+
+  return 'No se encontró una dirección IPv4';
+}
+
+const ipv4Address = getIPv4Address();
+https.createServer(options, app).listen(3000, '0.0.0.0', () => {
+  console.log(`Servidor escuchando en https://${getIPv4Address()}:3000`);
 });
