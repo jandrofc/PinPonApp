@@ -1,14 +1,17 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit} from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/angular/standalone';
-import { ExploreContainerComponent } from '../explore-container/explore-container.component';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router'; //navegacion entre paginas
+
+
+import { ConexionBackendService} from 'src/app/services/conexion-backend.service';
 
 export interface Producto {
-  id: number;
-  nombre: string;
-  cantidad: number;
-  fecha: string;
+  nombre_producto: string;
+  categoria: string;
+  cantidad: string;
+  precio: string;
   imagen: string;
 }
 
@@ -17,40 +20,56 @@ export interface Producto {
   templateUrl: 'tab1.page.html',
   styleUrls: ['tab1.page.scss'],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, FormsModule, CommonModule, ExploreContainerComponent],
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, FormsModule, CommonModule],
 })
-export class Tab1Page {
-  constructor() {}
-  productos: Producto[] = [
-    {
-      id: 1,
-      nombre: 'Doritos',
-      cantidad: 5,
-      fecha: '12/10/2021',
-      imagen: 'assets/images/placeholder.svg',
-    },
-    {
-      id: 2,
-      nombre: 'Bebida',
-      cantidad: 10,
-      fecha: '12/10/2021',
-      imagen: 'assets/images/placeholder.svg',
-    },
-    {
-      id: 3,
-      nombre: 'Bebida 2',
-      cantidad: 7,
-      fecha: '12/10/2021',
-      imagen: 'assets/images/placeholder.svg',
-    },
-  ];
+export class Tab1Page implements OnInit{
+  constructor(
+    private apiService: ConexionBackendService,
+    private router: Router,
+    private params: ActivatedRoute) {}
 
+
+  ngOnInit() {
+    this.obtenerProductos();
+  }
+
+
+  productos: Producto[] = [];
+
+  obtenerProductos() : void {
+    // Llamar al servicio para obtener los productos
+    this.apiService.getListaProducto('get/lista_productos','todas', 'DESC').subscribe(
+      (response: any) => {
+        if (response.success) {
+          this.productos = response.productos; // Asignar los productos a la variable
+          console.log('Productos obtenidos:', this.productos);
+        }
+      },
+      error => {
+        console.error('Error al obtener productos:', error);
+      }
+    );
+  }
   searchQuery: string = '';
 
   get filteredProducts() {
     return this.productos.filter(producto =>
-      producto.nombre.toLowerCase().includes(this.searchQuery.toLowerCase())
+      producto.nombre_producto.toLowerCase().includes(this.searchQuery.toLowerCase())
     );
   }
+  escanear_Productos_Nuevos(){
+
+
+    this.router.navigate(['/barcode-scanner'], {
+
+
+      queryParams: { modo: 'Agregar Producto', routingbefore: '/tabs/tab1' }
+
+
+    });
+
+
+  }
+
 }
 

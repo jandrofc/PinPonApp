@@ -41,11 +41,11 @@
         >
           <div class="product-info">
             <div class="product-image-wrapper">
-              <img [src]="producto.imagen" [alt]="producto.nombre" class="product-image" />
+              <img [src]="producto.imagen" [alt]="producto.nombre_producto" class="product-image" />
             </div>
             <div class="product-text">
-              <p class="product-name">{{ producto.nombre }}</p>
-              <p class="product-date">{{ producto.fecha }}</p>
+              <p class="product-name">{{ producto.nombre_producto }}</p>
+              <p class="product-precio"> $:{{ producto.precio }}</p>
             </div>
           </div>
           <div class="product-quantity">
@@ -65,7 +65,7 @@
     </div>
 
     <!-- Add Product Button -->
-    <button class="add-product-button">
+    <button class="add-product-button" (click)="escanear_Productos_Nuevos()">
       <ion-icon name="add"></ion-icon>
       Agregar Productos / Buscar por BARRAS
     </button>
