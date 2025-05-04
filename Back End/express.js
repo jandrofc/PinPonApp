@@ -36,7 +36,7 @@ app.get('/api/get/lista_productos', (request, response) => {
   let query= `SELECT 
                     FP.id AS id_formato,
                     FP.producto_id,
-                    P.producto,
+                    P.producto AS nombre_producto,
                     FP.formato,
                     P.marca,
                     FP.cantidad,

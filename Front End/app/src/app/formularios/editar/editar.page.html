@@ -1,0 +1,50 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Editar Producto</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <form (ngSubmit)="guardarCambios()">
+    <ion-list>
+      <!-- Nombre del producto -->
+      <ion-item>
+        <ion-label position="stacked">Nombre del Producto</ion-label>
+        <ion-input [(ngModel)]="producto.nombre_producto" name="nombre_producto" required></ion-input>
+      </ion-item>
+
+      <!-- Categoría -->
+      <ion-item>
+        <ion-label position="stacked">Categoría</ion-label>
+        <ion-input [(ngModel)]="producto.marca" name="categoria" required></ion-input>
+      </ion-item>
+
+      <!-- Cantidad -->
+      <ion-item>
+        <ion-label position="stacked">Cantidad</ion-label>
+        <ion-input type="number" [(ngModel)]="producto.cantidad" name="cantidad" required></ion-input>
+      </ion-item>
+
+      <!-- Precio -->
+      <ion-item>
+        <ion-label position="stacked">Precio</ion-label>
+        <ion-input type="number" [(ngModel)]="producto.precio" name="precio" required></ion-input>
+      </ion-item>
+
+      <!-- formato -->
+      <ion-item>
+        <ion-label position="stacked">Categoría</ion-label>
+        <ion-input [(ngModel)]="producto.formato" name="formato" required></ion-input>
+      </ion-item>
+
+      <!-- Imagen -->
+      <ion-item>
+        <ion-label position="stacked">URL de la Imagen</ion-label>
+        <ion-input [(ngModel)]="producto.imagen" name="imagen"></ion-input>
+      </ion-item>
+    </ion-list>
+
+    <!-- Botón para guardar cambios -->
+    <ion-button expand="block" type="submit">Guardar Cambios</ion-button>
+  </form>
+</ion-content>
