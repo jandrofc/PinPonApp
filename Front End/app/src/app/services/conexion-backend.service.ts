@@ -8,14 +8,16 @@ import { Observable , catchError, throwError } from 'rxjs';
 export class ConexionBackendService {
 
   // Mejor práctica: Considera usar environment variables para la URL
-  private apiUrl = 'http://localhost:3000/test-db/';
+  private apiUrl = 'https://localhost:3000/api/';
 
   constructor(private http: HttpClient) { }
 
   // Método GET genérico
-  getData(endpoint: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}${endpoint}`).pipe(
-      catchError(this.handleError)
+  getListaProducto(endponit: string = "", orden: string = 'asc'): Observable<any> {
+    // Construir la URL completa
+    const url = `${this.apiUrl}${endponit}`; // URL del endpoint
+    const params = {   orden }; // Parámetros de consulta
+    return this.http.get(url, { params }).pipe(
     );
   }
 

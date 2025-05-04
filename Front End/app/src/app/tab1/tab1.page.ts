@@ -8,10 +8,16 @@ import { CommonModule } from '@angular/common';
 import { ConexionBackendService} from 'src/app/services/conexion-backend.service';
 
 export interface Producto {
-  id: number;
-  nombre: string;
-  cantidad: number;
-  fecha: string;
+  id:  number;
+  producto_id: number;
+  nombre_producto: string;
+  formato: string;
+  marca: string;
+  cantidad: string;
+  precio: string;
+  codigo: string;
+  fecha_creacion: string;
+  fecha_actualizacion: string;
   imagen: string;
 }
 
@@ -27,55 +33,65 @@ export class Tab1Page implements OnInit{
 
 
   ngOnInit() {
-    this.obtenerDatos();
+    this.obtenerProductos();
   }
 
-  productos: Producto[] = [
-    {
-      id: 1,
-      nombre: 'Doritos',
-      cantidad: 5,
-      fecha: '12/10/2021',
-      imagen: 'assets/images/placeholder.svg',
-    },
-    {
-      id: 2,
-      nombre: 'Bebida',
-      cantidad: 10,
-      fecha: '12/10/2021',
-      imagen: 'assets/images/placeholder.svg',
-    },
-    {
-      id: 3,
-      nombre: 'Bebida 2',
-      cantidad: 7,
-      fecha: '12/10/2021',
-      imagen: 'assets/images/placeholder.svg',
-    },
-  ];
-
+  modoEdicion: boolean = false;
+  productos: Producto[] = [];
+  productoSeleccionado: Producto = {
+  id: 0,
+  producto_id: 0,
+  nombre_producto: '',
+  formato: '',
+  marca: '',
+  cantidad: '',
+  precio: '',
+  codigo: '',
+  fecha_creacion: '',
+  fecha_actualizacion: '',
+  imagen: '',
+};
   searchQuery: string = '';
 
-  get filteredProducts() {
-    return this.productos.filter(producto =>
-      producto.nombre.toLowerCase().includes(this.searchQuery.toLowerCase())
+  obtenerProductos() : void {
+    // Llamar al servicio para obtener los productos
+    this.apiService.getListaProducto('get/lista_productos','desc').subscribe(
+      (response: any) => {
+        if (response.success) {
+          this.productos = response.productos; // Asignar los productos a la variable
+          console.log('Productos obtenidos:', this.productos);
+        }
+      },
+      error => {
+        console.error('Error al obtener productos:', error);
+      }
     );
   }
 
+  get filteredProducts() {
+    return this.productos.filter(producto =>
+      producto.nombre_producto.toLowerCase().includes(this.searchQuery.toLowerCase())
+    );
+  }
 
-  
+  activarEdicion(producto: Producto) {
+    this.productoSeleccionado = { ...producto }; // Clonar el producto para evitar modificarlo directamente
+    this.modoEdicion = true; // Activa el modo de edición
+  }
 
-  obtenerDatos() {
-    this.apiService.getData('')
-      .subscribe({
-        next: (data) => {
-          console.log('Datos recibidos:', data);
-          // Maneja los datos aquÃ
-        },
-        error: (err) => {
-          console.error('Error al obtener datos:', err);
-        }
-      });
+  guardarCambios() {
+    if (this.productoSeleccionado) {
+      const index = this.productos.findIndex((p) => p.id === this.productoSeleccionado?.id);
+      if (index !== -1) {
+        this.productos[index] = { ...this.productoSeleccionado }; // Actualizar el producto en la lista
+      }
+    }
+    this.modoEdicion = false; // Vuelve a la lista de productos
+    console.log('Cambios guardados:', this.productos);
+  }
+
+  cancelarEdicion() {
+    this.modoEdicion = false; // Cancela la edición y vuelve a la lista
   }
 }
 
