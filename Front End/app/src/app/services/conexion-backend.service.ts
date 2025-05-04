@@ -28,6 +28,12 @@ export class ConexionBackendService {
     );
   }
 
+   // Método PUT genérico
+   putData(endpoint: string, data: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}${endpoint}`, data)
+      .pipe(catchError(this.handleError));
+  }
+
   // Manejo de errores
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'Error desconocido';
