@@ -2,7 +2,7 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit} from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/angular/standalone';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-
+import { ActivatedRoute, Router } from '@angular/router'; //navegacion entre paginas
 
 
 import { ConexionBackendService} from 'src/app/services/conexion-backend.service';
@@ -23,7 +23,10 @@ export interface Producto {
   imports: [IonHeader, IonToolbar, IonTitle, IonContent, FormsModule, CommonModule],
 })
 export class Tab1Page implements OnInit{
-  constructor(private apiService: ConexionBackendService) {}
+  constructor(
+    private apiService: ConexionBackendService,
+    private router: Router,
+    private params: ActivatedRoute) {}
 
 
   ngOnInit() {
@@ -76,6 +79,12 @@ export class Tab1Page implements OnInit{
           console.error('Error al obtener datos:', err);
         }
       });
+  }
+  
+  escanear_Productos_Nuevos(){
+    this.router.navigate(['/barcode-scanner'], {
+      queryParams: { modo: 'Agregar Producto', routingbefore: '/tabs/tab1' }
+    });
   }
 }
 

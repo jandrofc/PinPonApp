@@ -6,7 +6,16 @@ import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/stan
 import { BarcodeScannerService } from '../services/barcode-scanner.service';  //servicio de scnaeo
 import { ElementRef,ViewChild, ChangeDetectorRef } from '@angular/core'; //obtener informacion de los elementos
 import { Capacitor } from '@capacitor/core';  //conocer donde se esta ejecutando
-import { Router } from '@angular/router'; //navegacion entre paginas
+import { ActivatedRoute, Router } from '@angular/router'; //navegacion entre paginas
+
+
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+
+//indica el estado del page del escaneo
+enum ScanState {
+  Scanning,
+  FillingForm
+}
 
 @Component({
   selector: 'app-barcode-scanner',
@@ -15,7 +24,28 @@ import { Router } from '@angular/router'; //navegacion entre paginas
   standalone: true,
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule]
 })
-export class BarcodeScannerPage implements AfterViewInit {
+export class BarcodeScannerPage implements AfterViewInit, OnInit {
+
+  public ScanState = ScanState;
+  scanState: ScanState = ScanState.Scanning;
+  
+  
+
+
+
+  //parametros
+  routingbefore: string | null=null;
+  
+  //Agregar producto a la bd
+  //Buscar producto por id en la bd
+  //Agregar producto a boleta
+  modo: string | null=null;
+
+  tiempo_mensaje = 3000;
+
+
+  scannedCode: string | null=null;
+
 
 
   //Para leer el html y darle el link de la camara virtual
@@ -30,6 +60,18 @@ export class BarcodeScannerPage implements AfterViewInit {
 
   private scannedCodes: Set<string> = new Set(); // Para almacenar códigos escaneados y evitar duplicados
 
+  ngOnInit(): void{
+    this.params.queryParams.subscribe(params => {
+      this.modo = params['modo'] || null;
+      this.routingbefore = params['routingbefore'] || null;
+
+      console.log('Modo:', this.modo);
+      console.log('routingbefore:', this.routingbefore);
+    });
+  }
+
+
+  
   //Detectamos en que plataforma se esta ejecutando con la funcion de capacitor
   async ngAfterViewInit(): Promise<void> {
     if (Capacitor.getPlatform() == "web") {
@@ -40,13 +82,17 @@ export class BarcodeScannerPage implements AfterViewInit {
           if (this.scannedCodes.has(result)) {
             this.showWarningMessage(); // Código duplicado
           } else {
+            this.ionViewWillLeave();
             this.scannedCodes.add(result);
+            this.scannedCode = result;
+            this.scanState = ScanState.FillingForm;
+            this.stopScanner()
             this.showSuccessMessage(); // Escaneo exitoso
+            
           }
         } else {
           this.showErrorMessage(); // Error en el escaneo
         }
-        await this.delay(10000);
         this.cdr.detectChanges();
       });
     } else {
@@ -54,20 +100,37 @@ export class BarcodeScannerPage implements AfterViewInit {
     }
   }
 
+
   private delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
-  
+  productForm: FormGroup;
   constructor(
     private barcodeScannerService: BarcodeScannerService,
     private cdr: ChangeDetectorRef,
-    private router: Router
-  ) {}
+    private router: Router,
+    private params: ActivatedRoute,
+    private formBuilder: FormBuilder
+  ) {
+    this.productForm = this.formBuilder.group({
+      code: [{value: '', disabled: true}],
+      name: ['', Validators.required],
+      brand: ['', Validators.required],
+      format: ['', Validators.required],
+      quantity: ['', [Validators.required, Validators.min(1)]],
+      price: ['', [Validators.required, Validators.min(0)]],
+    });
+  }
   
+
+  // COMENZAR Y DETENER CAMARA
+
+
   //Le entregamos el link de referencia a la tag img del html leyendo su interior
   async startStreamFromWebCam() {
     if (!this.videoRef || !this.videoRef.nativeElement) {
       console.error('Video element not found');
+      
       return;
     }
   
@@ -85,28 +148,6 @@ export class BarcodeScannerPage implements AfterViewInit {
     }
   }
 
-  private showSuccessMessage() {
-    this.scanSuccess = true;
-    this.scanError = false;
-    this.scanDuplicate = false;
-  }
-
-  private showErrorMessage() {
-    this.scanSuccess = false;
-    this.scanError = true;
-    this.scanDuplicate = false;
-  }
-
-  private showWarningMessage() {
-    this.scanSuccess = false;
-    this.scanError = false;
-    this.scanDuplicate = true;
-  }
-
-  confirmarScan() {
-    this.router.navigate(['/tabs/tab1']);
-  }
-
 
   ionViewWillLeave(): void {
     if (this.videoRef && this.videoRef.nativeElement) {
@@ -122,29 +163,109 @@ export class BarcodeScannerPage implements AfterViewInit {
       this.barcodeScannerService.stopWebScanner(videoElement);
     }
   }
+
+  //TEST
+  private stopScanner() {
+    const videoElement = this.videoRef?.nativeElement;
+    if (videoElement && videoElement.srcObject) {
+      const stream = videoElement.srcObject as MediaStream;
+      stream.getTracks().forEach(track => track.stop());
+      videoElement.srcObject = null;
+    }
+  
+    this.barcodeScannerService.stopWebScanner(this.videoRef?.nativeElement);
+  }
+
+
+  // MENSAJES DE FEEDBACK
+
+
+  private showSuccessMessage() {
+    this.scanSuccess = true;
+    setTimeout(() => {
+      this.scanSuccess = false;
+    }, this.tiempo_mensaje); // sigue siendo 1000 o 2000 ms
+  }
+  
+  private showErrorMessage() {
+    this.scanError = true;
+    setTimeout(() => {
+      this.scanError = false;
+    }, this.tiempo_mensaje);
+  }
+  
+  private showWarningMessage() {
+    this.scanDuplicate = true;
+    setTimeout(() => {
+      this.scanDuplicate = false;
+    }, this.tiempo_mensaje);
+  }
+
+
+  //FORMULARIO
+
+  getProductData() {
+    if (this.productForm.valid) {
+      // Incluir el código en el objeto final aunque el campo esté deshabilitado
+      const productData = {
+        ...this.productForm.getRawValue()
+      };
+      
+      console.log('Datos del producto:', productData);
+      return productData;
+    } else {
+      // Marcar todos los campos como tocados para mostrar errores
+      this.markFormGroupTouched(this.productForm);
+      return null;
+    }
+  }
+
+  resetForm() {
+    this.productForm.reset();
+    // Mantener el código deshabilitado
+    this.productForm.get('code')?.setValue(this.scannedCode);
+    this.productForm.get('code')?.disable();
+  }
+  
+  private markFormGroupTouched(formGroup: FormGroup) {
+    Object.values(formGroup.controls).forEach(control => {
+      control.markAsTouched();
+      if (control instanceof FormGroup) {
+        this.markFormGroupTouched(control);
+      }
+    });
+  }
+  continueScanning(): void{
+    this.scannedCode = null;
+    this.scanSuccess = false;
+    this.scanError = false;
+    this.scanDuplicate = false;
+  
+    this.scanState = ScanState.Scanning;
+  
+    this.startStreamFromWebCam();
+    this.barcodeScannerService.scanBarcode(this.handleScanCallback.bind(this));
+  }
+
+  private handleScanCallback(result: string) {
+    if (result) {
+      if (this.scannedCodes.has(result)) {
+        this.showWarningMessage();
+      } else {
+        this.scannedCodes.add(result);
+        this.scannedCode = result;
+        this.scanState = ScanState.FillingForm;
+        this.stopScanner(); 
+        this.showSuccessMessage();
+      }
+    } else {
+      this.showErrorMessage();
+    }
+  
+    this.cdr.detectChanges();
+  }
 }
 
-  // Método para iniciar el escaneo
-  // async startScan() {
-  //   this.isScanning = true;
-  //   this.result = null;  // Resetear resultado antes de empezar
-
-  //   try {
-  //     this.result = await this.barcodeScannerService.scanBarcode();
-  //   } catch (error) {
-  //     console.error('Error al escanear:', error);
-  //   } finally {
-  //     this.isScanning = false;
-  //   }
-  // }
-
-  // // Método para detener el escaneo (para web)
-  // stopScan() {
-  //   const videoElement = document.getElementById(this.videoElementId) as HTMLVideoElement;
-  //   if (videoElement) {
-  //     this.barcodeScannerService.stopWebScanner(videoElement);
-  //   }
-  // }
 
   
 
