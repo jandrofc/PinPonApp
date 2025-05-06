@@ -15,8 +15,8 @@
         <div class="header-price">Precio</div>
       </div>
 
-      <!-- Filas de productos -->
-      <ng-container *ngIf="scannedProducts.length > 0; else noProducts">
+      <!-- Filas de productos  else noProducts-->
+      <ng-container *ngIf="scannedProducts.length > 0; ">
         <div
           *ngFor="let producto of scannedProducts; let i = index"
           [ngClass]="i % 2 === 0 ? 'product-row even' : 'product-row odd'"

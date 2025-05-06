@@ -20,12 +20,15 @@
     </div>
   </ng-container>
   <ng-container *ngIf="scanState === ScanState.Scanning" class="video-container">
-    <ion-button (click)="scannedList()">
-      Ver Lista de Productos Escaneados
-    </ion-button>
     <video #video ID="video" autoplay muted playsinline class="full-screen-video"></video>
   </ng-container>
-  
+  <ng-container *ngIf="scannedProducts.length > 0 && scanState === ScanState.Scanning">
+    <div class="button-container">
+      <ion-button (click)="scannedList()" expand="block" class="boton-confirmar">
+        Confirmar Escaneos
+      </ion-button>
+    </div>
+  </ng-container>
   <ng-container *ngIf="scanState === ScanState.FillingForm">
     <div>
       <h2>Información del Producto</h2>
