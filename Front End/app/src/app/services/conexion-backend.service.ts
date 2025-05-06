@@ -34,6 +34,10 @@ export class ConexionBackendService {
       .pipe(catchError(this.handleError));
   }
 
+  validarCodigoBarra(codigo: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/validar-codigo/${codigo}`);
+  }
+
   // Manejo de errores
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'Error desconocido';
