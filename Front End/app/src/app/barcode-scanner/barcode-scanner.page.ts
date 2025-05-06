@@ -29,7 +29,7 @@ enum ScanState {
   imports: [ CommonModule, FormsModule,ReactiveFormsModule, IonicModule]
 })
 export class BarcodeScannerPage implements AfterViewInit, OnInit {
-
+  scannedProducts: any[] = [];
 
   constructor(
     private barcodeScannerService: BarcodeScannerService,
@@ -128,6 +128,21 @@ export class BarcodeScannerPage implements AfterViewInit, OnInit {
     }
   }
 
+  //guarda el producto escaneado
+  saveProduct() {
+    if (this.productForm.valid) {
+      const product = this.productForm.value; // Obtén los datos del formulario
+      this.scannedProducts.push(product); // Agrega el producto al array
+      console.log('Producto guardado:', product);
+      console.log('Productos escaneados:', this.scannedProducts);
+
+      this.productForm.reset(); // Limpia el formulario para el siguiente producto
+      this.productForm.patchValue({ quantity: 1, price: 0 }); // Valores por defecto
+    } else {
+      console.log('Formulario inválido');
+    }
+  }
+
   //reinicia la camara y el escaneo
   async continueScanning(): Promise<void> {
     this.scannedCode = null;
@@ -142,6 +157,12 @@ export class BarcodeScannerPage implements AfterViewInit, OnInit {
     await this.EmpezarEscaneo();
   }
 
+  // navegar a la pagina de productos escaneados
+  scannedList() {
+    this.router.navigate(['/scan-inventario'], {
+      queryParams: { scannedProducts: JSON.stringify(this.scannedProducts) }
+    });
+  }
 
   // MENSAJES DE FEEDBACK
 

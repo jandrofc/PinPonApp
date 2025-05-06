@@ -20,6 +20,9 @@
     </div>
   </ng-container>
   <ng-container *ngIf="scanState === ScanState.Scanning" class="video-container">
+    <ion-button (click)="scannedList()">
+      Ver Lista de Productos Escaneados
+    </ion-button>
     <video #video ID="video" autoplay muted playsinline class="full-screen-video"></video>
   </ng-container>
   
