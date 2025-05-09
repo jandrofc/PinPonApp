@@ -19,8 +19,7 @@
       <ng-container *ngIf="scannedProducts.length > 0; ">
         <div
           *ngFor="let producto of scannedProducts; let i = index"
-          [ngClass]="i % 2 === 0 ? 'product-row even' : 'product-row odd'"
-        > 
+          [ngClass]="i % 2 === 0 ? 'product-row even' : 'product-row odd'">
           <div class="product-code">
             <span class="badge">{{ producto.codigo }}</span>
           </div>

@@ -93,7 +93,7 @@
       <button *ngIf="!modoEdicion" class="add-product-button" (click)="escanear_Productos_Nuevos()">
         <ion-icon name="add"></ion-icon>
         Agregar Productos / Buscar por BARRAS
-      </button>  
+      </button>
       <br>
 
       <!-- Encabezado de la tabla -->
@@ -131,6 +131,14 @@
             >
             <ion-icon name="create-outline"></ion-icon>
             </button>
+            <!-- Botón de eliminar -->
+              <button
+              class="icon-button delete-button"
+              (click)="eliminarProducto(producto.id_formato)"
+            >
+              <ion-icon name="trash-outline"></ion-icon>
+            </button>
+
           </div>
         </div>
       </ng-container>

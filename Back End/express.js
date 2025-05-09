@@ -46,14 +46,25 @@ app.get('/api/get/lista_productos', (request, response) => {
                     FP.fecha_actualizado
               FROM formato_producto AS FP
               INNER JOIN producto AS P
-              ON FP.producto_id = P.id \n`;
+              ON FP.producto_id = P.id `;
     const parametros= [];
+    const wheres = [];
+    // Condicinal para productos y formato habilitados 
+    wheres.push('FP.habilitado = 1');
+    wheres.push('P.habilitado = 1');
 
     if(marca!=='any'){
-      query +=`WHERE P.marca = ?\n`;
+      wheres.push(`P.marca = ?`);
       parametros.push(marca);
     }
+
+    // Armeos el WHERE con todos los filtros acumulados
+    if (wheres.length) {
+      query += 'WHERE ' + wheres.join(' AND ') + '\n';
+    }
+
     query +=`ORDER BY FP.cantidad ${orden};`;
+
     db.query(query,parametros,(err, results) => {
         if (err) {
           console.error('Error al obtener productos:', err);
@@ -210,7 +221,7 @@ app.post('/api/post/formato',(request,response)=>{
 //Para actualizar los datos del producto
 app.put('/api/put/formato', (req, res) => {
   const {
-    id_formato,
+    id_formato, //pete
     producto_id,
     nombre_producto,  // <-- nombre que quieres dejar en producto.producto
     formato,
@@ -280,6 +291,39 @@ app.use((req, res) => {
     endpoints
   });
 });
+
+//deshabilita el formato de un producto y la fecha en el que fue deshabilitado
+
+app.patch('/api/patch/formato/:id', (req, res) => {
+  const id = req.params.id;
+
+  // Validación básica
+  if (!id) {
+    return res.status(400).json({ error: 'Falta el ID del producto' });
+  }
+
+  // Actualizamos el campo habilitado a 0 y la fecha de actualización
+  const query = `
+    UPDATE formato
+    SET habilitado = 0,
+        fecha_actualizado = NOW()
+    WHERE id = ?
+  `;
+
+  db.query(query, [id], (err, result) => {
+    if (err) {
+      console.error('Error al deshabilitar producto:', err);
+      return res.status(500).json({ error: 'Error en la base de datos', details: err });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Producto no encontrado' });
+    }
+    res.json({ success: true, message: 'Producto deshabilitado correctamente' });
+  });
+});
+
+
+
 
 // Arrancar el servidor
  const PORT = process.env.PORT || 3000;

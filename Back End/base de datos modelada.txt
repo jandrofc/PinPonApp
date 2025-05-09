@@ -19,3 +19,12 @@ CREATE TABLE IF NOT EXISTS formato_producto (
     fecha_actualizado TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (producto_id) REFERENCES producto(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+
+-- Agregar campo 'habilitado' a la tabla 'producto'
+ALTER TABLE producto
+ADD COLUMN habilitado TINYINT(1) DEFAULT 1;
+
+-- Agregar campo 'habilitado' a la tabla 'formato_producto'
+ALTER TABLE formato_producto
+ADD COLUMN habilitado TINYINT(1) DEFAULT 1;

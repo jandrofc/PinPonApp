@@ -8,7 +8,7 @@ import { Observable , catchError, throwError } from 'rxjs';
 export class ConexionBackendService {
 
   // Mejor práctica: Considera usar environment variables para la URL
-  private apiUrl = 'https://192.168.1.133:3000/api/';
+  private apiUrl = 'http://localhost:3000/api/';
 
   constructor(private http: HttpClient) { }
 
@@ -37,6 +37,14 @@ export class ConexionBackendService {
   validarCodigoBarra(codigo: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/validar-codigo/${codigo}`);
   }
+
+  deshabilitarFormato(idFormato: number): Observable<any> {
+    return this.http
+      .patch(`${this.apiUrl}patch/formato/${idFormato}`, {})
+      .pipe(catchError(this.handleError));
+  }
+
+
 
   // Manejo de errores
   private handleError(error: HttpErrorResponse) {

@@ -286,3 +286,10 @@ ion-list {
   background: transparent;
 }
 }
+/* Ícono de basura */
+.delete-button {
+  color: #ef4444; /* rojo */
+}
+.delete-button:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+}

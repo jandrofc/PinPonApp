@@ -121,6 +121,36 @@ export class Tab1Page implements OnInit{
       });
   }
 
+
+  //metodo para deshabilitar un formato
+
+  eliminarProducto(idFormato: number) {
+    const ok = confirm('¿Seguro que quieres eliminar (deshabilitar) este producto?');
+    if (!ok) {
+      return;
+    }
+
+    this.apiService.deshabilitarFormato(idFormato)
+      .subscribe({
+        next: (res: any) => {
+          if (res.success) {
+            // Refresca la lista para ocultar el deshabilitado
+            this.obtenerProductos();
+            alert('Producto deshabilitado correctamente.');
+          } else {
+            alert('No se pudo deshabilitar el producto.');
+          }
+        },
+        error: (err) => {
+          console.error('Error al deshabilitar formato:', err);
+          alert('Ocurrió un error al deshabilitar el producto.');
+        }
+      });
+  }
+
+
+
+
   cancelarEdicion() {
     this.modoEdicion = false; // Cancela la edición y vuelve a la lista
   }
