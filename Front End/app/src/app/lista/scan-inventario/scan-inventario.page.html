@@ -5,41 +5,28 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-    <ion-list>
-      <div class="product-list-header">
-        <div class="header-code">Codigo</div>
-        <div class="header-name">Nombre</div>
-        <div class="header-brand">Marca</div>
-        <div class="header-format">Formato</div>
-        <div class="header-quantity">Cantidad</div>
-        <div class="header-price">Precio</div>
-      </div>
+  <div class="product-list-header">
+    <div class="header-code">Codigo</div>
+    <div class="header-name">Nombre</div>
+    <div class="header-brand">Marca</div>
+    <div class="header-format">Formato</div>
+    <div class="header-quantity">Cantidad</div>
+  </div>
 
-      <!-- Filas de productos  else noProducts-->
-      <ng-container *ngIf="scannedProducts.length > 0; ">
-        <div
-          *ngFor="let producto of scannedProducts; let i = index"
-          [ngClass]="i % 2 === 0 ? 'product-row even' : 'product-row odd'"
-        > 
-          <div class="product-code">
-            <span class="badge">{{ producto.codigo }}</span>
-          </div>
-          <div class="product-name">
-            <span class="badge">{{ producto.nombre }}</span>
-          </div>
-          <div class="product-brand">
-            <span class="badge">{{ producto.marca }}</span>
-          </div>
-          <div class="product-format">
-            <span class="badge">{{ producto.formato }}</span>
-          </div>
-          <div class="product-quantity">
-            <span class="badge">{{ producto.cantidad }}</span>
-          </div>
-          <div class="product-price">
-            <span class="badge">{{ producto.precio }}</span>
-          </div>
+  <ng-container *ngIf="scannedProducts.length > 0;">
+    <div *ngFor="let producto of scannedProducts; let i = index"
+          [ngClass]="i % 2 === 0 ? 'product-row even' : 'product-row odd'">
+      <div><span class="badge">{{ producto.code }}</span></div>
+      <div class="product-info">
+        <div class="product-text">
+          <p class="product-name" class="badge2">{{ producto.name }}</p>
+          <p class="product-price" class="badge2"> $:{{ producto.price }}</p>
         </div>
-      </ng-container>
-    </ion-list>
+      </div>
+      <div class="product-brand"><span class="badge">{{ producto.brand }}</span></div>
+      <div class="product-format"><span class="badge">{{ producto.format }}</span></div>
+      <div class="product-quantity"><span class="badge">{{ producto.quantity }}</span></div>
+    </div>
+  </ng-container>
 </ion-content>
+
