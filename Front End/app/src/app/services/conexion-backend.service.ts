@@ -38,9 +38,9 @@ export class ConexionBackendService {
     return this.http.get(`${this.apiUrl}/validar-codigo/${codigo}`);
   }
 
-  deshabilitarFormato(idFormato: number): Observable<any> {
+  deshabilitarFormato(endpoint: string, idFormato: number): Observable<any> {
     return this.http
-      .patch(`${this.apiUrl}patch/formato/${idFormato}`, {})
+      .patch(`${this.apiUrl}${endpoint}${idFormato}`, {})
       .pipe(catchError(this.handleError));
   }
 

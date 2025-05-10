@@ -130,7 +130,7 @@ export class Tab1Page implements OnInit{
       return;
     }
 
-    this.apiService.deshabilitarFormato(idFormato)
+    this.apiService.deshabilitarFormato('patch/formato/',idFormato)
       .subscribe({
         next: (res: any) => {
           if (res.success) {
@@ -143,7 +143,7 @@ export class Tab1Page implements OnInit{
         },
         error: (err) => {
           console.error('Error al deshabilitar formato:', err);
-          alert('Ocurrió un error al deshabilitar el producto.');
+          alert('Error al deshabilitar: ' + (err.error?.message || 'Error desconocido'));
         }
       });
   }

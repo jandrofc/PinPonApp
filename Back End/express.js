@@ -282,6 +282,9 @@ app.use((req, res) => {
     ],
     POST: [
       '/api/post/producto'
+    ],
+    PATCH: [
+      '/api/patch/formato/:id'
     ]
   };
 
@@ -304,7 +307,7 @@ app.patch('/api/patch/formato/:id', (req, res) => {
 
   // Actualizamos el campo habilitado a 0 y la fecha de actualización
   const query = `
-    UPDATE formato
+    UPDATE formato_producto
     SET habilitado = 0,
         fecha_actualizado = NOW()
     WHERE id = ?
