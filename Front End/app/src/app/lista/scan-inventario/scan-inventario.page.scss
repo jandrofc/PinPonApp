@@ -8,43 +8,70 @@
 }
 
 .product-list-header {
-  display: grid;
-  grid-template-columns: 2fr 2fr 2fr 2fr 2fr;
   background-color: #3048A7;
   color: white;
-  padding: 0.75rem;
   font-weight: 500;
-  text-align: center;
 }
 
 .product-row {
-  display: grid;
-  grid-template-columns: 2fr 2fr 2fr 2fr 2fr;
-  padding: 0.75rem;
-  align-items: center;
   border-bottom: 1px solid #e5e7eb;
+}
+
+.product-list-header,
+.product-row {
+  display: grid;
+  grid-template-columns: 4fr 3fr 2fr 2fr; /* Define tamaños fijos para las columnas */
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  padding-left: 0rem;
+  padding-right: 0rem;
+  align-items: center;
+  text-align: center;
 }
 
 .product-row.even {
   background-color: #eef2ff; /* bg-indigo-50 */
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+  padding-left: 0.3rem;
+  padding-right: 0rem;
+  border-bottom: 1px solid #afb2b7;
 }
 
 .product-row.odd {
   background-color: white;
 }
 
+.product-list-header div:last-child,
+.product-row div:last-child {
+  border-right: none;
+}
+
+.product-code {
+  font-weight: 500;
+  color: #3730a3;
+  padding: 0.5rem;
+}
+
 .product-name {
   font-weight: 500;
-  color: #1e293b;
+  color: #3730a3;
+  padding: 0.5rem;
 }
 
 .product-price {
   font-weight: 500;
-  color: #1e293b;
 }
 
-.product-quantity {
+.product-name,
+.product-code,
+.product-quantity,
+.product-price {
   text-align: center;
+  overflow: hidden;
+  white-space: normal;
+  word-wrap: break-word;
+  word-break: break-word;
 }
 
 .badge {
@@ -52,7 +79,7 @@
   padding: 0.25rem 0.75rem;
   background-color: #e5ebff;
   color: #3730a3;
-  border-radius: 9999px;
+  border-radius: 20px;
   font-weight: 500;
   font-size: 1rem;
   border: 1px solid #a49fe5;
