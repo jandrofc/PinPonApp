@@ -273,28 +273,6 @@ app.put('/api/put/formato', (req, res) => {
   });
 });
 
-// Middleware para manejar rutas no definidas
-app.use((req, res) => {
-  const endpoints = {
-    GET: [
-      '/api', 
-      '/api/get/lista_productos?marca={marca}&orden={asc|desc}'
-    ],
-    POST: [
-      '/api/post/producto'
-    ],
-    PATCH: [
-      '/api/patch/formato/:id'
-    ]
-  };
-
-  res.status(404).json({
-    success: false,
-    message: 'Ruta no encontrada. Aquí están los endpoints disponibles:',
-    endpoints
-  });
-});
-
 //deshabilita el formato de un producto y la fecha en el que fue deshabilitado
 
 app.patch('/api/patch/formato/:id', (req, res) => {
@@ -324,6 +302,30 @@ app.patch('/api/patch/formato/:id', (req, res) => {
     res.json({ success: true, message: 'Producto deshabilitado correctamente' });
   });
 });
+
+
+// Middleware para manejar rutas no definidas
+app.use((req, res) => {
+  const endpoints = {
+    GET: [
+      '/api', 
+      '/api/get/lista_productos?marca={marca}&orden={asc|desc}'
+    ],
+    POST: [
+      '/api/post/producto'
+    ],
+    PATCH: [
+      '/api/patch/formato/:id'
+    ]
+  };
+
+  res.status(404).json({
+    success: false,
+    message: 'Ruta no encontrada. Aquí están los endpoints disponibles:',
+    endpoints
+  });
+});
+
 
 
 
