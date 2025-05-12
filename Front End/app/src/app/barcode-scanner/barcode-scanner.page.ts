@@ -9,6 +9,7 @@ import { IonicModule } from '@ionic/angular';
 import { BarcodeScannerService } from '../services/barcode-scanner.service';  //servicio de scnaeo
 import { ElementRef,ViewChild, ChangeDetectorRef } from '@angular/core'; //obtener informacion de los elementos
 import { Capacitor } from '@capacitor/core';  //conocer donde se esta ejecutando
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera'; //para la camara
 import { ActivatedRoute, Router } from '@angular/router'; //navegacion entre paginas
 
 
@@ -96,9 +97,28 @@ export class BarcodeScannerPage implements AfterViewInit, OnInit {
   async ngAfterViewInit(): Promise<void> {
     this.EmpezarEscaneo();
   }
+
+  //Solicitar permisos de la camara
+  async requestCameraPermission() {
+    const status = await Camera.requestPermissions();
+    if (status.camera === 'granted') {
+      console.log('Permiso para la cámara concedido');
+    } else {
+      console.error('Permiso para la cámara denegado');
+    }
+  }
+
+  //Reproducir el sonido de beep
+  playBeepSound() {
+  const audio = new Audio('assets/sonido/beep.mp3');
+  audio.play();
+  }
+
   // COMENZAR Y DETENER CAMARA
 
   async EmpezarEscaneo() {
+    await this.requestCameraPermission(); // Solicitar permisos de la cámara
+    
     if (!this.videoRef || !this.videoRef.nativeElement) {
       console.error('El elemento video no está disponible');
     }
@@ -111,6 +131,7 @@ export class BarcodeScannerPage implements AfterViewInit, OnInit {
             this.showWarningMessage(); // Código duplicado
           } else {
             this.showSuccessMessage(); // Escaneo exitos
+            this.playBeepSound(); // Reproducir sonido de beep
             this.productForm.patchValue({ code: result });
             this.barcodeScannerService.stopWebScanner(this.videoRef.nativeElement); // Detener el escáner
             this.scannedCodes.add(result);
