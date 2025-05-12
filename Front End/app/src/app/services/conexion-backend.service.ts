@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient ,HttpErrorResponse } from '@angular/common/http';
 import { Observable , catchError, throwError } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +9,7 @@ import { Observable , catchError, throwError } from 'rxjs';
 export class ConexionBackendService {
 
   // Mejor práctica: Considera usar environment variables para la URL
-  private apiUrl = 'http://192.168.100.77:3000/api/';
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
 
