@@ -8,7 +8,7 @@ import { Observable , catchError, throwError } from 'rxjs';
 export class ConexionBackendService {
 
   // Mejor práctica: Considera usar environment variables para la URL
-  private apiUrl = 'http://localhost:3000/api/';
+  private apiUrl = 'http://192.168.100.77:3000/api/';
 
   constructor(private http: HttpClient) { }
 
