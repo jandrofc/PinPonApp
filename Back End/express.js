@@ -5,7 +5,11 @@ const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: 'localhost:8100', // IP de tu notebook con el frontend
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 
 // const helmet = require('helmet');
 // app.use(
@@ -329,11 +333,12 @@ app.use((req, res) => {
 
 
 
-
+const os = require('os');
+console.log(getIPv4Address());
 // Arrancar el servidor
  const PORT = process.env.PORT || 3000;
- app.listen(PORT, () => {
-   console.log(`Servidor escuchando en http://localhost:${PORT}`);
+ app.listen(PORT,'0.0.0.0', () => {
+   console.log(`Servidor escuchando en http://localhost:3000`);
  });
 
 
@@ -342,28 +347,28 @@ app.use((req, res) => {
 
 // const https = require('https');
 // const fs = require('fs');
-// const os = require('os');
+
 
 // const options = {
 //   key: fs.readFileSync('firma_openssl/key.pem'),
 //   cert: fs.readFileSync('firma_openssl/cert.pem')
 // };
 
-// function getIPv4Address() {
-//   const networkInterfaces = os.networkInterfaces();
+function getIPv4Address() {
+  const networkInterfaces = os.networkInterfaces();
 
-//   for (const interfaceName in networkInterfaces) {
-//     const interfaces = networkInterfaces[interfaceName];
+  for (const interfaceName in networkInterfaces) {
+    const interfaces = networkInterfaces[interfaceName];
 
-//     for (const iface of interfaces) {
-//       if (iface.family === 'IPv4' && !iface.internal) {
-//         return iface.address;
-//       }
-//     }
-//   }
+    for (const iface of interfaces) {
+      if (iface.family === 'IPv4' && !iface.internal) {
+        return iface.address;
+      }
+    }
+  }
 
-//   return 'No se encontró una dirección IPv4';
-// }
+  return 'No se encontró una dirección IPv4';
+}
 
 // const ipv4Address = getIPv4Address();
 // https.createServer(options, app).listen(3000, '0.0.0.0', () => {

@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  apiUrl: process.env['IP'] || 'http://localhost:3000/api/'
+  apiUrl: process.env['IP'] || 'http://localhost:3000'
 };
 
 /*
