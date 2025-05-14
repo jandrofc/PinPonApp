@@ -6,7 +6,7 @@ require('dotenv').config();
 
 const app = express();
 app.use(cors({
-  origin: 'localhost:8100', // IP de tu notebook con el frontend
+  origin: ['http://localhost:8100','capacitor://localhost'], // IP de tu notebook con el frontend
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
