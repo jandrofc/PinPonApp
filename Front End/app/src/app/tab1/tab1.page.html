@@ -82,8 +82,16 @@
     <ng-template #listaProductos>
       <div class="section-header">
         <h2 class="section-title">Inventario de Productos</h2>
+        
       </div>
-
+      <div class="section-content">
+        <!-- DEBUG -->
+          <div class="debug-info" style="color: red;">
+            <h1>debug</h1>
+            <p>api url: {{ apiUrl }}</p>
+            <p>error: {{ response }}</p>
+          </div>
+      </div>
       <!-- Barra de búsqueda -->
       <ion-searchbar
         [(ngModel)]="searchQuery"

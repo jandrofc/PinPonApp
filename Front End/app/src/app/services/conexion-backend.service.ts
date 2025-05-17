@@ -16,6 +16,11 @@ export class ConexionBackendService {
     private configService: ConfigService
   ) { };
 
+  getIPFILE(): string {
+    return this.configService.apiUrl;
+  }
+
+
   // Método GET genérico
   getListaProducto(endponit: string = "", orden: string = 'asc'): Observable<any> {
     // Construir la URL completa

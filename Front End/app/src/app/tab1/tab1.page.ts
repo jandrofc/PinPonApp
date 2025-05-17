@@ -35,6 +35,10 @@ export class Tab1Page implements OnInit{
     private router: Router,
     private params: ActivatedRoute) {}
 
+    // DEBUG 
+    apiUrl: string = this.apiService.getIPFILE();
+    response: any;
+    
 
   ngOnInit() {
     this.obtenerProductos();
@@ -68,6 +72,7 @@ export class Tab1Page implements OnInit{
         }
       },
       error => {
+        this.response = error;
         console.error('Error al obtener productos:', error);
       }
     );
