@@ -14,9 +14,7 @@ export class ConexionBackendService {
   constructor(
     private http: HttpClient,
     private configService: ConfigService
-  ) { }
-
-  
+  ) { };
 
   // Método GET genérico
   getListaProducto(endponit: string = "", orden: string = 'asc'): Observable<any> {
