@@ -35,14 +35,19 @@ export class Tab1Page implements OnInit{
     private router: Router,
     private params: ActivatedRoute) {}
 
-    // DEBUG 
-    apiUrl: string = this.apiService.getIPFILE();
-    response: any;
+    
     
 
   ngOnInit() {
     this.obtenerProductos();
   }
+
+
+    // DEBUG 
+    apiUrl: string = this.apiService.getIPFILE();
+    response: any;
+
+
 
   modoEdicion: boolean = false;
   productos: Producto[] = [];
@@ -61,6 +66,16 @@ export class Tab1Page implements OnInit{
   imagen: '',
 };
   searchQuery: string = '';
+
+
+
+
+  mostrarError(): string {
+  return JSON.stringify(this.response, null, 2); // Convierte el objeto a JSON con formato
+  }
+
+
+
 
   obtenerProductos() : void {
     // Llamar al servicio para obtener los productos
