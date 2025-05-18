@@ -6,7 +6,7 @@ require('dotenv').config();
 
 const app = express();
 app.use(cors({
-  origin: ['http://localhost:8100','capacitor://localhost'], // IP de tu notebook con el frontend
+  origin: ['http://localhost:8100','capacitor://localhost',"*"], // IP de tu notebook con el frontend
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
@@ -22,6 +22,58 @@ app.use(cors({
 // );
 
 app.use(express.json());
+
+
+
+const os = require('os');
+
+// Arrancar el servidor
+const PORT = process.env.PORT || 3000;
+ app.listen(PORT,'0.0.0.0', () => {
+   console.log(`Servidor escuchando en http://${getIPv4Address()}:${PORT}`);
+ });
+
+
+
+//openssl req -nodes -new -x509 -keyout key.pem -out cert.pem -days 365
+
+// const https = require('https');
+// const fs = require('fs');
+
+
+// const options = {
+//   key: fs.readFileSync('firma_openssl/key.pem'),
+//   cert: fs.readFileSync('firma_openssl/cert.pem')
+// };
+
+function getIPv4Address() {
+  const networkInterfaces = os.networkInterfaces();
+
+  for (const interfaceName in networkInterfaces) {
+    const interfaces = networkInterfaces[interfaceName];
+
+    for (const iface of interfaces) {
+      if (iface.family === 'IPv4' && !iface.internal) {
+        return iface.address;
+      }
+    }
+  }
+
+  return 'No se encontró una dirección IPv4';
+}
+
+// https.createServer(options, app).listen(3000, '0.0.0.0', () => {
+//   console.log(`Servidor escuchando en https://${getIPv4Address()}:3000`);
+// });
+
+
+
+
+
+
+
+
+
 
 // Crear la conexión a la base de datos
 const db = mysql.createPool({
@@ -330,47 +382,3 @@ app.use((req, res) => {
   });
 });
 
-
-
-
-const os = require('os');
-console.log(getIPv4Address());
-// Arrancar el servidor
- const PORT = process.env.PORT || 3000;
- app.listen(PORT,'0.0.0.0', () => {
-   console.log(`Servidor escuchando en http://localhost:3000`);
- });
-
-
-
-//openssl req -nodes -new -x509 -keyout key.pem -out cert.pem -days 365
-
-// const https = require('https');
-// const fs = require('fs');
-
-
-// const options = {
-//   key: fs.readFileSync('firma_openssl/key.pem'),
-//   cert: fs.readFileSync('firma_openssl/cert.pem')
-// };
-
-function getIPv4Address() {
-  const networkInterfaces = os.networkInterfaces();
-
-  for (const interfaceName in networkInterfaces) {
-    const interfaces = networkInterfaces[interfaceName];
-
-    for (const iface of interfaces) {
-      if (iface.family === 'IPv4' && !iface.internal) {
-        return iface.address;
-      }
-    }
-  }
-
-  return 'No se encontró una dirección IPv4';
-}
-
-// const ipv4Address = getIPv4Address();
-// https.createServer(options, app).listen(3000, '0.0.0.0', () => {
-//   console.log(`Servidor escuchando en https://${getIPv4Address()}:3000`);
-// });
