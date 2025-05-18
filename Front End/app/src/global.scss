@@ -64,3 +64,11 @@
   ion-title {
     color: #ffffff; /* Color del texto del título */
   }
+
+  ion-searchbar {
+    --background: #ffffff !important;
+    --color: #000000 !important;
+    --placeholder-color: #888888 !important;
+    --icon-color: #000000 !important;
+  }
+  

@@ -36,7 +36,10 @@
               }
             ],
             "styles": ["src/global.scss", "src/theme/variables.scss"],
-            "scripts": [],
+            "scripts": [
+              {"input": "node_modules/dotenv/lib/main.js",
+                "inject": true}
+            ],
             "browser": "src/main.ts"
           },
           "configurations": {

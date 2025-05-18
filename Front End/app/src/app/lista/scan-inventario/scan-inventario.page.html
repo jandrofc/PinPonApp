@@ -1,0 +1,25 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Productos Escaneados</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="product-list-header">
+    <div class="header-code">Codigo</div>
+    <div class="header-name">Nombre</div>
+    <div class="header-quantity">Cantidad</div>
+    <div class="header-price">Precio</div>
+  </div>
+
+  <ng-container *ngIf="scannedProducts.length > 0;">
+    <div *ngFor="let producto of scannedProducts; let i = index"
+          [ngClass]="i % 2 === 0 ? 'product-row even' : 'product-row odd'">
+      <div class="product-code"><span>{{ producto.code }}</span></div>
+      <div class="product-name"><span>{{ producto.name }} - {{ producto.brand }} - {{ producto.format }}</span></div>
+      <div class="product-quantity"><span class="badge">{{ producto.quantity }}</span></div>
+      <div class="product-price"><span class="badge"> ${{ producto.price }}</span></div>
+    </div>
+  </ng-container>
+</ion-content>
+

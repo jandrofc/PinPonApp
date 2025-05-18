@@ -32,6 +32,10 @@ export const routes: Routes = [
         pathMatch: 'full',
       },
     ],
+  },
+  {
+    path: 'scan-inventario',
+    loadComponent: () => import('./lista/scan-inventario/scan-inventario.page').then( m => m.ScanInventarioPage)
   }
 
 ];
