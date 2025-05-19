@@ -215,7 +215,7 @@
 .add-product-button {
   width: 100%;
   padding: 1rem;
-  background-color: #3D59C7;
+  background-color: #397cef;
   color: white;
   font-size: 1rem;
   font-weight: 0;
@@ -228,7 +228,12 @@
 }
 
 .add-product-button:hover {
-  background-color: #4338ca;
+  background-color: #3464b8;
+}
+
+.camera-icon {
+  margin-right: 0.5rem;
+  font-size: 1.5rem;
 }
 
 /* Bottom Navigation */
