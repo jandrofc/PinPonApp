@@ -70,7 +70,7 @@ export class BarcodeScannerPage implements AfterViewInit, OnInit {
   //Almacena el resultado del escaneo
   scannedCode: string | null=null;
 
-
+  platform: string | null=null;
 
   //Para leer el html y darle el link de la camara virtual
   @ViewChild('video', { static: false }) videoRef!: ElementRef<HTMLVideoElement>;
@@ -83,6 +83,7 @@ export class BarcodeScannerPage implements AfterViewInit, OnInit {
   private scannedCodes: Set<string> = new Set(); // Para almacenar códigos escaneados y evitar duplicados
 
   ngOnInit(): void{
+    this.platform=Capacitor.getPlatform()
     // Obtener los parámetros de la URL que vienenn de la página anterior
     this.params.queryParams.subscribe(params => {
       this.modo = params['modo'] || null;
@@ -91,6 +92,9 @@ export class BarcodeScannerPage implements AfterViewInit, OnInit {
       console.log('Modo:', this.modo);
       console.log('routingbefore:', this.routingbefore);
     });
+
+
+
   }
   //Detectamos en que plataforma se esta ejecutando con la funcion de capacitor
   //Inicia el video y empieza a escanear
@@ -122,7 +126,7 @@ export class BarcodeScannerPage implements AfterViewInit, OnInit {
     if (!this.videoRef || !this.videoRef.nativeElement) {
       console.error('El elemento video no está disponible');
     }
-    if (Capacitor.getPlatform() == "web") {
+    if (this.platform == "web") {
       await this.barcodeScannerService.restartWebScanner(this.videoRef.nativeElement);
       await this.barcodeScannerService.scanBarcode(async (result) => {
         if (result) {
@@ -144,10 +148,33 @@ export class BarcodeScannerPage implements AfterViewInit, OnInit {
         }
         this.cdr.detectChanges();
       });
-    } else {
-      // Ejecutar la cámara con Capacitor
+    } 
+    else {
+      await this.barcodeScannerService.scanBarcode(async (result) => {
+        if (result) {
+          console.log('Código escaneado:', result);
+          if (this.scannedCodes.has(result)) {
+            this.showWarningMessage(); // Código duplicado
+          } else {
+            this.showSuccessMessage(); // Escaneo exitos
+            this.playBeepSound(); // Reproducir sonido de beep
+            this.productForm.patchValue({ code: result });
+            this.barcodeScannerService.stopScan();
+            this.scannedCodes.add(result);
+            this.scannedCode = result;
+            this.scanState = ScanState.FillingForm;
+          }
+        } else {
+          this.showErrorMessage(); // Error en el escaneo
+        }
+      });
+      };
+
+
+
+
+
     }
-  }
 
 
 

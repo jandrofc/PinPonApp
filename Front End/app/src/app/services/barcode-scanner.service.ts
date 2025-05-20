@@ -2,12 +2,13 @@
 import { Injectable } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 
-// Import MLKit
-import { BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
+
+import {BarcodeScanner} from '@capacitor-mlkit/barcode-scanning';
 
 // Import ZXing para web
 import { BrowserMultiFormatReader} from '@zxing/browser';
 import { IScannerControls } from '@zxing/browser';
+
 
 @Injectable({
   providedIn: 'root',
@@ -25,19 +26,60 @@ export class BarcodeScannerService {
     if (Capacitor.getPlatform() === 'web') {
       return this.scanWithZXing(onResult);
     } else {
-      return this.scanWithMLKit();
+      return this.scanWithCapacitor(onResult);
     }
   }
 
-  private async scanWithMLKit(): Promise<string | null> {
-    try {
-      const result = await BarcodeScanner.scan();
-      return result.barcodes?.[0]?.rawValue || null;
-    } catch (error) {
-      console.error('MLKit scan error:', error);
-      return null;
-    }
+  async scanWithCapacitor (onResult: (value: string) => void) : Promise<string | null> {
+  // The camera is visible behind the WebView, so that you can customize the UI in the WebView.
+  // However, this means that you have to hide all elements that should not be visible.
+  // You can find an example in our demo repository.
+  // In this case we set a class `barcode-scanner-active`, which then contains certain CSS rules for our app.
+  document.querySelectorAll('ion-content').forEach(element => {
+  console.log('Aplicando clase a:', element);
+  element.classList.add('barcode-scanner-active');
+  });
+  
+  return new Promise<string | null>(async (resolve) => {
+    // Add the `barcodeScanned` listener
+    await BarcodeScanner.addListener(
+      'barcodesScanned',
+      async result => {
+        
+        if (result.barcodes.length > 0) {
+          resolve(result.barcodes[0].rawValue);
+          onResult(result.barcodes[0].rawValue);
+        }
+      },
+    
+    );
+  // Start the barcode scanner
+  await BarcodeScanner.startScan();
+  });
+}
+
+
+
+
+  async stopScan () : Promise<void|null> {
+  // Make all elements in the WebView visible again
+  document.querySelector('ion-content')?.classList.remove('barcode-scanner-active');
+  const ionContent = document.querySelector('ion-content');
+  if (ionContent) {
+    console.log('Clases del ion-content: stop can', ionContent.className);
   }
+  // Remove all listeners
+  await BarcodeScanner.removeAllListeners();
+
+  // Stop the barcode scanner
+  await BarcodeScanner.stopScan();
+};
+
+
+
+
+
+// FUNCIONES PARA EL ESCANEO CON ZXING ---- WEB
 
   private async scanWithZXing(onResult: (value: string) => void): Promise<string | null> {
     try {
