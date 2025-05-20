@@ -1,0 +1,56 @@
+.main-content {
+  flex: 1;
+  padding: 1.5rem 1rem;
+  max-width: 768px;
+  margin: 0 auto;
+}
+
+.section-header {
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.section-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #4f46e5;
+  display: flex;
+  justify-content: center;
+}
+
+.menu-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Centra verticalmente */
+    height: 100%; /* Ocupa toda la altura de la pantalla */
+    padding: 20px;
+    background-color: #EBF3F5; /* Color de fondo claro */
+  }
+
+.menu-buttons {
+    width: 100%;
+    max-width: 300px;
+  }
+  
+.menu-button {
+    width: 100%;
+    padding: 15px;
+    font-size: 16px;
+    background-color: #3D59C7;
+    color: rgb(255, 255, 255);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.menu-button:hover {
+    background-color: #314490;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #ccc;
+    margin: 10px 0;
+  }

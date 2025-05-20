@@ -3,6 +3,11 @@
     <ion-title>
       Inventario
     </ion-title>
+    <ion-buttons slot="end">
+    <ion-button class="notification-button">
+      <ion-icon class="noti-icon" name="notifications"></ion-icon>
+    </ion-button>
+  </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -91,7 +96,7 @@
       ></ion-searchbar>
 
       <button *ngIf="!modoEdicion" class="add-product-button" (click)="escanear_Productos_Nuevos()">
-        <ion-icon name="add"></ion-icon>
+        <ion-icon class="camera-icon" name="camera"></ion-icon>
         Agregar Productos / Buscar por BARRAS
       </button>
       <br>
