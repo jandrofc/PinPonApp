@@ -1,17 +1,42 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Tab 3
+      Carrito
     </ion-title>
+    
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 3</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <main class="main-content">
+    <div class="section-header">
+      <h2 class="section-title">Lista de Productos</h2>
+    </div>
+    <div class="menu-container">
+        <!-- Encabezado de la tabla -->
+      <div class="product-list-header">
+        <div class="header-name">Nombre</div>
+        <div class="header-quantity">Cantidad</div>
+      </div>
 
-  <app-explore-container name="Tab 3 page"></app-explore-container>
+      <!-- Filas de productos -->
+      <ng-container *ngIf="filteredProducts.length > 0; else noProducts">
+      
+      </ng-container>
+
+      <ng-template #noProducts>
+        <div class="no-productos">No se encontraron productos</div>
+      </ng-template>
+    </div>
+    <div class="button-container">
+        <button class="product-button">
+        <ion-icon class="camera-icon" name="camera"></ion-icon>
+        Escanear productos
+        </button>
+        <button class="shop-button">
+        <ion-icon class="shop-icon" name="bag"></ion-icon>
+        Realizar compra
+        </button>
+    </div>
+  </main>
 </ion-content>
