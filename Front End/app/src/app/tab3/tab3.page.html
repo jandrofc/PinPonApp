@@ -12,30 +12,30 @@
     <div class="section-header">
       <h2 class="section-title">Lista de Productos</h2>
     </div>
-    <div class="menu-container">
-        <!-- Encabezado de la tabla -->
-      <div class="product-list-header">
-        <div class="header-name">Nombre</div>
-        <div class="header-quantity">Cantidad</div>
+    <div class="scan-container">
+      <div class="scan-message">
+          <i class="fas fa-barcode"></i>
+          <p>¡Escanee los productos!</p>
       </div>
 
-      <!-- Filas de productos -->
-      <ng-container *ngIf="filteredProducts.length > 0; else noProducts">
-      
-      </ng-container>
+      <div class="products-container">
+          <!-- Aquí se mostrarían los productos escaneados -->
+      </div>
 
-      <ng-template #noProducts>
-        <div class="no-productos">No se encontraron productos</div>
-      </ng-template>
+      <div class="total-section">
+          <div class="total-label">Total:</div>
+          <div class="total-amount">$ 0</div>
+      </div>
     </div>
-    <div class="button-container">
-        <button class="product-button">
-        <ion-icon class="camera-icon" name="camera"></ion-icon>
-        Escanear productos
+
+    <div class="action-buttons">
+        <button class="scan-button">
+            <ion-icon class="fas fa-barcode" name="camera"></ion-icon>
+            Escanear productos
         </button>
-        <button class="shop-button">
-        <ion-icon class="shop-icon" name="bag"></ion-icon>
-        Realizar compra
+        <button class="checkout-button">
+            <ion-icon class="fas fa-shopping-cart" name="bag"></ion-icon>
+            Realizar Compra
         </button>
     </div>
   </main>

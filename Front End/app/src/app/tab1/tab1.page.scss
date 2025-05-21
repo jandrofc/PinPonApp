@@ -85,6 +85,7 @@
   font-size: 1.875rem;
   font-weight: 700;
   color: #4f46e5;
+  text-align: center;
 }
 
 /* Search */
@@ -128,11 +129,13 @@
 .product-list-header {
   display: grid;
   grid-template-columns: 6fr 3fr 3fr;
-  background-color: #3048A7;
+  background-color: #4361ee;
   color: white;
   padding: 0.75rem;
   font-weight: 500;
   text-align: center;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
 }
 
 .product-row {
@@ -220,12 +223,12 @@
 .add-product-button {
   width: 100%;
   padding: 1rem;
-  background-color: #397cef;
-  color: white;
+  background-color: #b3e1ff;
+  color: #4361ee;
   font-size: 1rem;
-  font-weight: 0;
+  font-weight: 600;
   border-radius: 1rem;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -302,4 +305,36 @@ ion-list {
 }
 .delete-button:hover {
   background-color: rgba(239, 68, 68, 0.1);
+}
+.botones {
+  padding: 1rem;
+}
+
+.btn-guardar {
+  width: 100%;
+  padding: 0.8rem;
+  background-color: #397cef;
+  color: white;
+  font-size: 1rem;
+  font-weight: 0;
+  border-radius: 0.7rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.8rem;
+}
+
+.btn-cancelar {
+  width: 100%;
+  padding: 0.8rem;
+  background-color: #ef4444;
+  color: white;
+  font-size: 1rem;
+  font-weight: 0;
+  border-radius: 0.7rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

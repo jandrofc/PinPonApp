@@ -28,158 +28,92 @@
     background-color: #EBF3F5; /* Color de fondo claro */
   }
 
-/* Product List */
-.product-list {
-  background-color: white;
-  border-radius: 1rem;
-  overflow: hidden;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-  margin-bottom: 1.5rem;
+/* Scan Container */
+.scan-container {
+    background-color: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-.product-list-header {
-  display: grid;
-  grid-template-columns: 6fr 3fr;
-  background-color: #3048A7;
-  color: white;
-  padding: 0.75rem;
-  font-weight: 500;
-  text-align: center;
+.scan-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 0;
+    color: #4361ee;
+    font-size: 1.2rem;
+    text-align: center;
 }
 
-.product-row {
-  display: grid;
-  grid-template-columns: 6fr 3fr;
-  padding: 0.75rem;
-  align-items: center;
-  border-bottom: 1px solid #e5e7eb;
+.scan-message i {
+    font-size: 3rem;
+    margin-bottom: 16px;
+    opacity: 0.7;
 }
 
-.product-row.even {
-  background-color: #eef2ff; /* bg-indigo-50 */
+.products-container {
+    min-height: 100px;
 }
 
-.product-row.odd {
-  background-color: white;
+.total-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-top: 1px solid #eee;
+    margin-top: 20px;
+    color: #3832a1;
 }
 
-.product-info {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+.total-label {
+    font-weight: 700;
+    font-size: 1.2rem;
 }
 
-.product-image-wrapper {
-  height: 3rem;
-  width: 3rem;
-  border-radius: 0.5rem;
-  background-color: white;
-  border: 1px solid #e5e7eb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.total-amount {
+    font-weight: 700;
+    font-size: 1.2rem;
 }
 
-.product-image {
-  height: 2.5rem;
-  width: 2.5rem;
-  object-fit: contain;
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
-.product-name {
-  font-weight: 500;
-  color: #1e293b;
+.scan-button, .checkout-button {
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
 }
 
-.product-precio {
-  font-size: 0.75rem;
-  color: #64748b;
+.scan-button {
+    background-color: #b3e1ff;
+    color: #4361ee;
 }
 
-.product-quantity {
-  text-align: center;
+.checkout-button {
+    background-color: #4361ee;
+    color: white;
 }
 
-.badge {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  background-color: #e5ebff;
-  color: #3730a3;
-  border-radius: 9999px;
-  font-weight: 500;
-  font-size: 1rem;
-  border: 1px solid #a49fe5;
+.scan-button:hover, .checkout-button:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
 }
 
-.product-edit {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-
-.edit-button:hover {
-  background-color: #eef2ff;
-}
-
-.no-products {
-  padding: 2rem;
-  text-align: center;
-  color: #64748b;
-}
-
-.button-container {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  margin-bottom: 2rem;
-}
-
-/* Add Product Button */
-.product-button {
-  width: 100%;
-  padding: 0.7rem;
-  background-color: #397cef;
-  color: white;
-  font-size: 1rem;
-  font-weight: 0;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-}
-
-.product-button:hover {
-  background-color: #3464b8;
-}
-
-.camera-icon {
-  margin-right: 0.5rem;
-  font-size: 1.5rem;
-}
-
-.shop-button {
-  width: 100%;
-  padding: 0.7rem;
-  background-color: #397cef;
-  color: white;
-  font-size: 1rem;
-  font-weight: 0;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-}
-
-.shop-button:hover {
-  background-color: #3464b8;
-}
-
-.shop-icon {
-  margin-right: 0.5rem;
-  font-size: 1.5rem;
+.scan-button:active, .checkout-button:active {
+    transform: translateY(0);
 }

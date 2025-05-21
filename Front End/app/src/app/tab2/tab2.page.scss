@@ -28,29 +28,38 @@
     background-color: #EBF3F5; /* Color de fondo claro */
   }
 
-.menu-buttons {
-    width: 100%;
-    max-width: 300px;
-  }
-  
-.menu-button {
-    width: 100%;
-    padding: 15px;
-    font-size: 16px;
-    background-color: #3D59C7;
-    color: rgb(255, 255, 255);
+.report-options {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.report-card {
+    background-color: #b3e1ff;
     border: none;
-    border-radius: 10px;
-    cursor: pointer;
+    border-radius: 12px;
+    padding: 20px;
     text-align: center;
+    font-size: 16px;
+    font-weight: 500;
+    color: #1e293b;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
 }
 
-.menu-button:hover {
-    background-color: #314490;
+.report-card:hover {
+    background-color: #75b9e7;
+    transform: translateY(-2px);
 }
 
-hr {
-    border: none;
-    border-top: 1px solid #ccc;
-    margin: 10px 0;
-  }
+.card-icon {
+    margin-right: 16px;
+    font-size: 30px;
+    color: #4361ee;
+    width: 24px;
+}
