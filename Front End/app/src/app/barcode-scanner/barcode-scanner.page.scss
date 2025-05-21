@@ -7,6 +7,30 @@ ion-content, .full-screen-video {
   left: 0;
 }
 
+
+// Hide all elements
+ion-content.barcode-scanner-active {
+  visibility: hidden !important;
+  --background: transparent !important;
+  --ion-background-color: transparent !important;
+  background: transparent !important;
+}
+
+// Show only the barcode scanner modal
+.barcode-scanner-modal {
+  visibility: visible;
+}
+
+@media (prefers-color-scheme: dark) {
+  .barcode-scanner-modal {
+    --background: transparent;
+    --ion-background-color: transparent;
+  }
+}
+
+
+
+
 .linea {
   position: absolute;
   top: 50%; /* Centra la línea verticalmente */

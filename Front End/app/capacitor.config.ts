@@ -16,6 +16,12 @@ const config: CapacitorConfig = {
     CapacitorHttp: {
       enabled: true
     },
+    MLKitBarcodeScanner: {
+      cameraFacing: 'back',
+      // Añade esto para compatibilidad con versiones antiguas:
+      formatsAllowed: ['ALL_FORMATS'],
+      lensFacing: 'back'
+    },
   }
 };
 

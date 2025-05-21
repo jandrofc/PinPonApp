@@ -6,7 +6,7 @@
 </ion-header>
 
 <ion-content>
-  <ng-container>
+  <ng-container class="barcode-scanner-modal">
     <div id="message-container">
       <div class="message messageSuccess" [ngClass]="{ visible: scanSuccess, hidden: !scanSuccess }">
         Código escaneado correctamente.
@@ -19,17 +19,17 @@
       </div>
     </div>
   </ng-container>
-  <ng-container *ngIf="scanState === ScanState.Scanning" class="video-container">
+  <ng-container *ngIf="scanState === ScanState.Scanning && platform =='web'" class="video-container">
     <video #video ID="video" autoplay muted playsinline class="full-screen-video"></video>
   </ng-container>
-  <ng-container *ngIf="scannedProducts.length > 0 && scanState === ScanState.Scanning">
+  <ng-container *ngIf="scannedProducts.length > 0 && scanState === ScanState.Scanning" class="barcode-scanner-modal">
     <div class="button-container">
       <ion-button (click)="scannedList()" expand="block" class="boton-confirmar">
         Confirmar Escaneos
       </ion-button>
     </div>
   </ng-container>
-  <ng-container *ngIf="scanState === ScanState.FillingForm">
+  <ng-container *ngIf="scanState === ScanState.FillingForm" class="barcode-scanner-modal">
     <div>
       <h2>Información del Producto</h2>
       
