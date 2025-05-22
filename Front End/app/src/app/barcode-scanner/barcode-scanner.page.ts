@@ -1,20 +1,19 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule , ReactiveFormsModule} from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar} from '@ionic/angular';
+
 import { IonicModule } from '@ionic/angular';
 
 
 
 import { BarcodeScannerService } from '../services/barcode-scanner.service';  //servicio de scnaeo
-import { ElementRef,ViewChild, ChangeDetectorRef } from '@angular/core'; //obtener informacion de los elementos
+import { ElementRef,ViewChild, ChangeDetectorRef} from '@angular/core'; //obtener informacion de los elementos
 import { Capacitor } from '@capacitor/core';  //conocer donde se esta ejecutando
-import { Camera, CameraResultType, CameraSource } from '@capacitor/camera'; //para la camara
+import { Camera } from '@capacitor/camera'; //para la camara
 import { ActivatedRoute, Router } from '@angular/router'; //navegacion entre paginas
 
-
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { IonItem } from '@ionic/angular';
+
 
 //indica el estado del page del escaneo
 enum ScanState {
@@ -29,7 +28,7 @@ enum ScanState {
   standalone: true,
   imports: [ CommonModule, FormsModule,ReactiveFormsModule, IonicModule]
 })
-export class BarcodeScannerPage implements AfterViewInit, OnInit {
+export class BarcodeScannerPage implements OnInit {
   scannedProducts: any[] = [];
 
   constructor(
@@ -37,7 +36,7 @@ export class BarcodeScannerPage implements AfterViewInit, OnInit {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private params: ActivatedRoute,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
   ) {
     this.productForm = this.formBuilder.group({
       code: [{value: '', disabled: true}],
@@ -70,10 +69,11 @@ export class BarcodeScannerPage implements AfterViewInit, OnInit {
   //Almacena el resultado del escaneo
   scannedCode: string | null=null;
 
-
+  platform: string | null=null;
 
   //Para leer el html y darle el link de la camara virtual
   @ViewChild('video', { static: false }) videoRef!: ElementRef<HTMLVideoElement>;
+  @ViewChild('body', { static: false }) body!: ElementRef<HTMLElement>;
 
   // Variables para los mensajes feedback
   scanSuccess: boolean = false;
@@ -83,6 +83,7 @@ export class BarcodeScannerPage implements AfterViewInit, OnInit {
   private scannedCodes: Set<string> = new Set(); // Para almacenar códigos escaneados y evitar duplicados
 
   ngOnInit(): void{
+    this.platform=Capacitor.getPlatform()
     // Obtener los parámetros de la URL que vienenn de la página anterior
     this.params.queryParams.subscribe(params => {
       this.modo = params['modo'] || null;
@@ -91,12 +92,16 @@ export class BarcodeScannerPage implements AfterViewInit, OnInit {
       console.log('Modo:', this.modo);
       console.log('routingbefore:', this.routingbefore);
     });
+
+
+
   }
-  //Detectamos en que plataforma se esta ejecutando con la funcion de capacitor
-  //Inicia el video y empieza a escanear
-  async ngAfterViewInit(): Promise<void> {
+
+  ionViewDidEnter() {
+    console.log('Body element:', this.body?.nativeElement);
     this.EmpezarEscaneo();
   }
+
 
   //Solicitar permisos de la camara
   async requestCameraPermission() {
@@ -119,12 +124,12 @@ export class BarcodeScannerPage implements AfterViewInit, OnInit {
   async EmpezarEscaneo() {
     await this.requestCameraPermission(); // Solicitar permisos de la cámara
     
-    if (!this.videoRef || !this.videoRef.nativeElement) {
-      console.error('El elemento video no está disponible');
-    }
-    if (Capacitor.getPlatform() == "web") {
-      await this.barcodeScannerService.restartWebScanner(this.videoRef.nativeElement);
-      await this.barcodeScannerService.scanBarcode(async (result) => {
+    
+    if (this.platform == "web") {
+      if (!this.videoRef || !this.videoRef.nativeElement) {
+        console.error('El elemento video no está disponible');
+      }
+      await this.barcodeScannerService.scanWithZXing(this.videoRef.nativeElement, async (result) => {
         if (result) {
           console.log('Código escaneado:', result);
           if (this.scannedCodes.has(result)) {
@@ -144,10 +149,28 @@ export class BarcodeScannerPage implements AfterViewInit, OnInit {
         }
         this.cdr.detectChanges();
       });
-    } else {
-      // Ejecutar la cámara con Capacitor
+    } 
+    else {
+      await this.barcodeScannerService.scanWithCapacitor(this.body.nativeElement,async (result) => {
+        if (result) {
+          console.log('Código escaneado:', result);
+          if (this.scannedCodes.has(result)) {
+            this.showWarningMessage(); // Código duplicado
+          } else {
+            this.showSuccessMessage(); // Escaneo exitos
+            this.playBeepSound(); // Reproducir sonido de beep
+            this.productForm.patchValue({ code: result });
+            this.barcodeScannerService.stopScan(this.body.nativeElement);
+            this.scannedCodes.add(result);
+            this.scannedCode = result;
+            this.scanState = ScanState.FillingForm;
+          }
+        } else {
+          this.showErrorMessage(); // Error en el escaneo
+        }
+      });
+      };
     }
-  }
 
 
 
@@ -234,8 +257,8 @@ export class BarcodeScannerPage implements AfterViewInit, OnInit {
       }
     });
   }
+
+
+  
+
 }
-
-
-
-

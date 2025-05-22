@@ -1,17 +1,42 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Tab 3
+      Carrito
     </ion-title>
+    
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 3</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <main class="main-content">
+    <div class="section-header">
+      <h2 class="section-title">Lista de Productos</h2>
+    </div>
+    <div class="scan-container">
+      <div class="scan-message">
+          <i class="fas fa-barcode"></i>
+          <p>¡Escanee los productos!</p>
+      </div>
 
-  <app-explore-container name="Tab 3 page"></app-explore-container>
+      <div class="products-container">
+          <!-- Aquí se mostrarían los productos escaneados -->
+      </div>
+
+      <div class="total-section">
+          <div class="total-label">Total:</div>
+          <div class="total-amount">$ 0</div>
+      </div>
+    </div>
+
+    <div class="action-buttons">
+        <button class="scan-button">
+            <ion-icon class="fas fa-barcode" name="camera"></ion-icon>
+            Escanear productos
+        </button>
+        <button class="checkout-button">
+            <ion-icon class="fas fa-shopping-cart" name="bag"></ion-icon>
+            Realizar Compra
+        </button>
+    </div>
+  </main>
 </ion-content>

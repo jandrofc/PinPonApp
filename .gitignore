@@ -70,7 +70,6 @@ yarn-error.log
 /libpeerconnection.log
 testem.log
 /typings
-android/
 www/
 
 # System files

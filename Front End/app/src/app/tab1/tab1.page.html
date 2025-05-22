@@ -3,6 +3,11 @@
     <ion-title>
       Inventario
     </ion-title>
+    <ion-buttons slot="end">
+    <ion-button class="notification-button">
+      <ion-icon class="noti-icon" name="notifications"></ion-icon>
+    </ion-button>
+  </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -67,14 +72,10 @@
         </ion-list>
 
         <!-- Botones de acción -->
-        <ion-button expand="block" type="submit">Guardar Cambios</ion-button>
-        <ion-button
-          expand="block"
-          color="medium"
-          (click)="cancelarEdicion()"
-        >
-          Cancelar
-        </ion-button>
+        <div class="botones">
+          <button class="btn-guardar" expand="block" type="submit">Guardar Cambios</button>
+          <button class="btn-cancelar" expand="block" (click)="cancelarEdicion()">Cancelar</button>
+        </div>
       </form>
     </div>
 
@@ -84,14 +85,6 @@
         <h2 class="section-title">Inventario de Productos</h2>
         
       </div>
-      <div class="section-content">
-        <!-- DEBUG -->
-          <div class="debug-info" style="color: red;">
-            <h1>debug</h1>
-            <p>api url: {{ apiUrl }}</p>
-            <p>error: {{ mostrarError() }}</p>
-          </div>
-      </div>
       <!-- Barra de búsqueda -->
       <ion-searchbar
         [(ngModel)]="searchQuery"
@@ -99,8 +92,8 @@
       ></ion-searchbar>
 
       <button *ngIf="!modoEdicion" class="add-product-button" (click)="escanear_Productos_Nuevos()">
-        <ion-icon name="add"></ion-icon>
-        Agregar Productos / Buscar por BARRAS
+        <ion-icon class="camera-icon" name="camera"></ion-icon>
+        Agregar Productos
       </button>
       <br>
 
