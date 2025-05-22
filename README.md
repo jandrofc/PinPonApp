@@ -15,6 +15,13 @@ npx cap open android // abre el android estudio con el proyecto
 
 npx cap sync
 
+
+
+npx ionic cap synx
+npx cap open android
+
+
+
 build.gradle minSdkVersion 26
 <meta-data 
 android:name="com.google.mlkit.vision.DEPENDENCIES" 

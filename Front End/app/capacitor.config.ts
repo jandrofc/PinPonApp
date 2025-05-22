@@ -2,8 +2,8 @@ import { CapacitorConfig } from '@capacitor/cli';
 import { CapacitorHttp, HttpResponse } from '@capacitor/core';
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
-  appName: 'smart-home-app',
+  appId: 'www.PINPON.PINPON',
+  appName: 'Pinpon',
   webDir: 'www',
   server: {
     androidScheme: 'http',
@@ -15,12 +15,6 @@ const config: CapacitorConfig = {
   plugins: {
     CapacitorHttp: {
       enabled: true
-    },
-    MLKitBarcodeScanner: {
-      cameraFacing: 'back',
-      // Añade esto para compatibilidad con versiones antiguas:
-      formatsAllowed: ['ALL_FORMATS'],
-      lensFacing: 'back'
     },
   }
 };
