@@ -73,3 +73,51 @@
     --placeholder-color: #888888 !important;
     --icon-color: #000000 !important;
   }
+
+
+/* Aplica ocultamiento general en modo escáner */
+ion-content.barcode-scanner-active {
+  visibility: hidden !important;
+  --background: transparent !important;
+  --ion-background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Asegura que el modal del escáner sea visible */
+.barcode-scanner-modal {
+  visibility: visible !important;
+  background: transparent !important;
+  --background: transparent !important;
+  --ion-background-color: transparent !important;
+  z-index: 10;
+  position: relative;
+}
+
+/* Asegura transparencia también en modo oscuro */
+@media (prefers-color-scheme: dark) {
+  .barcode-scanner-modal {
+    visibility: visible !important;
+    background: transparent !important;
+    --background: transparent !important;
+    --ion-background-color: transparent !important;
+    z-index: 10;
+    position: relative;
+  }
+
+  ion-content.barcode-scanner-active {
+    visibility: hidden !important;
+    --background: transparent !important;
+    --ion-background-color: transparent !important;
+    background: transparent !important;
+  }
+}
+
+/* Posicionamiento de la vista de la cámara */
+capacitor-camera-preview {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+}

@@ -36,32 +36,11 @@ export class BarcodeScannerService {
   // However, this means that you have to hide all elements that should not be visible.
   // You can find an example in our demo repository.
   // In this case we set a class `barcode-scanner-active`, which then contains certain CSS rules for our app.
+  document.querySelectorAll('ion-content').forEach(element => {
+  console.log('Aplicando clase a:', element);
+  element.classList.add('barcode-scanner-active');
+  });
   
-
-  document.body.style.background = 'transparent';
-
-  // Hide all elements
-  // ion-content.barcode-scanner-active {
-  //   visibility: hidden !important;
-  //   --background: transparent !important;
-  //   --ion-background-color: transparent !important;
-  //   background: transparent !important;
-  // }
-
-  // // Show only the barcode scanner modal
-  // .barcode-scanner-modal {
-  //   visibility: visible;
-  // }
-
-
-  // capacitor-camera-preview {
-  //   position: absolute;
-  //   top: 0;
-  //   left: 0;
-  //   width: 100vw;
-  //   height: 100vh;
-  //   z-index: 1;
-  // }
   return new Promise<string | null>(async (resolve) => {
     // Add the `barcodeScanned` listener
     await BarcodeScanner.addListener(
@@ -99,9 +78,6 @@ export class BarcodeScannerService {
   // Make all elements in the WebView visible again
   document.querySelector('ion-content')?.classList.remove('barcode-scanner-active');
   const ionContent = document.querySelector('ion-content');
-  document.body.style.background = 'white';
-
-
   if (ionContent) {
     console.log('Clases del ion-content: stop can', ionContent.className);
   }
