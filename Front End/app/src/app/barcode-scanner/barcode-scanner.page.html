@@ -5,7 +5,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content #body>
   <ng-container class="barcode-scanner-modal">
     <div id="message-container">
       <div class="message messageSuccess" [ngClass]="{ visible: scanSuccess, hidden: !scanSuccess }">

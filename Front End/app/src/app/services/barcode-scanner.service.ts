@@ -1,6 +1,5 @@
 // src/app/services/barcode-scanner.service.ts
 import { Injectable } from '@angular/core';
-import { Capacitor } from '@capacitor/core';
 
 
 import {BarcodeScanner} from '@capacitor-mlkit/barcode-scanning';
@@ -8,7 +7,6 @@ import { BarcodeFormat } from '@capacitor-mlkit/barcode-scanning';
 // Import ZXing para web
 import { BrowserMultiFormatReader} from '@zxing/browser';
 import { IScannerControls } from '@zxing/browser';
-import { barcode } from 'ionicons/icons';
 
 
 @Injectable({
@@ -23,23 +21,20 @@ export class BarcodeScannerService {
     this.zxingReader = new BrowserMultiFormatReader();
   }
 
-  async scanBarcode(onResult: (value: string) => void): Promise<string | null> {
-    if (Capacitor.getPlatform() === 'web') {
-      return this.scanWithZXing(onResult);
-    } else {
-      return this.scanWithCapacitor(onResult);
-    }
-  }
 
-  async scanWithCapacitor (onResult: (value: string) => void, formats?: BarcodeFormat[]) : Promise<string | null> {
+  async scanWithCapacitor (elementoHTML: HTMLElement ,onResult: (value: string) => void, formats?: BarcodeFormat[]) : Promise<string | null> {
   // The camera is visible behind the WebView, so that you can customize the UI in the WebView.
   // However, this means that you have to hide all elements that should not be visible.
   // You can find an example in our demo repository.
   // In this case we set a class `barcode-scanner-active`, which then contains certain CSS rules for our app.
-  document.querySelectorAll('ion-content').forEach(element => {
-  console.log('Aplicando clase a:', element);
-  element.classList.add('barcode-scanner-active');
+  elementoHTML.classList.add('barcode-scanner-active');
+  const elements = document.querySelectorAll('ion-content');
+  console.log(`Encontrados ${elements.length} elementos ion-content`);
+  
+  elements.forEach((el, index) => {
+    this.debugElementStyles(el as HTMLElement, `ion-content #${index}`);
   });
+  
   
   return new Promise<string | null>(async (resolve) => {
     // Add the `barcodeScanned` listener
@@ -72,15 +67,9 @@ export class BarcodeScannerService {
 }
 
 
-
-
-  async stopScan () : Promise<void|null> {
+  async stopScan (elementoHTML: HTMLElement) : Promise<void|null> {
   // Make all elements in the WebView visible again
-  document.querySelector('ion-content')?.classList.remove('barcode-scanner-active');
-  const ionContent = document.querySelector('ion-content');
-  if (ionContent) {
-    console.log('Clases del ion-content: stop can', ionContent.className);
-  }
+  elementoHTML.classList.remove('barcode-scanner-active');
   // Remove all listeners
   await BarcodeScanner.removeAllListeners();
 
@@ -94,14 +83,11 @@ export class BarcodeScannerService {
 
 // FUNCIONES PARA EL ESCANEO CON ZXING ---- WEB
 
-  private async scanWithZXing(onResult: (value: string) => void): Promise<string | null> {
+  async scanWithZXing(videoElement: HTMLVideoElement,onResult: (value: string) => void): Promise<string | null> {
     try {
       const devices = await BrowserMultiFormatReader.listVideoInputDevices();
       const selectedDeviceId = devices[0]?.deviceId;
       if (!selectedDeviceId) throw new Error('No camera found');
-  
-      const videoElement = document.getElementById('video') as HTMLVideoElement;
-  
       return new Promise((resolve, reject) => {
         this.zxingReader
           .decodeFromVideoDevice(selectedDeviceId, videoElement, (result, err, controls) => {
@@ -158,7 +144,46 @@ export class BarcodeScannerService {
   }
 }
 
-
+//DEBUGGING
+  debugElementStyles(element: HTMLElement | null, description: string = 'Elemento') {
+  if (!element) {
+    console.error('Elemento no disponible para depuración');
+    return;
+  }
+  
+  console.group(`Estilos de ${description}`);
+  
+  // Mostrar clases aplicadas
+  console.log('Clases:', element.classList.toString());
+  
+  // Obtener todos los estilos computados
+  const computedStyles = window.getComputedStyle(element);
+  
+  // Crear un objeto para almacenar los estilos relevantes
+  const relevantStyles = {
+    visibility: computedStyles.visibility,
+    display: computedStyles.display,
+    opacity: computedStyles.opacity,
+    background: computedStyles.background,
+    backgroundColor: computedStyles.backgroundColor,
+    position: computedStyles.position,
+    zIndex: computedStyles.zIndex
+  };
+  
+  console.table(relevantStyles);
+  
+  // Variables CSS personalizadas (como --background en Ionic)
+  console.log('Variables CSS personalizadas (computadas):');
+  console.log('--background:', computedStyles.getPropertyValue('--background'));
+  console.log('--ion-background-color:', computedStyles.getPropertyValue('--ion-background-color'));
+  
+  // Inspeccionar el DOM para mostrar los valores actuales de las variables CSS
+  console.log('Valores efectivos de background:');
+  console.log('background-color (real):', window.getComputedStyle(element).backgroundColor);
+  console.log('background (real):', window.getComputedStyle(element).background);
+  
+  console.groupEnd();
+  }
 
 }
   
