@@ -34,7 +34,10 @@ export class BarcodeScannerService {
   elements.forEach((el, index) => {
     this.debugElementStyles(el as HTMLElement, `ion-content #${index}`);
   });
-  
+      document.querySelectorAll('ion-content').forEach(element => {
+      console.log('Aplicando clase a:', element);
+      element.classList.add('barcode-scanner-active');
+      });
   
   return new Promise<string | null>(async (resolve) => {
     // Add the `barcodeScanned` listener
