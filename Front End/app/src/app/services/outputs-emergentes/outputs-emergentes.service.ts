@@ -30,7 +30,7 @@ import {
 @Injectable({
   providedIn: 'root'
 })
-export class ModalesService {
+export class OutputsEmergentesService {
 
   constructor(
     // variables de clase para los controladores de Ionic
