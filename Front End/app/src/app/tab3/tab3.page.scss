@@ -1,0 +1,119 @@
+.main-content {
+  flex: 1;
+  padding: 1.5rem 1rem;
+  max-width: 768px;
+  margin: 0 auto;
+}
+
+.section-header {
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.section-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #4f46e5;
+  display: flex;
+  justify-content: center;
+}
+
+.menu-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centra verticalmente */
+    height: 100%; /* Ocupa toda la altura de la pantalla */
+    padding-top: 20px;
+    padding-bottom: 20px;
+    background-color: #EBF3F5; /* Color de fondo claro */
+  }
+
+/* Scan Container */
+.scan-container {
+    background-color: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.scan-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 0;
+    color: #4361ee;
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.scan-message i {
+    font-size: 3rem;
+    margin-bottom: 16px;
+    opacity: 0.7;
+}
+
+.products-container {
+    min-height: 100px;
+}
+
+.total-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-top: 1px solid #eee;
+    margin-top: 20px;
+    color: #3832a1;
+}
+
+.total-label {
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+.total-amount {
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.scan-button, .checkout-button {
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.scan-button {
+    background-color: #b3e1ff;
+    color: #4361ee;
+}
+
+.checkout-button {
+    background-color: #4361ee;
+    color: white;
+}
+
+.scan-button:hover, .checkout-button:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.scan-button:active, .checkout-button:active {
+    transform: translateY(0);
+}

@@ -1,0 +1,23 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>registro de productos</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-card *ngIf="valoresEscaneados.length > 0">
+        <ion-card-header>
+          <ion-card-title>Códigos Escaneados ({{ valoresEscaneados.length }})</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-list>
+            <ion-item *ngFor="let codigo of valoresEscaneados; let i = index">
+              <ion-label>
+                <h3>Código {{ i + 1 }}</h3>
+                <p>{{ codigo }}</p>
+              </ion-label>
+            </ion-item>
+          </ion-list>
+        </ion-card-content>
+      </ion-card>
+</ion-content>

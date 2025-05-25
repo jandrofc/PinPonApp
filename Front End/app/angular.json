@@ -36,7 +36,10 @@
               }
             ],
             "styles": ["src/global.scss", "src/theme/variables.scss"],
-            "scripts": [],
+            "scripts": [
+              {"input": "node_modules/dotenv/lib/main.js",
+                "inject": true}
+            ],
             "browser": "src/main.ts"
           },
           "configurations": {
@@ -50,7 +53,7 @@
                 {
                   "type": "anyComponentStyle",
                   "maximumWarning": "2kb",
-                  "maximumError": "4kb"
+                  "maximumError": "5kb"
                 }
               ],
               "fileReplacements": [

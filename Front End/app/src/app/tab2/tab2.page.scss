@@ -1,0 +1,65 @@
+.main-content {
+  flex: 1;
+  padding: 1.5rem 1rem;
+  max-width: 768px;
+  margin: 0 auto;
+}
+
+.section-header {
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.section-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #4f46e5;
+  display: flex;
+  justify-content: center;
+}
+
+.menu-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Centra verticalmente */
+    height: 100%; /* Ocupa toda la altura de la pantalla */
+    padding: 20px;
+    background-color: #EBF3F5; /* Color de fondo claro */
+  }
+
+.report-options {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.report-card {
+    background-color: #b3e1ff;
+    border: none;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 500;
+    color: #1e293b;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.report-card:hover {
+    background-color: #75b9e7;
+    transform: translateY(-2px);
+}
+
+.card-icon {
+    margin-right: 16px;
+    font-size: 30px;
+    color: #4361ee;
+    width: 24px;
+}

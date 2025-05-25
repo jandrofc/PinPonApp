@@ -3,6 +3,11 @@
     <ion-title>
       Inventario
     </ion-title>
+    <ion-buttons slot="end">
+    <ion-button class="notification-button">
+      <ion-icon class="noti-icon" name="notifications"></ion-icon>
+    </ion-button>
+  </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -67,14 +72,10 @@
         </ion-list>
 
         <!-- Botones de acción -->
-        <ion-button expand="block" type="submit">Guardar Cambios</ion-button>
-        <ion-button
-          expand="block"
-          color="medium"
-          (click)="cancelarEdicion()"
-        >
-          Cancelar
-        </ion-button>
+        <div class="botones">
+          <button class="btn-guardar" expand="block" type="submit">Guardar Cambios</button>
+          <button class="btn-cancelar" expand="block" (click)="cancelarEdicion()">Cancelar</button>
+        </div>
       </form>
     </div>
 
@@ -82,8 +83,8 @@
     <ng-template #listaProductos>
       <div class="section-header">
         <h2 class="section-title">Inventario de Productos</h2>
+        
       </div>
-
       <!-- Barra de búsqueda -->
       <ion-searchbar
         [(ngModel)]="searchQuery"
@@ -91,9 +92,9 @@
       ></ion-searchbar>
 
       <button *ngIf="!modoEdicion" class="add-product-button" (click)="escanear_Productos_Nuevos()">
-        <ion-icon name="add"></ion-icon>
-        Agregar Productos / Buscar por BARRAS
-      </button>  
+        <ion-icon class="camera-icon" name="camera"></ion-icon>
+        Agregar Productos
+      </button>
       <br>
 
       <!-- Encabezado de la tabla -->
@@ -113,7 +114,6 @@
             <div class="product-image-wrapper">
               <img
                 [src]="producto.imagen"
-                [alt]="producto.nombre_producto"
                 class="product-image"
               />
             </div>
@@ -132,6 +132,14 @@
             >
             <ion-icon name="create-outline"></ion-icon>
             </button>
+            <!-- Botón de eliminar -->
+              <button
+              class="icon-button delete-button"
+              (click)="eliminarProducto(producto.id_formato)"
+            >
+              <ion-icon name="trash-outline"></ion-icon>
+            </button>
+
           </div>
         </div>
       </ng-container>

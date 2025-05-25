@@ -35,10 +35,19 @@ export class Tab1Page implements OnInit{
     private router: Router,
     private params: ActivatedRoute) {}
 
+    
+    
 
   ngOnInit() {
     this.obtenerProductos();
   }
+
+
+    // DEBUG 
+    apiUrl: string = this.apiService.getIPFILE();
+    response: any;
+
+
 
   modoEdicion: boolean = false;
   productos: Producto[] = [];
@@ -58,6 +67,16 @@ export class Tab1Page implements OnInit{
 };
   searchQuery: string = '';
 
+
+
+
+  mostrarError(): string {
+  return JSON.stringify(this.response, null, 2); // Convierte el objeto a JSON con formato
+  }
+
+
+
+
   obtenerProductos() : void {
     // Llamar al servicio para obtener los productos
     this.apiService.getListaProducto('get/lista_productos','desc').subscribe(
@@ -68,6 +87,7 @@ export class Tab1Page implements OnInit{
         }
       },
       error => {
+        this.response = error;
         console.error('Error al obtener productos:', error);
       }
     );
@@ -79,17 +99,7 @@ export class Tab1Page implements OnInit{
     );
   }
   escanear_Productos_Nuevos(){
-
-
-    this.router.navigate(['/barcode-scanner'], {
-
-
-      queryParams: { modo: 'Agregar Producto', routingbefore: '/tabs/tab1' }
-
-
-    });
-
-
+    this.router.navigate(['/registro-producto']);
   }
 
   activarEdicion(producto: Producto) {
@@ -120,6 +130,36 @@ export class Tab1Page implements OnInit{
         }
       });
   }
+
+
+  //metodo para deshabilitar un formato
+
+  eliminarProducto(idFormato: number) {
+    const ok = confirm('¿Seguro que quieres eliminar (deshabilitar) este producto?');
+    if (!ok) {
+      return;
+    }
+
+    this.apiService.deshabilitarFormato('patch/formato/',idFormato)
+      .subscribe({
+        next: (res: any) => {
+          if (res.success) {
+            // Refresca la lista para ocultar el deshabilitado
+            this.obtenerProductos();
+            alert('Producto deshabilitado correctamente.');
+          } else {
+            alert('No se pudo deshabilitar el producto.');
+          }
+        },
+        error: (err) => {
+          console.error('Error al deshabilitar formato:', err);
+          alert('Error al deshabilitar: ' + (err.error?.message || 'Error desconocido'));
+        }
+      });
+  }
+
+
+
 
   cancelarEdicion() {
     this.modoEdicion = false; // Cancela la edición y vuelve a la lista

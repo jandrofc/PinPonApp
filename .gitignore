@@ -2,7 +2,8 @@ node_modules
 .angular
 cert.pem
 key.pem
-
+.env
+config.json
 # Specifies intentionally untracked files to ignore when using Git
 # http://git-scm.com/docs/gitignore
 
@@ -69,6 +70,7 @@ yarn-error.log
 /libpeerconnection.log
 testem.log
 /typings
+www/
 
 # System files
 .DS_Store

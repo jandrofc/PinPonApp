@@ -3,10 +3,6 @@ import { Routes } from '@angular/router';
 
 export const routes: Routes = [
   {
-    path: 'barcode-scanner',
-    loadComponent: () => import('./barcode-scanner/barcode-scanner.page').then( m => m.BarcodeScannerPage)
-  },
-  {
     path: '',
     loadComponent: () => import('./menu/menu/menu.page').then( m => m.MenuPage)
   },
@@ -32,5 +28,15 @@ export const routes: Routes = [
         pathMatch: 'full',
       },
     ],
+  },
+  {
+    path: 'scan-inventario',
+    loadComponent: () => import('./lista/scan-inventario/scan-inventario.page').then( m => m.ScanInventarioPage)
+  },
+  {
+    path: 'registro-producto',
+    loadComponent: () => import('./registro-producto/registro-producto.page').then( m => m.RegistroProductoPage)
   }
+
+
 ];
