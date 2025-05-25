@@ -8,8 +8,8 @@ import {
   ViewChild,       // Para obtener referencias de elementos del template
 } from '@angular/core';
 
-
-
+import { CommonModule } from '@angular/common'; // Módulo común de Angular
+import { IonicModule } from '@ionic/angular';
 import {
   Barcode,          // Tipo que representa un código escaneado
   BarcodeFormat,    // Formatos de códigos (QR, Code128, etc.)
@@ -95,6 +95,8 @@ import { InputCustomEvent } from '@ionic/angular'; // Eventos de input de Ionic
       }
     `,
   ],
+  imports: [ CommonModule, IonicModule],
+  standalone: true,
 })
 export class CameraScannerModalComponent implements AfterViewInit, OnDestroy {
 
@@ -181,8 +183,6 @@ export class CameraScannerModalComponent implements AfterViewInit, OnDestroy {
           ? this.videoElement?.nativeElement
           : undefined,
     };
-
-
 
 
 

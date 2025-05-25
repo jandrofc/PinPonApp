@@ -14,11 +14,15 @@ import { provideHttpClient } from '@angular/common/http';
 // Modulos para el manejo de errores visibles como popups
 import { ManejadorErroresService } from './app/services/manejador-errores/manejador-errores.service';
 import { ErrorHandler } from '@angular/core';
+import { IonicModule } from '@ionic/angular';
+import { importProvidersFrom } from '@angular/core';
+
 
 bootstrapApplication(AppComponent, {
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideIonicAngular(),
+    importProvidersFrom(IonicModule.forRoot()),
     provideRouter(routes, withPreloading(PreloadAllModules)),
     provideHttpClient(),
     {

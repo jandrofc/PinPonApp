@@ -99,17 +99,7 @@ export class Tab1Page implements OnInit{
     );
   }
   escanear_Productos_Nuevos(){
-
-
-    this.router.navigate(['/barcode-scanner'], {
-
-
-      queryParams: { modo: 'Agregar Producto', routingbefore: '/tabs/tab1' }
-
-
-    });
-
-
+    this.router.navigate(['/registro-producto']);
   }
 
   activarEdicion(producto: Producto) {
