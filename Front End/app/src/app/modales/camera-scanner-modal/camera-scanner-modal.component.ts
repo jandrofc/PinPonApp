@@ -111,12 +111,7 @@ export class CameraScannerModalComponent implements AfterViewInit, OnDestroy {
   public minZoomRatio: number | undefined;
   public maxZoomRatio: number | undefined;
 
-
-  constructor(
-    // readonly hace que la propiedad no se pueda modificar
-    private readonly OutPuts_Emergentes: OutputsEmergentesService,
-    private readonly ngZone: NgZone,
-    private formatos: BarcodeFormat[] = [
+  private formatos: BarcodeFormat[] = [
       BarcodeFormat.Codabar,
       BarcodeFormat.Code128,
       BarcodeFormat.Code39,
@@ -126,8 +121,15 @@ export class CameraScannerModalComponent implements AfterViewInit, OnDestroy {
       BarcodeFormat.Itf,
       BarcodeFormat.UpcA,
       BarcodeFormat.UpcE
-    ],
-    private readonly lensFacing: LensFacing = LensFacing.Back,
+    ];
+  private readonly lensFacing: LensFacing = LensFacing.Back;
+
+  constructor(
+    // readonly hace que la propiedad no se pueda modificar
+    private readonly OutPuts_Emergentes: OutputsEmergentesService,
+    private readonly ngZone: NgZone,
+    
+    
 
   ) {}
 

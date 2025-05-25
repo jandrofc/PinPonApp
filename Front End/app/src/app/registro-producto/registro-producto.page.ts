@@ -16,7 +16,7 @@ import { OutputsEmergentesService } from '../services/outputs-emergentes/outputs
 import { CameraScannerModalComponent } from '../modales/camera-scanner-modal/camera-scanner-modal.component';
 
 
-import { IonLabel } from '@ionic/angular';
+
 
 
 @Component({
@@ -66,7 +66,7 @@ export class RegistroProductoPage implements OnInit {
       this.isPermissionGranted = result.camera === 'granted';
     });
     BarcodeScanner.removeAllListeners().then(() => {
-      if (this.scannedCodes.size < 0) {
+      if (this.scannedCodes.size < 1) {
         this.startScan();
       }
       else {
