@@ -1,21 +1,31 @@
 import { Injectable } from '@angular/core';
 import { HttpClient ,HttpErrorResponse } from '@angular/common/http';
 import { Observable , catchError, throwError } from 'rxjs';
+import { environment } from 'src/environments/environment';
+import { ConfigService } from './config.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ConexionBackendService {
 
-  // Mejor práctica: Considera usar environment variables para la URL
-  private apiUrl = 'https://localhost:3000/api/';
 
-  constructor(private http: HttpClient) { }
+
+  constructor(
+    private http: HttpClient,
+    private configService: ConfigService
+  ) { };
+
+  getIPFILE(): string {
+    return this.configService.apiUrl;
+  }
+
 
   // Método GET genérico
   getListaProducto(endponit: string = "", orden: string = 'asc'): Observable<any> {
     // Construir la URL completa
-    const url = `${this.apiUrl}${endponit}`; // URL del endpoint
+    console.log(this.configService.apiUrl);
+    const url = `${this.configService.apiUrl}${endponit}`; // URL del endpoint
     const params = {   orden }; // Parámetros de consulta
     return this.http.get(url, { params }).pipe(
     );
@@ -23,10 +33,28 @@ export class ConexionBackendService {
 
   // Método POST de ejemplo
   postData(endpoint: string, data: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}${endpoint}`, data).pipe(
+    return this.http.post(`${this.configService.apiUrl}${endpoint}`, data).pipe(
       catchError(this.handleError)
     );
   }
+
+   // Método PUT genérico
+   putData(endpoint: string, data: any): Observable<any> {
+    return this.http.put(`${this.configService.apiUrl}${endpoint}`, data)
+      .pipe(catchError(this.handleError));
+  }
+
+  validarCodigoBarra(codigo: string): Observable<any> {
+    return this.http.get(`${this.configService.apiUrl}/validar-codigo/${codigo}`);
+  }
+
+  deshabilitarFormato(endpoint: string, idFormato: number): Observable<any> {
+    return this.http
+      .patch(`${this.configService.apiUrl}${endpoint}${idFormato}`, {})
+      .pipe(catchError(this.handleError));
+  }
+
+
 
   // Manejo de errores
   private handleError(error: HttpErrorResponse) {

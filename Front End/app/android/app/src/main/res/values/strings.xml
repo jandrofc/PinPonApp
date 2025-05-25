@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Pinpon</string>
+    <string name="title_activity_main">Pinpon</string>
+    <string name="package_name">www.PINPON.PINPON</string>
+    <string name="custom_url_scheme">www.PINPON.PINPON</string>
+</resources>

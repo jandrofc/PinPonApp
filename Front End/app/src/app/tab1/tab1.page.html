@@ -3,50 +3,79 @@
     <ion-title>
       Inventario
     </ion-title>
+    <ion-buttons slot="end">
+    <ion-button class="notification-button">
+      <ion-icon class="noti-icon" name="notifications"></ion-icon>
+    </ion-button>
+  </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <main class="main-content">
     <!-- Formulario de edición -->
-    <div *ngIf="modoEdicion; else listaProductos">
+    <div *ngIf="modoEdicion; else listaProductos" class="edit-form">
       <h2 class="section-title">Editar Producto</h2>
       <form (ngSubmit)="guardarCambios()">
         <ion-list>
+          <!-- CAMPO OCULTO: id_formato -->
+          <ion-item lines="none" style="display: none;">
+            <ion-label position="stacked">ID Formato</ion-label>
+            <ion-input
+              [(ngModel)]="productoSeleccionado.id_formato"
+              name="id_formato"
+            ></ion-input>
+          </ion-item>
+          <!-- FIN CAMPO OCULTO -->
+
           <!-- Nombre del producto -->
           <ion-item>
             <ion-label position="stacked">Nombre del Producto</ion-label>
-            <ion-input [(ngModel)]="productoSeleccionado.nombre_producto" name="nombre_producto" required></ion-input>
+            <ion-input
+              [(ngModel)]="productoSeleccionado.nombre_producto"
+              name="nombre_producto"
+              required
+            ></ion-input>
           </ion-item>
 
-          <!-- Categoría -->
+          <!-- Categoría/Formato -->
           <ion-item>
             <ion-label position="stacked">Categoría</ion-label>
-            <ion-input [(ngModel)]="productoSeleccionado.formato" name="formato" required></ion-input>
+            <ion-input
+              [(ngModel)]="productoSeleccionado.formato"
+              name="formato"
+              required
+            ></ion-input>
           </ion-item>
 
           <!-- Cantidad -->
           <ion-item>
             <ion-label position="stacked">Cantidad</ion-label>
-            <ion-input type="number" [(ngModel)]="productoSeleccionado.cantidad" name="cantidad" required></ion-input>
+            <ion-input
+              type="number"
+              [(ngModel)]="productoSeleccionado.cantidad"
+              name="cantidad"
+              required
+            ></ion-input>
           </ion-item>
 
           <!-- Precio -->
           <ion-item>
             <ion-label position="stacked">Precio</ion-label>
-            <ion-input type="number" [(ngModel)]="productoSeleccionado.precio" name="precio" required></ion-input>
-          </ion-item>
-
-          <!-- Imagen -->
-          <ion-item>
-            <ion-label position="stacked">URL de la Imagen</ion-label>
-            <ion-input [(ngModel)]="productoSeleccionado.imagen" name="imagen"></ion-input>
+            <ion-input
+              type="number"
+              [(ngModel)]="productoSeleccionado.precio"
+              name="precio"
+              required
+            ></ion-input>
           </ion-item>
         </ion-list>
 
-        <!-- Botones -->
-        <ion-button expand="block" type="submit">Guardar Cambios</ion-button>
-        <ion-button expand="block" color="medium" (click)="cancelarEdicion()">Cancelar</ion-button>
+        <!-- Botones de acción -->
+        <div class="botones">
+          <button class="btn-guardar" expand="block" type="submit">Guardar Cambios</button>
+          <button class="btn-cancelar" expand="block" (click)="cancelarEdicion()">Cancelar</button>
+        </div>
       </form>
     </div>
 
@@ -54,45 +83,70 @@
     <ng-template #listaProductos>
       <div class="section-header">
         <h2 class="section-title">Inventario de Productos</h2>
+        
+      </div>
+      <!-- Barra de búsqueda -->
+      <ion-searchbar
+        [(ngModel)]="searchQuery"
+        placeholder="Buscar producto..."
+      ></ion-searchbar>
+
+      <button *ngIf="!modoEdicion" class="add-product-button" (click)="escanear_Productos_Nuevos()">
+        <ion-icon class="camera-icon" name="camera"></ion-icon>
+        Agregar Productos
+      </button>
+      <br>
+
+      <!-- Encabezado de la tabla -->
+      <div class="product-list-header">
+        <div class="header-name">Nombre</div>
+        <div class="header-quantity">Cantidad</div>
+        <div class="header-edit">Editar</div>
       </div>
 
-      <!-- Products List -->
-      <div class="product-list">
-        <div class="product-list-header">
-          <div class="header-name">Nombre</div>
-          <div class="header-quantity">Cantidad</div>
-          <div class="header-edit">Editar</div>
-        </div>
-
-        <ng-container *ngIf="filteredProducts.length > 0; else noProducts">
-          <div
-            *ngFor="let producto of filteredProducts; let i = index"
-            [ngClass]="i % 2 === 0 ? 'product-row even' : 'product-row odd'"
-          >
-            <div class="product-info">
-              <div class="product-image-wrapper">
-                <img [src]="producto.imagen" [alt]="producto.nombre_producto" class="product-image" />
-              </div>
-              <div class="product-text">
-                <p class="product-name">{{ producto.nombre_producto }}</p>
-                <p class="product-precio"> $:{{ producto.precio }}</p>
-              </div>
+      <!-- Filas de productos -->
+      <ng-container *ngIf="filteredProducts.length > 0; else noProducts">
+        <div
+          *ngFor="let producto of filteredProducts; let i = index"
+          [ngClass]="i % 2 === 0 ? 'product-row even' : 'product-row odd'"
+        >
+          <div class="product-info">
+            <div class="product-image-wrapper">
+              <img
+                [src]="producto.imagen"
+                class="product-image"
+              />
             </div>
-            <div class="product-quantity">
-              <span class="badge">{{ producto.cantidad }}</span>
-            </div>
-            <div class="product-edit">
-              <button class="icon-button edit-button" (click)="activarEdicion(producto)">
-                <ion-icon name="create"></ion-icon>
-              </button>
+            <div class="product-text">
+              <p class="product-name">{{ producto.nombre_producto }}</p>
+              <p class="product-precio"> $:{{ producto.precio }}</p>
             </div>
           </div>
-        </ng-container>
+          <div class="product-quantity">
+            <span class="badge">{{ producto.cantidad }}</span>
+          </div>
+          <div class="product-edit">
+            <button
+              class="icon-button edit-button"
+              (click)="activarEdicion(producto)"
+            >
+            <ion-icon name="create-outline"></ion-icon>
+            </button>
+            <!-- Botón de eliminar -->
+              <button
+              class="icon-button delete-button"
+              (click)="eliminarProducto(producto.id_formato)"
+            >
+              <ion-icon name="trash-outline"></ion-icon>
+            </button>
 
-        <ng-template #noProducts>
-          <div class="no-productos">No se encontraron productos</div>
-        </ng-template>
-      </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-template #noProducts>
+        <div class="no-productos">No se encontraron productos</div>
+      </ng-template>
     </ng-template>
   </main>
 </ion-content>

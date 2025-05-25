@@ -2,13 +2,14 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit} from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/angular/standalone';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-
+import { ActivatedRoute, Router } from '@angular/router'; //navegacion entre paginas
 
 
 import { ConexionBackendService} from 'src/app/services/conexion-backend.service';
+import { IonicModule } from '@ionic/angular';
 
 export interface Producto {
-  id:  number;
+  id_formato:  number;
   producto_id: number;
   nombre_producto: string;
   formato: string;
@@ -26,20 +27,33 @@ export interface Producto {
   templateUrl: 'tab1.page.html',
   styleUrls: ['tab1.page.scss'],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, FormsModule, CommonModule],
+  imports: [    FormsModule, CommonModule,IonicModule],
 })
 export class Tab1Page implements OnInit{
-  constructor(private apiService: ConexionBackendService) {}
+  constructor(
+    private apiService: ConexionBackendService,
+    private router: Router,
+    private params: ActivatedRoute) {}
 
+    
+    
 
   ngOnInit() {
     this.obtenerProductos();
   }
 
+
+    // DEBUG 
+    apiUrl: string = this.apiService.getIPFILE();
+    response: any;
+
+
+
   modoEdicion: boolean = false;
   productos: Producto[] = [];
+
   productoSeleccionado: Producto = {
-  id: 0,
+  id_formato: 0,
   producto_id: 0,
   nombre_producto: '',
   formato: '',
@@ -53,6 +67,16 @@ export class Tab1Page implements OnInit{
 };
   searchQuery: string = '';
 
+
+
+
+  mostrarError(): string {
+  return JSON.stringify(this.response, null, 2); // Convierte el objeto a JSON con formato
+  }
+
+
+
+
   obtenerProductos() : void {
     // Llamar al servicio para obtener los productos
     this.apiService.getListaProducto('get/lista_productos','desc').subscribe(
@@ -63,6 +87,7 @@ export class Tab1Page implements OnInit{
         }
       },
       error => {
+        this.response = error;
         console.error('Error al obtener productos:', error);
       }
     );
@@ -73,6 +98,9 @@ export class Tab1Page implements OnInit{
       producto.nombre_producto.toLowerCase().includes(this.searchQuery.toLowerCase())
     );
   }
+  escanear_Productos_Nuevos(){
+    this.router.navigate(['/registro-producto']);
+  }
 
   activarEdicion(producto: Producto) {
     this.productoSeleccionado = { ...producto }; // Clonar el producto para evitar modificarlo directamente
@@ -80,15 +108,58 @@ export class Tab1Page implements OnInit{
   }
 
   guardarCambios() {
-    if (this.productoSeleccionado) {
-      const index = this.productos.findIndex((p) => p.id === this.productoSeleccionado?.id);
-      if (index !== -1) {
-        this.productos[index] = { ...this.productoSeleccionado }; // Actualizar el producto en la lista
-      }
-    }
-    this.modoEdicion = false; // Vuelve a la lista de productos
-    console.log('Cambios guardados:', this.productos);
+    if (!this.productoSeleccionado) return;
+
+    // Llamamos al PUT
+    this.apiService.putData('put/formato', this.productoSeleccionado)
+      .subscribe({
+        next: (res: any) => {
+          if (res.success) {
+            // Opción A: volver a cargar lista desde el back
+            this.obtenerProductos();
+            // Opción B: actualizar sólo localmente:
+             const idx = this.productos.findIndex(p => p.id_formato === this.productoSeleccionado.id_formato);
+            if (idx > -1) this.productos[idx] = { ...this.productoSeleccionado };
+
+            this.modoEdicion = false;
+            console.log('Formato actualizado correctamente');
+          }
+        },
+        error: err => {
+          console.error('Error al actualizar formato:', err);
+        }
+      });
   }
+
+
+  //metodo para deshabilitar un formato
+
+  eliminarProducto(idFormato: number) {
+    const ok = confirm('¿Seguro que quieres eliminar (deshabilitar) este producto?');
+    if (!ok) {
+      return;
+    }
+
+    this.apiService.deshabilitarFormato('patch/formato/',idFormato)
+      .subscribe({
+        next: (res: any) => {
+          if (res.success) {
+            // Refresca la lista para ocultar el deshabilitado
+            this.obtenerProductos();
+            alert('Producto deshabilitado correctamente.');
+          } else {
+            alert('No se pudo deshabilitar el producto.');
+          }
+        },
+        error: (err) => {
+          console.error('Error al deshabilitar formato:', err);
+          alert('Error al deshabilitar: ' + (err.error?.message || 'Error desconocido'));
+        }
+      });
+  }
+
+
+
 
   cancelarEdicion() {
     this.modoEdicion = false; // Cancela la edición y vuelve a la lista
