@@ -1,0 +1,91 @@
+.product-list {
+    padding: 16px;
+    padding-bottom: 100px;
+    
+    .product-item {
+      background-color: #dbeafe;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      
+      .product-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        
+        .product-info {
+          flex: 1;
+          
+          .product-name-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+            
+            h3 {
+              font-weight: 600;
+              color: #1f2937;
+              margin: 0;
+              font-size: 1rem;
+            }
+            
+            .new-badge {
+              font-size: 0.75rem;
+              padding: 2px 8px;
+            }
+          }
+          
+          .product-details {
+            font-size: 0.875rem;
+            color: #4b5563;
+            margin: 0;
+          }
+        }
+        
+        .quantity-controls {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          
+          .quantity-button {
+            --background: white;
+            --color: #4b5563;
+            --border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            
+            &:hover {
+              --background: #f3f4f6;
+            }
+          }
+          
+          .quantity-value {
+            font-weight: 500;
+            min-width: 16px;
+            text-align: center;
+            color: #1f2937;
+          }
+        }
+      }
+    }
+  }
+  
+  .confirm-container {
+    position: fixed;
+    bottom: 60px;
+    left: 0;
+    right: 0;
+    padding: 16px;
+    background: white;
+    border-top: 1px solid #e5e7eb;
+    z-index: 10;
+    
+    .confirm-button {
+      --background: #2563eb;
+      --background-hover: #1d4ed8;
+      --border-radius: 8px;
+      font-weight: 500;
+      height: 48px;
+    }
+  }

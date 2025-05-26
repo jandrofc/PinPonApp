@@ -14,10 +14,20 @@ import { BarcodeScanner, Barcode } from '@capacitor-mlkit/barcode-scanning';
 import { OutputsEmergentesService } from '../services/outputs-emergentes/outputs-emergentes.service';
 
 import { CameraScannerModalComponent } from '../modales/camera-scanner-modal/camera-scanner-modal.component';
+import { createOutline } from 'ionicons/icons';
+import { addIcons } from 'ionicons';
+import { ModalController } from '@ionic/angular';
+import { FormularioRegistroProductoModalComponent } from '../modales/formulario-registro-producto-modal/formulario-registro-producto-modal.component';
 
 
-
-
+export interface ProductoEscaneado {
+  codigo: string;
+  nombre: string;
+  marca: string;
+  formato: string;
+  cantidad: number | null;
+  precio: number | null;
+}
 
 @Component({
   selector: 'app-registro-producto',
@@ -42,21 +52,66 @@ export class RegistroProductoPage implements OnInit {
   
 
   // Almacena los codigos de barras escaneados
-  private scannedCodes: Set<string> = new Set();
+  public productosEscaneados: ProductoEscaneado[] = [];
 
   // Almacena los codigos de barras escaneados para mostrar en la vista
   // debe borrarse, solo fue para pruebas
   public valoresEscaneados: string[] = [];
   
   constructor(
-    private outputsEmergentesService: OutputsEmergentesService
+    private outputsEmergentesService: OutputsEmergentesService,
+    private modalController: ModalController
 
 
-  ) { }
+  ) { addIcons({ createOutline }) }
 
   
+  async editarProducto(producto: any) {
+    const modal = await this.modalController.create({
+      component: FormularioRegistroProductoModalComponent,
+      componentProps: { producto }
+    });
+    await modal.present();
 
+    // manejar el resultado al cerrar el modal
+    const { data } = await modal.onWillDismiss();
+    if (data) {
+      // Actualiza el producto en tu lista si es necesario
+      const index = this.productosEscaneados.findIndex(p => p.codigo === data.codigo);
+      if (index !== -1) {
+        this.productosEscaneados[index] = data; // Actualiza el producto con los nuevos datos
+        this.productosEscaneados = [...this.productosEscaneados]; // Forzar la actualización de la vista
+      }
+    }
+  }
 
+  async escanear_Productos() {
+    const modal = await this.modalController.create({
+      component: CameraScannerModalComponent,
+      cssClass: 'barcode-scanning-modal',
+      showBackdrop: false,
+    });
+    await modal.present();
+
+    const { data } = await modal.onWillDismiss();
+    // Si se escaneó un código y no está repetido, lo agregamos
+    if (data?.barcode && !this.productosEscaneados.some(p => p.codigo === data.barcode.rawValue)) {
+      this.productosEscaneados.push({
+        codigo: data.barcode.rawValue,
+        nombre: '',
+        marca: '',
+        formato: '',
+        cantidad: null,
+        precio: null
+      });
+    } else if (data?.barcode && this.productosEscaneados.some(p => p.codigo === data.barcode.rawValue)) {
+      this.outputsEmergentesService.showErrorAlert({
+        header: 'AVISO',
+        message: 'El código ya fue escaneado',
+        buttons: ['OK'],
+      });
+    }
+  }
 
   public ngOnInit(): void {
     BarcodeScanner.isSupported().then((result) => {
@@ -66,7 +121,7 @@ export class RegistroProductoPage implements OnInit {
       this.isPermissionGranted = result.camera === 'granted';
     });
     BarcodeScanner.removeAllListeners().then(() => {
-      if (this.scannedCodes.size < 1) {
+      if (this.productosEscaneados.length < 1) {
         this.startScan();
       }
       else {
@@ -86,18 +141,22 @@ export class RegistroProductoPage implements OnInit {
     });
     element.onDidDismiss().then((result) => {
       const barcode: Barcode | undefined = result.data?.barcode;
-      if (barcode && !this.scannedCodes.has(barcode.rawValue)) {
-        this.scannedCodes.add(barcode.rawValue);
-        this.valoresEscaneados = Array.from(this.scannedCodes);
-      }
-      else if (barcode && this.scannedCodes.has(barcode.rawValue)){
-        // Si el codigo ya fue escaneado, no se agrega a la lista
+      if (barcode && !this.productosEscaneados.some(p => p.codigo === barcode.rawValue)) {
+        this.productosEscaneados.push({
+          codigo: barcode.rawValue,
+          nombre: '',
+          marca: '',
+          formato: '',
+          cantidad: null,
+          precio: null
+        });
+      } else if (barcode && this.productosEscaneados.some(p => p.codigo === barcode.rawValue)) {
         this.outputsEmergentesService.showErrorAlert({
           header: 'AVISO',
           message: 'El código ya fue escaneado',
           buttons: ['OK'],
         });
-      } 
+      }
     });
   }
 
