@@ -8,6 +8,10 @@ import { ActivatedRoute, Router } from '@angular/router'; //navegacion entre pag
 import { ConexionBackendService} from 'src/app/services/conexion-backend.service';
 import { IonicModule } from '@ionic/angular';
 
+import { OutputsEmergentesService } from '../services/outputs-emergentes/outputs-emergentes.service';
+
+
+
 export interface Producto {
   id_formato:  number;
   producto_id: number;
@@ -33,19 +37,50 @@ export class Tab1Page implements OnInit{
   constructor(
     private apiService: ConexionBackendService,
     private router: Router,
-    private params: ActivatedRoute) {}
-
+    private params: ActivatedRoute,
+    private readonly outputsEmergentesService: OutputsEmergentesService,
+    
+  ){}
     
     
+    
 
-  ngOnInit() {
-    this.obtenerProductos();
+  async ngOnInit() {
+    this.CargarDatos();
+    this.iniciarAutoRefresh(); // Inicia el auto-refresh al cargar la página
+  }
+  private autoRefreshInterval: any;
+  private readonly REFRESH_INTERVAL = 30000 // 1 minuto
+
+
+
+  iniciarAutoRefresh(): void {
+    if (this.autoRefreshInterval) {
+      clearInterval(this.autoRefreshInterval);
+    }
+    this.autoRefreshInterval = setInterval(() => {
+      this.obtenerProductos(); // Llama al método para obtener productos
+    }, this.REFRESH_INTERVAL);
+
+    console.log(`Auto-refresh iniciado cada ${this.REFRESH_INTERVAL / 1000} segundos`);
+  }
+
+
+
+  async CargarDatos(): Promise<void> {
+    const loading = await this.outputsEmergentesService.showLoading({
+      message: 'Cargando productos...',
+    });
+    this.obtenerProductos()
+    loading.dismiss(); // Cierra el loading una vez que se cargan los productos
   }
 
 
     // DEBUG 
     apiUrl: string = this.apiService.getIPFILE();
     response: any;
+
+
 
 
 
@@ -87,10 +122,9 @@ export class Tab1Page implements OnInit{
         }
       },
       error => {
-        this.response = error;
-        console.error('Error al obtener productos:', error);
-      }
-    );
+        throw new Error('Error al obtener productos: ' + (error || 'Error desconocido'));
+        }
+      );
   }
 
   get filteredProducts() {
@@ -127,6 +161,7 @@ export class Tab1Page implements OnInit{
         },
         error: err => {
           console.error('Error al actualizar formato:', err);
+          throw new Error('Error al actualizar formato: ' + (err || 'Error desconocido'));
         }
       });
   }

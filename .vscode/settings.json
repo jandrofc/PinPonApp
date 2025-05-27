@@ -1,0 +1,12 @@
+{
+    "folder-color.pathColors": [
+        {
+            "folderPath": "PinPonApp\\Front End\\app\\src\\app\\modales\\",
+            "color": "foldercolorizer.color_99cc66"
+        },
+        {
+            "folderPath": "PinPonApp\\Front End\\app\\src\\app\\services\\",
+            "color": "foldercolorizer.color_9900cc"
+        }
+    ]
+}
