@@ -20,14 +20,14 @@
           .product-code-container {
             font-size: 0.875rem;
             color: #4b5563;
-            margin: 0;
+            margin-bottom: 8px;
           }
           
           .product-name-container {
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-bottom: 4px;
+            margin-bottom: -12px;
             
             h3 {
               font-weight: 600;
@@ -43,9 +43,9 @@
           }
           
           .product-details {
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: #4b5563;
-            margin: 0;
+            margin-bottom: 0;
           }
         }
         
@@ -92,20 +92,41 @@
   .product-edit {
     display: flex;
     align-items: center;
-    justify-content: center;
-    text-align: center;
+    gap: 6px;
+    background: transparent;
+    border: 2px solid #7c89d2;
+    color: #5b6bc0;
+    padding: 5px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .product-edit:hover {
+    background-color: #b2ccee; // color de fondo al pasar el mouse
+    border-color: #636fb6; // color del borde al pasar el mouse
   }
   
   .icon-button.edit-button {
-    flex-direction: column; // icono arriba, texto abajo
-    font-size: 2.2rem; // tamaño del icono
+    font-size: 2rem; // tamaño del icono
 
     .edit-text {
       font-size: 1.1rem; // tamaño del texto "Editar"
       margin-top: 2px;
+      margin-left: 4px;
       color: #4f46e5; // mismo color que el icono
       font-weight: 500;
     }
+
+    .edit-text:hover {
+      color: rgb(49, 39, 156); // color del icono al pasar el mouse
+    }
+  }
+
+  .icon-button.edit-button:hover {
+    color: rgb(49, 39, 156); // color del icono al pasar el mouse
   }
 
   .confirm-container {

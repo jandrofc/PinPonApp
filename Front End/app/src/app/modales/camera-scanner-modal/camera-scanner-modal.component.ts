@@ -162,6 +162,12 @@ export class CameraScannerModalComponent implements AfterViewInit, OnDestroy {
     this.stopScan();
   }
 
+  //Reproducir el sonido de beep
+  playBeepSound() {
+    const audio = new Audio('assets/sonido/beep.mp3');
+    audio.play();
+  }
+
   // Funcion que cambia el zoom
   public setZoomRatio(event: InputCustomEvent): void {
     if (!event.detail.value) {
@@ -203,6 +209,7 @@ export class CameraScannerModalComponent implements AfterViewInit, OnDestroy {
         (result: Result | undefined, err, controls) => {
           if (result) {
             this.ngZone.run(() => {
+              this.playBeepSound(); // Reproducir sonido de beep
               this.closeModal({ rawValue: result.getText() } as any);
               controls.stop();
             });
@@ -287,6 +294,7 @@ export class CameraScannerModalComponent implements AfterViewInit, OnDestroy {
               return;
             }
           }
+          this.playBeepSound(); // Reproducir sonido de beep
           listener.remove();
           this.closeModal(firstBarcode);
         });

@@ -18,7 +18,7 @@ import { createOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { ModalController } from '@ionic/angular';
 import { FormularioRegistroProductoModalComponent } from '../modales/formulario-registro-producto-modal/formulario-registro-producto-modal.component';
-
+import { Router } from '@angular/router';
 
 export interface ProductoEscaneado {
   codigo: string;
@@ -60,7 +60,8 @@ export class RegistroProductoPage implements OnInit {
   
   constructor(
     private outputsEmergentesService: OutputsEmergentesService,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private router: Router
 
 
   ) { addIcons({ createOutline }) }
@@ -155,7 +156,10 @@ export class RegistroProductoPage implements OnInit {
           header: 'AVISO',
           message: 'El código ya fue escaneado',
           buttons: ['OK'],
-        });
+         });
+      } else if (!barcode && this.productosEscaneados.length === 0) {
+        // Si NO se escaneó nada y la lista está vacía, volver al inventario
+        this.router.navigate(['/tabs/tab1']);
       }
     });
   }
