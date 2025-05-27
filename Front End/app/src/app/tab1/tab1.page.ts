@@ -9,7 +9,7 @@ import { ConexionBackendService} from 'src/app/services/conexion-backend.service
 import { IonicModule } from '@ionic/angular';
 
 import { OutputsEmergentesService } from '../services/outputs-emergentes/outputs-emergentes.service';
-
+import { HTMLIonOverlayElement } from '@ionic/core';
 
 
 export interface Producto {
@@ -50,19 +50,28 @@ export class Tab1Page implements OnInit{
     this.iniciarAutoRefresh(); // Inicia el auto-refresh al cargar la página
   }
   private autoRefreshInterval: any;
-  private readonly REFRESH_INTERVAL = 30000 // 1 minuto
-
+  private REFRESH_INTERVAL = 30000 // 1 minuto
+  private intentos_error = 0; // Contador de intentos de error
 
 
   iniciarAutoRefresh(): void {
     if (this.autoRefreshInterval) {
       clearInterval(this.autoRefreshInterval);
     }
+    if (this.intentos_error > 8) {
+      return;
+    }
     this.autoRefreshInterval = setInterval(() => {
+      // adjust selector to fit your needs
+      const overlays = document.querySelectorAll('ion-alert');
+      const overlaysArr = Array.from(overlays) as HTMLIonOverlayElement[];
+      overlaysArr.forEach(o => o.dismiss());
+
+      console.log(`Auto-refresh iniciado cada ${this.REFRESH_INTERVAL / 1000} segundos`);
       this.obtenerProductos(); // Llama al método para obtener productos
     }, this.REFRESH_INTERVAL);
 
-    console.log(`Auto-refresh iniciado cada ${this.REFRESH_INTERVAL / 1000} segundos`);
+    
   }
 
 
@@ -119,11 +128,14 @@ export class Tab1Page implements OnInit{
         if (response.success) {
           this.productos = response.productos; // Asignar los productos a la variable
           console.log('Productos obtenidos:', this.productos);
+          this.REFRESH_INTERVAL = 30000
         }
       },
-      error => {
-        throw new Error('Error al obtener productos: ' + (error || 'Error desconocido'));
-        }
+      (error: any) => {
+        this.intentos_error++;
+        this.REFRESH_INTERVAL = 30000 + this.REFRESH_INTERVAL; // Si hay error, reduce el intervalo a 10 segundos
+        throw error;
+      }
       );
   }
 
@@ -161,7 +173,6 @@ export class Tab1Page implements OnInit{
         },
         error: err => {
           console.error('Error al actualizar formato:', err);
-          throw new Error('Error al actualizar formato: ' + (err || 'Error desconocido'));
         }
       });
   }
