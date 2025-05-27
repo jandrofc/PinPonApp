@@ -131,6 +131,8 @@ app.get('/api/get/lista_productos', (request, response) => {
     );
 
 });
+
+
 //curl -X POST http://localhost:3000/api/post/producto
 app.post('/api/post/producto', (req, res) => {
     const {
@@ -147,70 +149,93 @@ app.post('/api/post/producto', (req, res) => {
       return res.status(400).json({ error: 'Faltan datos obligatorios en el body' });
     }
 
-
-  // 2) Comprobar unicidad de código de barras
-    const codigoQuery = `SELECT id FROM formato_producto WHERE codigo_barra = ?`;
+    // 2) Comprobar unicidad de código de barras y estado habilitado
+    const codigoQuery = `SELECT * FROM formato_producto WHERE codigo_barra = ?`;
     db.query(codigoQuery, [codigo_barra], (err, codigoRes) => {
-    if (err) {
-      console.error('Error comprobando código de barras:', err);
-      return res.status(500).json({ error: 'Error en la validación de código de barras' });
-    }
-    if (codigoRes.length > 0) {
-      return res.status(400).json({ error: 'Código de barras ya registrado' });
-    }
-
-    // 3) Comprobar si existe el producto genérico
-    const checkQuery = `SELECT id FROM producto WHERE producto = ? AND marca = ?`;
-    db.query(checkQuery, [producto, marca], (err, prodRes) => {
       if (err) {
-        console.error('Error comprobando producto:', err);
-        return res.status(500).json({ error: 'Error al comprobar producto' });
+        console.error('Error comprobando código de barras:', err);
+        return res.status(500).json({ error: 'Error en la validación de código de barras' });
       }
-
-      const insertarFormato = (productId) => {
-        const insertFmtQ = `
-          INSERT INTO formato_producto
-            (producto_id, formato, cantidad, codigo_barra, precio)
-          VALUES (?, ?, ?, ?, ?)
-        `;
-        db.query(
-          insertFmtQ,
-          [productId, formato, cantidad, codigo_barra, precio],
-          (err, fmtRes) => {
+      if (codigoRes.length > 0) {
+        const formato = codigoRes[0];
+        if (formato.habilitado === 1) {
+          // Ya existe y está habilitado
+          return res.status(400).json({ error: 'Código de barras ya registrado y habilitado', formato });
+        } else {
+          // Existe pero está deshabilitado, lo reactivamos
+          const updateQuery = `
+            UPDATE formato_producto
+            SET habilitado = 1
+            WHERE id = ?
+          `;
+          db.query(updateQuery, [formato.id], (err, updateRes) => {
             if (err) {
-              console.error('Error al insertar formato:', err);
-              return res.status(500).json({ error: 'Error al insertar formato' });
+              console.error('Error reactivando formato:', err);
+              return res.status(500).json({ error: 'Error al reactivar formato' });
             }
-            res.json({
+            // Devolvemos los datos del formato reactivado
+            return res.json({
               success: true,
-              message: prodRes.length > 0
-                ? 'Formato agregado a producto existente'
-                : 'Producto y formato creados correctamente',
-              formatoId: fmtRes.insertId,
-              productoId: productId
+              message: 'Formato reactivado correctamente',
+              formato: { ...formato, habilitado: 1 }
             });
-          }
-        );
-      };
-
-      if (prodRes.length > 0) {
-        // a) Producto ya existe → sólo insertamos formato
-        const existingId = prodRes[0].id;
-        insertarFormato(existingId);
-      } else {
-        // b) Producto no existe → insertamos producto y luego formato
-        const insertProdQ = `INSERT INTO producto (producto, marca) VALUES (?, ?)`;
-        db.query(insertProdQ, [producto, marca], (err, prodInsertRes) => {
-          if (err) {
-            console.error('Error al insertar producto:', err);
-            return res.status(500).json({ error: 'Error al crear producto' });
-          }
-          const newProductId = prodInsertRes.insertId;
-          insertarFormato(newProductId);
-        });
+          });
+          return;
+        }
       }
+
+      // 3) Comprobar si existe el producto genérico
+      const checkQuery = `SELECT id FROM producto WHERE producto = ? AND marca = ?`;
+      db.query(checkQuery, [producto, marca], (err, prodRes) => {
+        if (err) {
+          console.error('Error comprobando producto:', err);
+          return res.status(500).json({ error: 'Error al comprobar producto' });
+        }
+
+        const insertarFormato = (productId) => {
+          const insertFmtQ = `
+            INSERT INTO formato_producto
+              (producto_id, formato, cantidad, codigo_barra, precio)
+            VALUES (?, ?, ?, ?, ?)
+          `;
+          db.query(
+            insertFmtQ,
+            [productId, formato, cantidad, codigo_barra, precio],
+            (err, fmtRes) => {
+              if (err) {
+                console.error('Error al insertar formato:', err);
+                return res.status(500).json({ error: 'Error al insertar formato' });
+              }
+              res.json({
+                success: true,
+                message: prodRes.length > 0
+                  ? 'Formato agregado a producto existente'
+                  : 'Producto y formato creados correctamente',
+                formatoId: fmtRes.insertId,
+                productoId: productId
+              });
+            }
+          );
+        };
+
+        if (prodRes.length > 0) {
+          // a) Producto ya existe → sólo insertamos formato
+          const existingId = prodRes[0].id;
+          insertarFormato(existingId);
+        } else {
+          // b) Producto no existe → insertamos producto y luego formato
+          const insertProdQ = `INSERT INTO producto (producto, marca) VALUES (?, ?)`;
+          db.query(insertProdQ, [producto, marca], (err, prodInsertRes) => {
+            if (err) {
+              console.error('Error al insertar producto:', err);
+              return res.status(500).json({ error: 'Error al crear producto' });
+            }
+            const newProductId = prodInsertRes.insertId;
+            insertarFormato(newProductId);
+          });
+        }
+      });
     });
-  });
 });
 
 //Valida que el codigo de barra exista en la DB
@@ -277,17 +302,36 @@ app.post('/api/post/formato',(request,response)=>{
 //Para actualizar los datos del producto
 app.put('/api/put/formato', (req, res) => {
   const {
-    id_formato, //pete
+    id_formato,
     producto_id,
-    nombre_producto,  // <-- nombre que quieres dejar en producto.producto
+    nombre_producto,
     formato,
     cantidad,
     codigo_barra,
     precio
   } = req.body;
 
+  // Validación de datos dependiendo de si esta vacion o no es String o numero negativos
   if (!id_formato) {
     return res.status(400).json({ error: 'Falta el id_formato' });
+  }
+  if (!producto_id) {
+    return res.status(400).json({ error: 'Falta el producto_id' });
+  }
+  if (!nombre_producto || typeof nombre_producto !== 'string' || nombre_producto.trim() === '') {
+    return res.status(400).json({ error: 'Falta el nombre_producto o es inválido' });
+  }
+  if (!formato || typeof formato !== 'string' || formato.trim() === '') {
+    return res.status(400).json({ error: 'Falta el formato o es inválido' });
+  }
+  if (cantidad == null || isNaN(Number(cantidad)) || Number(cantidad) < 0) {
+    return res.status(400).json({ error: 'Cantidad inválida' });
+  }
+  if (!codigo_barra || typeof codigo_barra !== 'string' || codigo_barra.trim() === '') {
+    return res.status(400).json({ error: 'Falta el codigo_barra o es inválido' });
+  }
+  if (precio == null || isNaN(Number(precio)) || Number(precio) < 0) {
+    return res.status(400).json({ error: 'Precio inválido' });
   }
 
   const updateQuery = `

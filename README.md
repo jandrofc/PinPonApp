@@ -17,7 +17,7 @@ npx cap sync
 
 
 
-npx ionic cap synx
+npx ionic cap sync
 npx cap open android
 
 
