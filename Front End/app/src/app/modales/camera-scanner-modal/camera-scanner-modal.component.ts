@@ -18,6 +18,9 @@ import {
   StartScanOptions, // Opciones para iniciar el escaneo
 } from '@capacitor-mlkit/barcode-scanning';
 
+import { BrowserMultiFormatReader } from '@zxing/browser'; // ZXing para escaneo en web
+import { Result } from '@zxing/library'; // Resultado del escaneo de ZXing
+
 import { OutputsEmergentesService } from 'src/app/services/outputs-emergentes/outputs-emergentes.service';
 import { Capacitor } from '@capacitor/core';      // Para detectar la plataforma
 import { InputCustomEvent } from '@ionic/angular'; // Eventos de input de Ionic
@@ -123,6 +126,10 @@ export class CameraScannerModalComponent implements AfterViewInit, OnDestroy {
       BarcodeFormat.UpcE
     ];
   private readonly lensFacing: LensFacing = LensFacing.Back;
+  
+  // ZXing para escaneo en web
+  private zxingReader = new BrowserMultiFormatReader();
+  private zxingControls: any;
 
   constructor(
     // readonly hace que la propiedad no se pueda modificar
@@ -138,11 +145,15 @@ export class CameraScannerModalComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     setTimeout(() => {
-      this.startScan().then(() =>
-        BarcodeScanner.isTorchAvailable().then((result) => {
-          this.isTorchAvailable = result.available;
-        }),
-      );
+      this.startScan().then(() => {
+        if (Capacitor.getPlatform() !== 'web') {
+          BarcodeScanner.isTorchAvailable().then((result) => {
+            this.isTorchAvailable = result.available;
+          });
+        } else {
+          this.isTorchAvailable = false;
+        }
+      });
     }, 500);
   }
 
@@ -177,13 +188,38 @@ export class CameraScannerModalComponent implements AfterViewInit, OnDestroy {
     document.querySelector('body')?.classList.add('barcode-scanning-active');
 
     // Configura las opciones para el escaneo, formato que lee, camara a usar y si sera en web o telefono
+    if (Capacitor.getPlatform() === 'web') {
+      // ZXing para escaneo en web
+      const devices = await BrowserMultiFormatReader.listVideoInputDevices();
+      const selectedDeviceId = devices[0]?.deviceId;
+      if (!selectedDeviceId) {
+        alert('No se encontró ninguna cámara disponible.');
+        return;
+      }
+      // Inicia el escaneo con ZXing
+      this.zxingControls = this.zxingReader.decodeFromVideoDevice(
+        selectedDeviceId,
+        this.videoElement?.nativeElement!,
+        (result: Result | undefined, err, controls) => {
+          if (result) {
+            this.ngZone.run(() => {
+              this.closeModal({ rawValue: result.getText() } as any);
+              controls.stop();
+            });
+          }
+          if (err) {
+            console.error('Error ZXing:', err);
+          }
+        }
+      );
+      return;
+    }
+
+    // --- MÓVIL: BarcodeScanner ---
     const options: StartScanOptions = {
       formats: this.formatos,
       lensFacing: this.lensFacing,
-      videoElement:
-        Capacitor.getPlatform() === 'web'
-          ? this.videoElement?.nativeElement
-          : undefined,
+      videoElement: undefined, // solo para móvil
     };
 
 
@@ -278,10 +314,12 @@ export class CameraScannerModalComponent implements AfterViewInit, OnDestroy {
 
   // Detiene el escaneo
   private async stopScan(): Promise<void> {
-    // Show everything behind the modal again
     document.querySelector('body')?.classList.remove('barcode-scanning-active');
-
-    await BarcodeScanner.stopScan();
+    if (Capacitor.getPlatform() === 'web') {
+      if (this.zxingControls && typeof this.zxingControls.stop === 'function') {
+        this.zxingControls.stop();}
+    } else {
+      await BarcodeScanner.stopScan();
+    }
   }
-
 }
