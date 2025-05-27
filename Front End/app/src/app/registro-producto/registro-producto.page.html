@@ -1,23 +1,49 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>registro de productos</ion-title>
+    <ion-title>Productos Escaneados</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-card *ngIf="valoresEscaneados.length > 0">
-        <ion-card-header>
-          <ion-card-title>Códigos Escaneados ({{ valoresEscaneados.length }})</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <ion-list>
-            <ion-item *ngFor="let codigo of valoresEscaneados; let i = index">
-              <ion-label>
-                <h3>Código {{ i + 1 }}</h3>
-                <p>{{ codigo }}</p>
-              </ion-label>
-            </ion-item>
-          </ion-list>
-        </ion-card-content>
-      </ion-card>
+  <div class="product-list">
+    <div class="product-item" *ngFor="let producto of productosEscaneados; let i = index">
+      <div class="product-content">
+        <div class="product-info">
+          <div class="product-code-container">
+            Codigo: {{producto.codigo}}
+          </div>
+          <div class="product-name-container"*ngIf="producto.nombre || producto.marca || producto.formato">
+            <h3>
+              <span *ngIf="producto.nombre">{{ producto.nombre }}</span>
+              <span *ngIf="producto.nombre && (producto.marca || producto.formato)"> - </span>
+              <span *ngIf="producto.marca">{{ producto.marca }}</span>
+              <span *ngIf="(producto.nombre || producto.marca) && producto.formato"> - </span>
+              <span *ngIf="producto.formato">{{ producto.formato }}</span>
+            </h3>
+            <ion-badge color="primary" class="new-badge">
+              ¡Nuevo!
+            </ion-badge>
+          </div>
+          <p class="product-details">
+            Existente:  · Total: ${{ producto.precio }} · Cantidad: {{ producto.cantidad }}
+          </p>
+        </div>
+        <div class="product-edit">
+            <button class="icon-button edit-button" (click)="editarProducto(producto)">
+              <ion-icon name="create-outline"></ion-icon>
+              <span class="edit-text">Editar</span>
+            </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="confirm-container">
+    <ion-button expand="block" color="secondary" class="scan-button" (click)="escanear_Productos()">
+      Seguir escaneando
+    </ion-button>
+    <ion-button expand="block" color="primary" class="confirm-button">
+      Confirme los productos escaneados
+    </ion-button>
+  </div>
 </ion-content>
