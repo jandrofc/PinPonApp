@@ -10,7 +10,7 @@
       <div class="product-content">
         <div class="product-info">
           <div class="product-code-container">
-            <h3>Codigo: {{producto.codigo}}</h3>
+            Codigo: {{producto.codigo}}
           </div>
           <div class="product-name-container"*ngIf="producto.nombre || producto.marca || producto.formato">
             <h3>
@@ -25,18 +25,13 @@
             </ion-badge>
           </div>
           <p class="product-details">
-            Existente  · total: ${{ producto.precio }}
+            Existente:  · Total: ${{ producto.precio }} · Cantidad: {{ producto.cantidad }}
           </p>
         </div>
-        <div class="quantity-controls">
-          <span class="quantity-value">Cant: {{ producto.cantidad }}</span>
-        </div>
         <div class="product-edit">
-            <button
-              class="icon-button edit-button"
-              (click)="editarProducto(producto)"
-            >
-            <ion-icon name="create-outline"></ion-icon>
+            <button class="icon-button edit-button" (click)="editarProducto(producto)">
+              <ion-icon name="create-outline"></ion-icon>
+              <span class="edit-text">Editar</span>
             </button>
         </div>
       </div>
