@@ -28,6 +28,7 @@ export class ConexionBackendService {
     const url = `${this.configService.apiUrl}${endponit}`; // URL del endpoint
     const params = {   orden }; // Parámetros de consulta
     return this.http.get(url, { params }).pipe(
+      catchError(this.handleError)
     );
   }
 
@@ -57,16 +58,93 @@ export class ConexionBackendService {
 
 
   // Manejo de errores
-  private handleError(error: HttpErrorResponse) {
+  private handleError = (error: any) => {
     let errorMessage = 'Error desconocido';
-    if (error.error instanceof ErrorEvent) {
-      // Error del cliente
-      errorMessage = `Error: ${error.error.message}`;
-    } else {
-      // Error del servidor
-      errorMessage = `Código: ${error.status}\nMensaje: ${error.message}`;
+    let errorType = 'UNKNOWN_ERROR';
+    
+    console.error('Error completo:', error);
+
+    // ✅ Error de timeout
+    if (error.name === 'TimeoutError') {
+      errorMessage = 'El servidor no responde. Verifique el estado del servidor e intenta nuevamente.';
+      errorType = 'TIMEOUT_ERROR';
     }
-    console.error(errorMessage);
-    return throwError(() => new Error(errorMessage));
+    // ✅ Error de red (sin respuesta del servidor)
+    else if (error instanceof HttpErrorResponse) {
+      // Sin conexión o servidor no disponible
+      if (error.status === 0) {
+        errorMessage = 'No se pudo conectar al servidor. Verifique el estado del servidor e intenta nuevamente.';
+        errorType = 'NETWORK_ERROR';
+      }
+      // Error del cliente (4xx)
+      else if (error.status >= 400 && error.status < 500) {
+        switch (error.status) {
+          case 400:
+            errorMessage = 'Solicitud incorrecta. Verifica los datos enviados.';
+            errorType = 'BAD_REQUEST';
+            break;
+          case 401:
+            errorMessage = 'No tienes autorización. Inicia sesión nuevamente.';
+            errorType = 'UNAUTHORIZED';
+            break;
+          case 403:
+            errorMessage = 'No tienes permisos para realizar esta acción.';
+            errorType = 'FORBIDDEN';
+            break;
+          case 404:
+            errorMessage = 'El recurso solicitado no existe.';
+            errorType = 'NOT_FOUND';
+            break;
+          default:
+            errorMessage = `Error del cliente: ${error.status} - ${error.message}`;
+            errorType = 'CLIENT_ERROR';
+        }
+      }
+      // Error del servidor (5xx)
+      else if (error.status >= 500) {
+        switch (error.status) {
+          case 500:
+            errorMessage = 'Error interno del servidor. Intenta más tarde.';
+            errorType = 'SERVER_ERROR';
+            break;
+          case 502:
+            errorMessage = 'El servidor no está disponible temporalmente.';
+            errorType = 'BAD_GATEWAY';
+            break;
+          case 503:
+            errorMessage = 'Servicio no disponible. Intenta más tarde.';
+            errorType = 'SERVICE_UNAVAILABLE';
+            break;
+          default:
+            errorMessage = `Error del servidor: ${error.status} - ${error.message}`;
+            errorType = 'SERVER_ERROR';
+        }
+      }
+      // Otros errores HTTP
+      else {
+        errorMessage = `Error HTTP: ${error.status} - ${error.message}`;
+        errorType = 'HTTP_ERROR';
+      }
+    }
+    // ✅ Error de JS/Cliente
+    else if (error.error instanceof ErrorEvent) {
+      errorMessage = `Error de conexión: ${error.error.message}`;
+      errorType = 'CLIENT_ERROR';
+    }
+    // ✅ Error genérico
+    else {
+      errorMessage = error.message || 'Ha ocurrido un error inesperado';
+      errorType = 'UNKNOWN_ERROR';
+    }
+
+    // ✅ Crear error estructurado
+    const structuredError = new Error(errorMessage);
+    (structuredError as any).type = errorType;
+    (structuredError as any).originalError = error;
+    (structuredError as any).timestamp = new Date().toISOString();
+
+    console.error(`[${errorType}] ${errorMessage}`);
+    
+    return throwError(() => structuredError);
   }
 }

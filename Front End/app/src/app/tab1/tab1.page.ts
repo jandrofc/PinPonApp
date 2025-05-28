@@ -1,4 +1,4 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit} from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, OnDestroy, OnInit} from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/angular/standalone';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -7,6 +7,10 @@ import { ActivatedRoute, Router } from '@angular/router'; //navegacion entre pag
 
 import { ConexionBackendService} from 'src/app/services/conexion-backend.service';
 import { IonicModule } from '@ionic/angular';
+
+import { OutputsEmergentesService } from '../services/outputs-emergentes/outputs-emergentes.service';
+import { HTMLIonOverlayElement } from '@ionic/core';
+
 
 export interface Producto {
   id_formato:  number;
@@ -29,23 +33,70 @@ export interface Producto {
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [    FormsModule, CommonModule,IonicModule],
 })
-export class Tab1Page implements OnInit{
+export class Tab1Page implements OnInit, OnDestroy{
   constructor(
     private apiService: ConexionBackendService,
     private router: Router,
-    private params: ActivatedRoute) {}
+    private params: ActivatedRoute,
+    private readonly outputsEmergentesService: OutputsEmergentesService,
+    
+  ){}
+    
+  async ngOnDestroy() {
+    if (this.autoRefreshInterval) {
+      clearInterval(this.autoRefreshInterval);
+      console.log('Auto-refresh detenido');
+    }  
+  }
+
+  async ngOnInit() {
+    this.CargarDatos();
+    this.iniciarAutoRefresh(); // Inicia el auto-refresh al cargar la página
+  }
+  private autoRefreshInterval: any;
+  private REFRESH_INTERVAL = 30000 // 1 minuto
+  private intentos_error = 0; // Contador de intentos de error
+
+
+
+
+
+  iniciarAutoRefresh(): void {
+    if (this.autoRefreshInterval) {
+      clearInterval(this.autoRefreshInterval);
+    }
+    if (this.intentos_error > 8) {
+      return;
+    }
+    this.autoRefreshInterval = setInterval(() => {
+      // adjust selector to fit your needs
+      const overlays = document.querySelectorAll('ion-alert');
+      const overlaysArr = Array.from(overlays) as HTMLIonOverlayElement[];
+      overlaysArr.forEach(o => o.dismiss());
+
+      console.log(`Auto-refresh iniciado cada ${this.REFRESH_INTERVAL / 1000} segundos`);
+      this.obtenerProductos(); // Llama al método para obtener productos
+    }, this.REFRESH_INTERVAL);
 
     
-    
+  }
 
-  ngOnInit() {
-    this.obtenerProductos();
+
+
+  async CargarDatos(): Promise<void> {
+    const loading = await this.outputsEmergentesService.showLoading({
+      message: 'Cargando productos...',
+    });
+    this.obtenerProductos()
+    loading.dismiss(); // Cierra el loading una vez que se cargan los productos
   }
 
 
     // DEBUG 
     apiUrl: string = this.apiService.getIPFILE();
     response: any;
+
+
 
 
 
@@ -84,13 +135,15 @@ export class Tab1Page implements OnInit{
         if (response.success) {
           this.productos = response.productos; // Asignar los productos a la variable
           console.log('Productos obtenidos:', this.productos);
+          this.REFRESH_INTERVAL = 30000
         }
       },
-      error => {
-        this.response = error;
-        console.error('Error al obtener productos:', error);
+      (error: any) => {
+        this.intentos_error++;
+        this.REFRESH_INTERVAL = 30000 + this.REFRESH_INTERVAL; // Si hay error, reduce el intervalo a 10 segundos
+        throw error;
       }
-    );
+      );
   }
 
   get filteredProducts() {
