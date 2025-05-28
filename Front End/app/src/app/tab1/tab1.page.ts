@@ -1,4 +1,4 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit} from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, OnDestroy, OnInit} from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/angular/standalone';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -33,7 +33,7 @@ export interface Producto {
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [    FormsModule, CommonModule,IonicModule],
 })
-export class Tab1Page implements OnInit{
+export class Tab1Page implements OnInit, OnDestroy{
   constructor(
     private apiService: ConexionBackendService,
     private router: Router,
@@ -42,8 +42,12 @@ export class Tab1Page implements OnInit{
     
   ){}
     
-    
-    
+  async ngOnDestroy() {
+    if (this.autoRefreshInterval) {
+      clearInterval(this.autoRefreshInterval);
+      console.log('Auto-refresh detenido');
+    }  
+  }
 
   async ngOnInit() {
     this.CargarDatos();
@@ -52,6 +56,9 @@ export class Tab1Page implements OnInit{
   private autoRefreshInterval: any;
   private REFRESH_INTERVAL = 30000 // 1 minuto
   private intentos_error = 0; // Contador de intentos de error
+
+
+
 
 
   iniciarAutoRefresh(): void {
