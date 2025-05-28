@@ -463,6 +463,68 @@ app.patch('/api/patch/formato/:id', (req, res) => {
 });
 
 
+// Endpoint para obtener un producto por su código de barra
+app.get('/api/get/producto_por_codigo/:codigo', (req, res) => {
+  const codigo = req.params.codigo;
+  if (!codigo) {
+    return res.status(400).json({ error: 'Falta el código de barra' });
+  }
+  const query = `
+    SELECT 
+      FP.id AS id_formato,
+      FP.producto_id,
+      P.producto AS nombre_producto,
+      FP.formato,
+      P.marca,
+      FP.cantidad,
+      FP.precio,
+      FP.codigo_barra
+    FROM formato_producto FP
+    INNER JOIN producto P ON FP.producto_id = P.id
+    WHERE FP.codigo_barra = ? AND FP.habilitado = 1 AND P.habilitado = 1
+    LIMIT 1
+  `;
+  db.query(query, [codigo], (err, results) => {
+    if (err) {
+      console.error('Error al buscar el producto:', err);
+      return res.status(500).json({ error: 'Error en la base de datos' });
+    }
+    if (results.length === 1) {
+      res.json({ producto: results[0] });
+    } else {
+      res.status(404).json({ error: 'Producto no encontrado' });
+    }
+  });
+});
+
+// Endpoint para realizar una compra y actualizar el stock
+app.post('/api/post/realizar_compra', (req, res) => {
+  const { productos } = req.body;
+  if (!productos || !Array.isArray(productos) || productos.length === 0) {
+    return res.status(400).json({ error: 'Debes enviar productos' });
+  }
+
+  // Verifica stock y descuenta
+  const updates = productos.map(p => {
+    return new Promise((resolve, reject) => {
+      const updateStock = `
+        UPDATE formato_producto
+        SET cantidad = cantidad - ?
+        WHERE id = ? AND cantidad >= ?`;
+      db.query(updateStock, [p.cantidad, p.id_formato, p.cantidad], (err, result) => {
+        if (err) return reject(err);
+        if (result.affectedRows === 0) return reject(new Error('Stock insuficiente para el producto ' + p.id_formato));
+        resolve();
+      });
+    });
+  });
+
+  Promise.all(updates)
+    .then(() => res.json({ success: true, mensaje: 'Compra realizada y stock actualizado' }))
+    .catch(err => res.status(400).json({ error: err.message }));
+});
+
+
 // Middleware para manejar rutas no definidas
 app.use((req, res) => {
   const endpoints = {

@@ -8,8 +8,6 @@
 
 /* Header */
 .header {
-  background-color: #4f46e5; /* bg-indigo-600 */
-  color: white;
   padding: 1rem;
   display: flex;
   align-items: center;
@@ -27,7 +25,7 @@
 
 .icon-button {
   background: none;
-  color: #4f46e5;
+  color: var(--cb-600);
   border: none;
   padding: 0.5rem;
   border-radius: 9999px;
@@ -38,7 +36,7 @@
 }
 
 .icon-button:hover {
-  background-color: #4338ca;
+  background-color: var(--cb-600);
 }
 
 .notification-button {
@@ -46,7 +44,6 @@
 }
 
 .noti-icon {
-  color: white;
   font-size: 1.7rem;
 }
 
@@ -76,7 +73,7 @@
 
 .back-button {
   margin-right: 0.5rem;
-  color: #4f46e5;
+  color: var(--cb-600);
   background: none;
   font-size: 1.5rem;
 }
@@ -84,7 +81,7 @@
 .section-title {
   font-size: 1.875rem;
   font-weight: 700;
-  color: #4f46e5;
+  color: var(--cb-600);
   text-align: center;
 }
 
@@ -129,8 +126,8 @@
 .product-list-header {
   display: grid;
   grid-template-columns: 6fr 3fr 3fr;
-  background-color: #4361ee;
-  color: white;
+  background-color: var(--cb-600);
+  color: var(--cb-50);
   padding: 0.75rem;
   font-weight: 500;
   text-align: center;
@@ -194,8 +191,8 @@
 .badge {
   display: inline-block;
   padding: 0.25rem 0.75rem;
-  background-color: #e5ebff;
-  color: #3730a3;
+  background-color: var(--cb-200);
+  color: var(--cb-600);
   border-radius: 9999px;
   font-weight: 500;
   font-size: 1rem;
@@ -213,18 +210,19 @@
   background-color: #eef2ff;
 }
 
-.no-products {
+.no-productos {
   padding: 2rem;
   text-align: center;
-  color: #64748b;
+  color: #000000 !important;
+
 }
 
 /* Add Product Button */
 .add-product-button {
   width: 100%;
   padding: 1rem;
-  background-color: #b3e1ff;
-  color: #4361ee;
+  background-color: var(--cb-600);
+  color: var(--cb-50);
   font-size: 1rem;
   font-weight: 600;
   border-radius: 1rem;
