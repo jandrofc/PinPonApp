@@ -13,27 +13,35 @@
       <h2 class="section-title">Lista de Productos</h2>
     </div>
     <div class="scan-container">
-      <div class="scan-message">
-          <i class="fas fa-barcode"></i>
-          <p>¡Escanee los productos!</p>
-      </div>
-
       <div class="products-container">
-          <!-- Aquí se mostrarían los productos escaneados -->
+        <div *ngIf="productosEscaneados.length === 0" class="no-products">
+          ¡Escanee los productos!
+        </div>
+        <div *ngFor="let producto of productosEscaneados" class="product-row">
+          <div class="product-info">
+            <div class="product-name">{{ producto.nombre }} - {{ producto.marca }} - {{ producto.formato }}</div>
+            <div class="product-price">$ {{ producto.precio }}</div>
+          </div>
+          <div class="product-quantity">
+            <button class="quantity-btn" (click)="restarCantidad(producto)">-</button>
+            <span class="quantity">{{ producto.cantidad }}</span>
+            <button class="quantity-btn" (click)="sumarCantidad(producto)">+</button>
+          </div>
+        </div>
       </div>
 
       <div class="total-section">
           <div class="total-label">Total:</div>
-          <div class="total-amount">$ 0</div>
+          <div class="total-amount">$ {{ getTotal() }}</div>
       </div>
     </div>
 
     <div class="action-buttons">
-        <button class="scan-button">
+        <button class="scan-button" (click)="abrirScanner()">
             <ion-icon class="fas fa-barcode" name="camera"></ion-icon>
             Escanear productos
         </button>
-        <button class="checkout-button">
+        <button class="checkout-button" (click)="realizarCompra()">
             <ion-icon class="fas fa-shopping-cart" name="bag"></ion-icon>
             Realizar Compra
         </button>

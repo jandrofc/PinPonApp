@@ -1,0 +1,149 @@
+.product-list {
+    padding: 16px;
+    padding-bottom: 100px;
+    
+    .product-item {
+      background-color: #dbeafe;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      
+      .product-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        
+        .product-info {
+          flex: 1;
+
+          .product-code-container {
+            font-size: 0.875rem;
+            color: #4b5563;
+            margin-bottom: 8px;
+          }
+          
+          .product-name-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: -12px;
+            
+            h3 {
+              font-weight: 600;
+              color: #1f2937;
+              margin: 0;
+              font-size: 1.2rem;
+            }
+            
+            .new-badge {
+              font-size: 0.75rem;
+              padding: 2px 8px;
+            }
+          }
+          
+          .product-details {
+            font-size: 0.9rem;
+            color: #4b5563;
+            margin-bottom: 0;
+          }
+        }
+        
+        .quantity-controls {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          
+          .quantity-button {
+            --background: white;
+            --color: #4b5563;
+            --border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            
+            &:hover {
+              --background: #f3f4f6;
+            }
+          }
+          
+          .quantity-value {
+            font-weight: 500;
+            min-width: 16px;
+            text-align: center;
+            color: #1f2937;
+          }
+        }
+      }
+    }
+  }
+
+  .icon-button {
+    background: none;
+    color: #4f46e5;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+  }
+
+  .product-edit {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 2px solid #7c89d2;
+    color: #5b6bc0;
+    padding: 5px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .product-edit:hover {
+    background-color: #b2ccee; // color de fondo al pasar el mouse
+    border-color: #636fb6; // color del borde al pasar el mouse
+  }
+  
+  .icon-button.edit-button {
+    font-size: 2rem; // tamaño del icono
+
+    .edit-text {
+      font-size: 1.1rem; // tamaño del texto "Editar"
+      margin-top: 2px;
+      margin-left: 4px;
+      color: #4f46e5; // mismo color que el icono
+      font-weight: 500;
+    }
+
+    .edit-text:hover {
+      color: rgb(49, 39, 156); // color del icono al pasar el mouse
+    }
+  }
+
+  .icon-button.edit-button:hover {
+    color: rgb(49, 39, 156); // color del icono al pasar el mouse
+  }
+
+  .confirm-container {
+    position: fixed;
+    bottom: 60px;
+    left: 0;
+    right: 0;
+    padding: 16px;
+    background: white;
+    border-top: 1px solid #e5e7eb;
+    z-index: 10;
+    
+    .confirm-button {
+      --background: #2563eb;
+      --background-hover: #1d4ed8;
+      --border-radius: 8px;
+      font-weight: 500;
+      height: 48px;
+    }
+  }
