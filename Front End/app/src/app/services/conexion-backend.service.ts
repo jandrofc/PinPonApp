@@ -54,6 +54,12 @@ export class ConexionBackendService {
       .pipe(catchError(this.handleError));
   }
 
+  // Método para registrar uno o varios productos
+  registrarProductos(productos: any | any[]): Observable<any> {
+  return this.http.post(`${this.configService.apiUrl}post/producto`, productos)
+    .pipe(catchError(this.handleError));
+}
+
 
 
   // Manejo de errores
