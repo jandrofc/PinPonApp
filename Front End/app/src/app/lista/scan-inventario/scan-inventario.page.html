@@ -5,21 +5,37 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <div class="product-list-header">
-    <div class="header-code">Codigo</div>
-    <div class="header-name">Nombre</div>
-    <div class="header-quantity">Cantidad</div>
-    <div class="header-price">Precio</div>
-  </div>
-
-  <ng-container *ngIf="scannedProducts.length > 0;">
-    <div *ngFor="let producto of scannedProducts; let i = index"
-          [ngClass]="i % 2 === 0 ? 'product-row even' : 'product-row odd'">
-      <div class="product-code"><span>{{ producto.code }}</span></div>
-      <div class="product-name"><span>{{ producto.name }} - {{ producto.brand }} - {{ producto.format }}</span></div>
-      <div class="product-quantity"><span class="badge">{{ producto.quantity }}</span></div>
-      <div class="product-price"><span class="badge"> ${{ producto.price }}</span></div>
+  <div class="product-list">
+    <div class="product-item" *ngFor="let producto of scannedProducts">
+      <div class="product-content">
+        <div class="product-info">
+          <div class="product-name-container">
+            <h3>{{ producto.name }} - {{producto.brand}} - {{producto.format}}</h3>
+            <ion-badge color="primary" *ngIf="producto.isNew" class="new-badge">
+              ¡Nuevo!
+            </ion-badge>
+          </div>
+          <p class="product-details">
+            Existente {{ producto.existente }} · total: {{ producto.price }}
+          </p>
+        </div>
+        <div class="quantity-controls">
+          <ion-button fill="clear" size="small" class="quantity-button" (click)="disminuirCantidad(producto.id)">
+            <ion-icon name="remove-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+          <span class="quantity-value">{{ producto.quantity }}</span>
+          <ion-button fill="clear" size="small" class="quantity-button" (click)="aumentarCantidad(producto.id)">
+            <ion-icon name="add-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
     </div>
-  </ng-container>
+  </div>
+  
+  <div class="confirm-container">
+    <ion-button expand="block" color="primary" class="confirm-button">
+      Confirme los productos escaneados
+    </ion-button>
+  </div>
 </ion-content>
 

@@ -13,11 +13,11 @@ npx cap add android // crea el proyecto para exportarlo android estudio basado e
 
 npx cap open android // abre el android estudio con el proyecto
 
-npx cap sync
 
 
 
-npx ionic cap synx
+
+npx ionic cap sync
 npx cap open android
 
 
