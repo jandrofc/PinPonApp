@@ -8,25 +8,25 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <main class="main-content">
+  <main class="main-content" color="primary">
     <div class="section-header">
       <h2 class="section-title">Generar Reporte</h2>
     </div>
     <div class="menu-container">
       <div class="report-options">
-        <button class="report-card">
-            <ion-icon class="card-icon" name="trending-up"></ion-icon>
-            <span>Productos más vendidos en el mes</span>
+        <button class="report-card best-sellers">
+            <ion-icon class="card-icon" name="trending-up" ></ion-icon>
+            <span class="button-text">Productos más vendidos en el mes</span>
         </button>
         
-        <button class="report-card">
-            <ion-icon class="card-icon" name="trending-down"></ion-icon>
-            <span>Productos menos vendidos</span>
+        <button class="report-card worst-sellers">
+            <ion-icon class="card-icon" name="trending-down" ></ion-icon>
+            <span class="button-text">Productos menos vendidos</span>
         </button>
         
-        <button class="report-card">
-            <ion-icon class="card-icon" name="logo-usd"></ion-icon>
-            <span>Ventas del mes</span>
+        <button class="report-card ventas-mes">
+            <ion-icon class="card-icon" name="logo-usd" ></ion-icon>
+            <span class="button-text">Ventas del mes</span>
         </button>
       </div>
     </div>

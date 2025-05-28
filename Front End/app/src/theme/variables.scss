@@ -2,6 +2,183 @@
 // http://ionicframework.com/docs/theming/
 
 
+/** Variables de color globales (light theme) **/
+:root {
+  /* Cerulean Blue Palette */
+  --cb-50:  #f2f5fc;
+  --cb-100: #e1e8f8;
+  --cb-200: #cad7f3;
+  --cb-300: #a5beeb;
+  --cb-400: #7a9de0;
+  --cb-500: #5a7cd7;
+  --cb-600: #3d59c7;
+  --cb-700: #3c4fb9;
+  --cb-800: #364297;
+  --cb-900: #303b78;
+  --cb-950: #21264a;
+
+/** primary: base = 600 */
+  --ion-color-primary:          var(--cb-600);
+  --ion-color-primary-rgb:      61,  89, 199;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade:    var(--cb-700);
+  --ion-color-primary-tint:     var(--cb-500);
+
+
+  /** secundary: base = 500 */
+  --ion-color-secundary:          var(--cb-500);
+  --ion-color-secundary-rgb:      90, 124, 215;
+  --ion-color-secundary-contrast: #ffffff;
+  --ion-color-secundary-contrast-rgb: 255, 255, 255;
+  --ion-color-secundary-shade:    var(--cb-600);
+  --ion-color-secundary-tint:     var(--cb-400);
+
+  /** tertiary: base = 400 */
+  --ion-color-tertiary:          var(--cb-400);
+  --ion-color-tertiary-rgb:      122, 157, 224;
+  --ion-color-tertiary-contrast: #ffffff;
+  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+  --ion-color-tertiary-shade:    var(--cb-500);
+  --ion-color-tertiary-tint:     var(--cb-300);
+
+  
+
+  /** success: base = 300 */
+  --ion-color-success:          var(--cb-300);
+  --ion-color-success-rgb:      165, 190, 235;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade:    var(--cb-400);
+  --ion-color-success-tint:     var(--cb-200);
+
+  /** warning: base = 200 */
+  --ion-color-warning:          var(--cb-200);
+  --ion-color-warning-rgb:      202, 215, 243;
+  --ion-color-warning-contrast: #000000;
+  --ion-color-warning-contrast-rgb: 0, 0, 0;
+  --ion-color-warning-shade:    var(--cb-300);
+  --ion-color-warning-tint:     var(--cb-100);
+
+  /** danger: base = 700 */
+  --ion-color-danger:          var(--cb-700);
+  --ion-color-danger-rgb:      60, 79, 185;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade:    var(--cb-800);
+  --ion-color-danger-tint:     var(--cb-600);
+
+  /** dark: base = 950 */
+  --ion-color-dark:          var(--cb-950);
+  --ion-color-dark-rgb:      33, 38, 74;
+  --ion-color-dark-contrast: #ffffff;
+  --ion-color-dark-contrast-rgb: 255, 255, 255;
+  --ion-color-dark-shade:    var(--cb-900);
+  --ion-color-dark-tint:     var(--cb-800);
+
+  /** medium: base = 700 */
+  --ion-color-medium:          var(--cb-700);
+  --ion-color-medium-rgb:      60, 79, 185;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade:    var(--cb-800);
+  --ion-color-medium-tint:     var(--cb-600);
+
+  /** light: base = 50 */
+  --ion-color-light:          var(--cb-50);
+  --ion-color-light-rgb:      242, 245, 252;
+  --ion-color-light-contrast: #000000;
+  --ion-color-light-contrast-rgb: 0, 0, 0;
+  --ion-color-light-shade:    var(--cb-100);
+  --ion-color-light-tint:     var(--cb-0); /* o repite var(--cb-50) si no existe cb-0 */
+}
+
+/** Dark theme overrides **/
+@media (prefers-color-scheme: dark) {
+  body {
+    /** primary: base = 600 */
+  --ion-color-primary:          var(--cb-600);
+  --ion-color-primary-rgb:      61,  89, 199;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade:    var(--cb-700);
+  --ion-color-primary-tint:     var(--cb-500);
+
+
+  /** secundary: base = 500 */
+  --ion-color-secundary:          var(--cb-500);
+  --ion-color-secundary-rgb:      90, 124, 215;
+  --ion-color-secundary-contrast: #ffffff;
+  --ion-color-secundary-contrast-rgb: 255, 255, 255;
+  --ion-color-secundary-shade:    var(--cb-600);
+  --ion-color-secundary-tint:     var(--cb-400);
+
+  /** tertiary: base = 400 */
+  --ion-color-tertiary:          var(--cb-400);
+  --ion-color-tertiary-rgb:      122, 157, 224;
+  --ion-color-tertiary-contrast: #ffffff;
+  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+  --ion-color-tertiary-shade:    var(--cb-500);
+  --ion-color-tertiary-tint:     var(--cb-300);
+
+  
+
+  /** success: base = 300 */
+  --ion-color-success:          var(--cb-300);
+  --ion-color-success-rgb:      165, 190, 235;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade:    var(--cb-400);
+  --ion-color-success-tint:     var(--cb-200);
+
+  /** warning: base = 200 */
+  --ion-color-warning:          var(--cb-200);
+  --ion-color-warning-rgb:      202, 215, 243;
+  --ion-color-warning-contrast: #000000;
+  --ion-color-warning-contrast-rgb: 0, 0, 0;
+  --ion-color-warning-shade:    var(--cb-300);
+  --ion-color-warning-tint:     var(--cb-100);
+
+  /** danger: base = 700 */
+  --ion-color-danger:          var(--cb-700);
+  --ion-color-danger-rgb:      60, 79, 185;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade:    var(--cb-800);
+  --ion-color-danger-tint:     var(--cb-600);
+
+  /** dark: base = 950 */
+  --ion-color-dark:          var(--cb-950);
+  --ion-color-dark-rgb:      33, 38, 74;
+  --ion-color-dark-contrast: #ffffff;
+  --ion-color-dark-contrast-rgb: 255, 255, 255;
+  --ion-color-dark-shade:    var(--cb-900);
+  --ion-color-dark-tint:     var(--cb-800);
+
+  /** medium: base = 700 */
+  --ion-color-medium:          var(--cb-700);
+  --ion-color-medium-rgb:      60, 79, 185;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade:    var(--cb-800);
+  --ion-color-medium-tint:     var(--cb-600);
+
+  /** light: base = 50 */
+  --ion-color-light:          var(--cb-50);
+  --ion-color-light-rgb:      242, 245, 252;
+  --ion-color-light-contrast: #000000;
+  --ion-color-light-contrast-rgb: 0, 0, 0;
+  --ion-color-light-shade:    var(--cb-100);
+  --ion-color-light-tint:     var(--cb-0); /* o repite var(--cb-50) si no existe cb-0 */
+  }
+}
+
+
+
+
+
+// barcode modal
+
 body.barcode-scanning-active {
 visibility: hidden;
 --background: transparent;
