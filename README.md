@@ -17,7 +17,7 @@ npx cap open android // abre el android estudio con el proyecto
 
 
 
-npx ionic cap synx
+npx ionic cap sync
 npx cap open android
 
 

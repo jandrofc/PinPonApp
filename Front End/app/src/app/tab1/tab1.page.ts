@@ -37,6 +37,11 @@ export class Tab1Page implements OnInit, OnDestroy{
   constructor(
     private apiService: ConexionBackendService,
     private router: Router,
+
+    private params: ActivatedRoute) {}
+
+
+
     private params: ActivatedRoute,
     private readonly outputsEmergentesService: OutputsEmergentesService,
     
@@ -48,6 +53,7 @@ export class Tab1Page implements OnInit, OnDestroy{
       console.log('Auto-refresh detenido');
     }  
   }
+
 
   async ngOnInit() {
     this.CargarDatos();
@@ -92,7 +98,7 @@ export class Tab1Page implements OnInit, OnDestroy{
   }
 
 
-    // DEBUG 
+    // DEBUG
     apiUrl: string = this.apiService.getIPFILE();
     response: any;
 
@@ -160,21 +166,46 @@ export class Tab1Page implements OnInit, OnDestroy{
     this.modoEdicion = true; // Activa el modo de edición
   }
 
-  guardarCambios() {
+guardarCambios() {
     if (!this.productoSeleccionado) return;
+
+    // Validación de datos antes de enviar al backend
+    const p = this.productoSeleccionado;
+    if (!p.id_formato) {
+      alert('Falta el id_formato');
+      return;
+    }
+    if (!p.producto_id) {
+      alert('Falta el producto_id');
+      return;
+    }
+    if (!p.nombre_producto || typeof p.nombre_producto !== 'string' || p.nombre_producto.trim() === '') {
+      alert('Falta el nombre del producto o es inválido');
+      return;
+    }
+    if (!p.formato || typeof p.formato !== 'string' || p.formato.trim() === '') {
+      alert('Falta el formato o es inválido');
+      return;
+    }
+    if (p.cantidad == null || isNaN(Number(p.cantidad)) || Number(p.cantidad) < 0) {
+      alert('Cantidad inválida');
+      return;
+    }
+    if (p.precio == null || isNaN(Number(p.precio)) || Number(p.precio) < 0) {
+      alert('Precio inválido');
+      return;
+    }
 
     // Llamamos al PUT
     this.apiService.putData('put/formato', this.productoSeleccionado)
       .subscribe({
         next: (res: any) => {
           if (res.success) {
-            // Opción A: volver a cargar lista desde el back
             this.obtenerProductos();
-            // Opción B: actualizar sólo localmente:
-             const idx = this.productos.findIndex(p => p.id_formato === this.productoSeleccionado.id_formato);
+            const idx = this.productos.findIndex(p => p.id_formato === this.productoSeleccionado.id_formato);
             if (idx > -1) this.productos[idx] = { ...this.productoSeleccionado };
-
             this.modoEdicion = false;
+            alert('Cambios realizados con éxito'); // Mensaje de éxito
             console.log('Formato actualizado correctamente');
           }
         },
