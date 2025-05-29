@@ -90,9 +90,9 @@ import { InputCustomEvent } from '@ionic/angular'; // Eventos de input de Ionic
     </ion-content>
   `,
   styles: [
-    `
+    ` 
       ion-content {
-        --background: #000000;
+        --background: transparent;
       }
 
       /* ✅ BOTÓN DE CERRAR PERSONALIZADO */
@@ -142,6 +142,7 @@ import { InputCustomEvent } from '@ionic/angular'; // Eventos de input de Ionic
         width: 280px;
         height: 280px;
         box-shadow: 0 0 0 4000px rgba(0, 0, 0, 0.6);
+        border-radius: 20px;
       }
 
       /* ✅ ESQUINAS ANIMADAS */
@@ -284,7 +285,6 @@ import { InputCustomEvent } from '@ionic/angular'; // Eventos de input de Ionic
         --color: white;
         --border-radius: 50%;
         --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        border: 2px solid rgba(255, 255, 255, 0.8);
         backdrop-filter: blur(10px);
         
         &:hover {
