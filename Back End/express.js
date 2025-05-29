@@ -498,30 +498,82 @@ app.get('/api/get/producto_por_codigo/:codigo', (req, res) => {
 });
 
 // Endpoint para realizar una compra y actualizar el stock
+
+// Esta función maneja la compra y hace rollback en caso de error
+function rollback(connection, res, msg, err) {
+  if (connection) {
+    connection.rollback(() => {
+      connection.release();
+      res.status(500).json({ error: msg, details: err.message });
+    });
+  } else {
+    res.status(500).json({ error: msg, details: err.message });
+  }
+}
+
 app.post('/api/post/realizar_compra', (req, res) => {
   const { productos } = req.body;
   if (!productos || !Array.isArray(productos) || productos.length === 0) {
     return res.status(400).json({ error: 'Debes enviar productos' });
   }
 
-  // Verifica stock y descuenta
-  const updates = productos.map(p => {
-    return new Promise((resolve, reject) => {
-      const updateStock = `
-        UPDATE formato_producto
-        SET cantidad = cantidad - ?
-        WHERE id = ? AND cantidad >= ?`;
-      db.query(updateStock, [p.cantidad, p.id_formato, p.cantidad], (err, result) => {
-        if (err) return reject(err);
-        if (result.affectedRows === 0) return reject(new Error('Stock insuficiente para el producto ' + p.id_formato));
-        resolve();
+  // Calcula el total de la venta
+  const total = productos.reduce((acc, p) => acc + (p.cantidad * p.precio), 0);
+
+  db.getConnection((err, connection) => {
+    if (err) return res.status(500).json({ error: 'Error de conexión', details: err });
+
+    connection.beginTransaction(err => {
+      if (err) {
+        connection.release();
+        return res.status(500).json({ error: 'Error al iniciar la compra', details: err });
+      }
+
+      // 1. Insertar la venta
+      const insertVenta = 'INSERT INTO venta (total) VALUES (?)';
+      connection.query(insertVenta, [total], (err, resultVenta) => {
+        if (err) return rollback(connection, res, 'Error al insertar venta', err);
+        if (!resultVenta || !resultVenta.insertId) {
+          return rollback(connection, res, 'No se pudo obtener el ID de la venta', new Error('insertId indefinido'));
+        }
+
+        const idVenta = resultVenta.insertId;
+
+        // 2. Insertar los detalles de la venta
+        const insertDetalle = 'INSERT INTO detalle_venta (id_venta, id_formato_producto, cantidad, precio_unitario) VALUES ?';
+        const detalleValues = productos.map(p => [idVenta, p.id_formato, p.cantidad, p.precio]);
+
+        connection.query(insertDetalle, [detalleValues], (err) => {
+          if (err) return rollback(connection, res, 'Error al insertar detalle', err);
+
+          // 3. Descontar stock de cada producto
+          const updates = productos.map(p => {
+            return new Promise((resolve, reject) => {
+              const updateStock = `
+                UPDATE formato_producto
+                SET cantidad = cantidad - ?
+                WHERE id = ? AND cantidad >= ?`;
+              connection.query(updateStock, [p.cantidad, p.id_formato, p.cantidad], (err, result) => {
+                if (err) return reject(err);
+                if (result.affectedRows === 0) return reject(new Error('Stock insuficiente para el producto ' + p.id_formato));
+                resolve();
+              });
+            });
+          });
+
+          Promise.all(updates)
+            .then(() => {
+              connection.commit(err => {
+                if (err) return rollback(connection, res, 'Error al confirmar', err);
+                connection.release();
+                res.status(201).json({ mensaje: 'Venta registrada', id_venta: idVenta });
+              });
+            })
+            .catch(err => rollback(connection, res, 'Error al actualizar stock', err));
+        });
       });
     });
   });
-
-  Promise.all(updates)
-    .then(() => res.json({ success: true, mensaje: 'Compra realizada y stock actualizado' }))
-    .catch(err => res.status(400).json({ error: err.message }));
 });
 
 
