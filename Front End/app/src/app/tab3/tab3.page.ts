@@ -1,17 +1,19 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/angular/standalone';
 import { CameraScannerModalComponent } from '../modales/camera-scanner-modal/camera-scanner-modal.component';
 import { HttpClient } from '@angular/common/http';
-import { CommonModule } from '@angular/common';
 import { OutputsEmergentesService } from '../services/outputs-emergentes/outputs-emergentes.service';
 
+
+
+import { CommonModule } from '@angular/common'; // Módulo común de Angular
+import { IonicModule } from '@ionic/angular';
 @Component({
   selector: 'app-tab3',
   templateUrl: 'tab3.page.html',
   styleUrls: ['tab3.page.scss'],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, CommonModule],
+  imports: [CommonModule],
 })
 
 export class Tab3Page {

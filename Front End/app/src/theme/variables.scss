@@ -197,3 +197,12 @@ visibility: visible;
 --ion-background-color: transparent;
 }
 }
+
+.show-error-alert{
+  visibility: visible;
+
+}
+@media (prefers-color-scheme: dark) {
+.show-error-alert{
+  visibility: visible;
+}}

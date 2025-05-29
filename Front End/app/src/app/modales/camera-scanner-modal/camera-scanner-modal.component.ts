@@ -8,6 +8,10 @@ import {
   ViewChild,       // Para obtener referencias de elementos del template
 } from '@angular/core';
 
+import { addIcons } from 'ionicons';
+import { close, closeOutline, flashlight, flashlightOutline } from 'ionicons/icons';
+
+
 import { CommonModule } from '@angular/common'; // Módulo común de Angular
 import { IonicModule } from '@ionic/angular';
 import {
@@ -96,6 +100,18 @@ import { InputCustomEvent } from '@ionic/angular'; // Eventos de input de Ionic
         transform: translateX(-50%);
         width: 50%;
       }
+
+
+
+      ion-header ion-button {
+        --color: white;
+      }
+
+      ion-fab-button {
+        --background: rgba(255, 255, 255, 0.2);
+        --backdrop-filter: blur(10px);
+        --color: white;
+      }
     `,
   ],
   imports: [ CommonModule, IonicModule],
@@ -138,7 +154,12 @@ export class CameraScannerModalComponent implements AfterViewInit, OnDestroy {
     
     
 
-  ) {}
+  ) {addIcons({
+      'close': close,
+      'close-outline': closeOutline,
+      'flashlight': flashlight,
+      'flashlight-outline': flashlightOutline,
+    });}
 
   // Comienza el escaneo despues de 500ms para esperar que cargue la vista, ademas que permite
   // usar el flash si esta disponible
@@ -199,8 +220,7 @@ export class CameraScannerModalComponent implements AfterViewInit, OnDestroy {
       const devices = await BrowserMultiFormatReader.listVideoInputDevices();
       const selectedDeviceId = devices[0]?.deviceId;
       if (!selectedDeviceId) {
-        alert('No se encontró ninguna cámara disponible.');
-        return;
+        throw new Error('No se encontró ninguna cámara disponible.');
       }
       // Inicia el escaneo con ZXing
       this.zxingControls = this.zxingReader.decodeFromVideoDevice(
@@ -215,7 +235,7 @@ export class CameraScannerModalComponent implements AfterViewInit, OnDestroy {
             });
           }
           if (err) {
-            console.error('Error ZXing:', err);
+            throw new Error(`Error al escanear con zxing: ${err.message}`);
           }
         }
       );
