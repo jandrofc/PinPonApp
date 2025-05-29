@@ -28,3 +28,21 @@ ADD COLUMN habilitado TINYINT(1) DEFAULT 1;
 -- Agregar campo 'habilitado' a la tabla 'formato_producto'
 ALTER TABLE formato_producto
 ADD COLUMN habilitado TINYINT(1) DEFAULT 1;
+
+-- Crear tabla de venta de productos
+CREATE TABLE venta (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
+  total DECIMAL(10) NOT NULL
+);
+
+-- Crear tabla del detalla de la venta del producto
+CREATE TABLE detalle_venta (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  id_venta INT,
+  id_formato_producto INT,
+  cantidad INT,
+  precio_unitario DECIMAL(10),
+  FOREIGN KEY (id_venta) REFERENCES venta(id),
+  FOREIGN KEY (id_formato_producto) REFERENCES formato_producto(id)
+);

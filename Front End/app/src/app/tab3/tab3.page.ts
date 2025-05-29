@@ -17,7 +17,7 @@ import { OutputsEmergentesService } from '../services/outputs-emergentes/outputs
 export class Tab3Page {
   ultimosEscaneos: { [codigo: string]: number } = {};
   productosEscaneados: any[] = [];
-  apiUrl = 'http://localhost:8080/';
+  apiUrl = 'http://localhost:3000/';
 
   constructor(
     private modalController: ModalController,
@@ -88,7 +88,8 @@ export class Tab3Page {
   realizarCompra() {
   const productos = this.productosEscaneados.map(p => ({
     id_formato: p.id_formato,
-    cantidad: p.cantidad
+    cantidad: p.cantidad,
+    precio: p.precio,
   }));
 
   this.http.post<any>(`${this.apiUrl}api/post/realizar_compra`, { productos }).subscribe({
@@ -102,7 +103,7 @@ export class Tab3Page {
       },
       error: async err => {
         await this.outputs.showErrorAlert({
-          message: 'Error al realizar la compra: ' + (err.error?.error || ''),
+          message: 'Error al realizar la compra.',
         });
       }
     });

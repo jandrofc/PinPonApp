@@ -67,7 +67,7 @@ export class RegistroProductoPage implements OnInit {
     private outputsEmergentesService: OutputsEmergentesService,
     private modalController: ModalController,
 
-    private conexionBackendService: ConexionBackendService
+    private conexionBackendService: ConexionBackendService,
     private router: Router
 
 

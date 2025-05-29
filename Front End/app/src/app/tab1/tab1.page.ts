@@ -37,11 +37,6 @@ export class Tab1Page implements OnInit, OnDestroy{
   constructor(
     private apiService: ConexionBackendService,
     private router: Router,
-
-    private params: ActivatedRoute) {}
-
-
-
     private params: ActivatedRoute,
     private readonly outputsEmergentesService: OutputsEmergentesService,
     
