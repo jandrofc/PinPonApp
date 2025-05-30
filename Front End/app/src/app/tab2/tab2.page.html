@@ -7,28 +7,137 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <main class="main-content" color="primary">
-    <div class="section-header">
-      <h2 class="section-title">Generar Reporte</h2>
-    </div>
-    <div class="menu-container">
-      <div class="report-options">
-        <button class="report-card best-sellers">
-            <ion-icon class="card-icon" name="trending-up" ></ion-icon>
-            <span class="button-text">Productos más vendidos en el mes</span>
-        </button>
-        
-        <button class="report-card worst-sellers">
-            <ion-icon class="card-icon" name="trending-down" ></ion-icon>
-            <span class="button-text">Productos menos vendidos</span>
-        </button>
-        
-        <button class="report-card ventas-mes">
-            <ion-icon class="card-icon" name="logo-usd" ></ion-icon>
-            <span class="button-text">Ventas del mes</span>
-        </button>
+<ion-content>
+  <main class="sales-app" color="primary">
+    <!-- Main Content -->
+        <div class="sales-main-content">
+            <!-- Quick Stats -->
+            <div class="sales-quick-stats">
+                <div class="sales-stat-card">
+                    <p class="sales-stat-label">Ventas Hoy</p>
+                    <p class="sales-stat-value">$2,450</p>
+                    <p class="sales-stat-change positive">+12%</p>
+                </div>
+                <div class="sales-stat-card">
+                    <p class="sales-stat-label">Productos Vendidos</p>
+                    <p class="sales-stat-value">156</p>
+                    <p class="sales-stat-change positive">+8%</p>
+                </div>
+                <div class="sales-stat-card">
+                    <p class="sales-stat-label">Categorías Activas</p>
+                    <p class="sales-stat-value">12</p>
+                    <p class="sales-stat-change neutral">0%</p>
+                </div>
+            </div>
+
+            <!-- Main Menu -->
+            <div class="sales-section-header">
+                <span class="sales-icon-chart"></span>
+                <span>Opciones de Reportes</span>
+            </div>
+
+            <div class="sales-menu-items">
+                <div class="sales-menu-card">
+                    <div class="sales-menu-card-content">
+                        <div class="sales-menu-icon blue">
+                            <span class="sales-icon-cart"></span>
+                        </div>
+                        <div class="sales-menu-info">
+                            <div class="sales-menu-title-row">
+                                <h3 class="sales-menu-title">Lista de Ventas</h3>
+                                <span class="sales-badge">Básico</span>
+                            </div>
+                            <p class="sales-menu-description">Ver ventas realizadas por fecha con productos y totales</p>
+                        </div>
+                        <span class="sales-menu-arrow sales-icon-arrow"></span>
+                    </div>
+                </div>
+
+                <div class="sales-menu-card">
+                    <div class="sales-menu-card-content">
+                        <div class="sales-menu-icon green">
+                            <span class="sales-icon-trend"></span>
+                        </div>
+                        <div class="sales-menu-info">
+                            <div class="sales-menu-title-row">
+                                <h3 class="sales-menu-title">Análisis de Ventas</h3>
+                                <span class="sales-badge">Agregados</span>
+                            </div>
+                            <p class="sales-menu-description">Totales por día, producto o categoría para identificar tendencias</p>
+                        </div>
+                        <span class="sales-menu-arrow sales-icon-arrow"></span>
+                    </div>
+                </div>
+
+                <div class="sales-menu-card">
+                    <div class="sales-menu-card-content">
+                        <div class="sales-menu-icon purple">
+                            <span class="sales-icon-filter"></span>
+                        </div>
+                        <div class="sales-menu-info">
+                            <div class="sales-menu-title-row">
+                                <h3 class="sales-menu-title">Reportes Filtrados</h3>
+                                <span class="sales-badge">Filtros</span>
+                            </div>
+                            <p class="sales-menu-description">Filtrar reportes por fecha y producto para análisis específico</p>
+                        </div>
+                        <span class="sales-menu-arrow sales-icon-arrow"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="sales-quick-actions">
+                <div class="sales-section-header">
+                    <span class="sales-icon-calendar"></span>
+                    <span>Acciones Rápidas</span>
+                </div>
+
+                <div class="sales-action-buttons">
+                    <button class="sales-action-btn">
+                        <span class="sales-action-btn-icon sales-icon-calendar"></span>
+                        <span class="sales-action-btn-text">Ventas de Hoy</span>
+                    </button>
+                    <button class="sales-action-btn">
+                        <span class="sales-action-btn-icon sales-icon-package"></span>
+                        <span class="sales-action-btn-text">Top Productos</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="sales-activity-card">
+                <div class="sales-activity-header">
+                    <h3 class="sales-activity-title">Actividad Reciente</h3>
+                    <p class="sales-activity-subtitle">Últimas ventas registradas</p>
+                </div>
+                <div class="sales-activity-content">
+                    <div class="sales-activity-item">
+                        <div class="sales-activity-info">
+                            <h4>Producto A</h4>
+                            <p>10:30 AM</p>
+                        </div>
+                        <div class="sales-activity-amount">$125.00</div>
+                    </div>
+                    <div class="sales-activity-item">
+                        <div class="sales-activity-info">
+                            <h4>Producto B</h4>
+                            <p>09:45 AM</p>
+                        </div>
+                        <div class="sales-activity-amount">$89.50</div>
+                    </div>
+                    <div class="sales-activity-item">
+                        <div class="sales-activity-info">
+                            <h4>Producto C</h4>
+                            <p>09:15 AM</p>
+                        </div>
+                        <div class="sales-activity-amount">$234.00</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Spacer -->
+            <div class="sales-bottom-spacer"></div>
       </div>
-    </div>
   </main>
 </ion-content>
