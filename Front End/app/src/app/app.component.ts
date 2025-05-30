@@ -19,14 +19,14 @@ export class AppComponent {
 
   async ngOnInit() {
     FirebaseMessaging.requestPermissions().then(() => {
-    FirebaseMessaging.getToken().then(token => {
-      console.log('FCM Token:', token.token);
-      fetch(`${this.getIPFILE()}post/fcm_token`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: token.token, usuario_id: 123 })
+      FirebaseMessaging.getToken().then(token => {
+        console.log('FCM Token:', token.token);
+        fetch(`${this.getIPFILE()}post/fcm_token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: token.token })
+      });
     });
-  });
   });
 
   FirebaseMessaging.addListener('notificationReceived', (notification) => {

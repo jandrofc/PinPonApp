@@ -576,6 +576,21 @@ app.post('/api/post/realizar_compra', (req, res) => {
   });
 });
 
+// Endpoint para guardar el token de FCM
+app.post('/api/post/fcm_token', (req, res) => {
+  const { token } = req.body;
+  if (!token) {
+    return res.status(400).json({ error: 'Falta el token' });
+  }
+  const query = 'INSERT IGNORE INTO fcm_tokens (token) VALUES (?)';
+  db.query(query, [token], (err) => {
+    if (err) {
+      return res.status(500).json({ error: 'Error al guardar el token', details: err });
+    }
+    res.json({ success: true, message: 'Token guardado' });
+  });
+});
+
 
 // Middleware para manejar rutas no definidas
 app.use((req, res) => {
