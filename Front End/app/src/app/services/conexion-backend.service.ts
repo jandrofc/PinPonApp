@@ -61,13 +61,24 @@ export class ConexionBackendService {
     .pipe(catchError(this.handleError));
 }
 
+  registrarProductoPorcodigo(endPoint: string, codigo: string): Observable<any> {
+    return this.http.get(`${this.configService.apiUrl}${endPoint}${ codigo }`)
+      .pipe(catchError(this.handleError));
+  }
+
+  realizarCompra(endPoint: string, compra: any): Observable<any> {
+    return this.http.post(`${this.configService.apiUrl}${endPoint}`, compra)
+      .pipe(catchError(this.handleError));
+  }
+
+
 
 
   // Manejo de errores
   private handleError = (error: any) => {
     let errorMessage = 'Error desconocido';
     let errorType = 'UNKNOWN_ERROR';
-    
+
     console.error('Error completo:', error);
 
     // ✅ Error de timeout
@@ -150,7 +161,7 @@ export class ConexionBackendService {
     (structuredError as any).timestamp = new Date().toISOString();
 
     console.error(`[${errorType}] ${errorMessage}`);
-    
+
     return throwError(() => structuredError);
   }
 }
