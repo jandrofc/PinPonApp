@@ -25,6 +25,10 @@ CREATE TABLE IF NOT EXISTS formato_producto (
 ALTER TABLE producto
 ADD COLUMN habilitado TINYINT(1) DEFAULT 1;
 
+-- Agregar campo 'stock_min' a la tabla 'producto'
+ALTER TABLE productos
+ADD COLUMN stock_min INT DEFAULT 1;
+
 -- Agregar campo 'habilitado' a la tabla 'formato_producto'
 ALTER TABLE formato_producto
 ADD COLUMN habilitado TINYINT(1) DEFAULT 1;
@@ -45,4 +49,9 @@ CREATE TABLE detalle_venta (
   precio_unitario DECIMAL(10),
   FOREIGN KEY (id_venta) REFERENCES venta(id),
   FOREIGN KEY (id_formato_producto) REFERENCES formato_producto(id)
+);
+
+-- Crear tabla de tokens para notificaciones push
+CREATE TABLE IF NOT EXISTS fcm_tokens (
+  token VARCHAR(255) PRIMARY KEY
 );
