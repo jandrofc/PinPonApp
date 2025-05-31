@@ -55,7 +55,17 @@ export class ConexionBackendService {
       .pipe(catchError(this.handleError));
   }
 
+  // Método para registrar uno o varios productos
+  registrarProductos(productos: any | any[]): Observable<any> {
+  return this.http.post(`${this.configService.apiUrl}post/producto`, productos)
+    .pipe(catchError(this.handleError));
+}
 
+// Metodo para registrar un token FCM (para notificaciones push)
+  registrarFcmToken(token: string): Observable<any> {
+    return this.http.post(`${this.configService.apiUrl}post/fcm_token`, { token })
+      .pipe(catchError(this.handleError));
+}
 
   // Manejo de errores
   private handleError = (error: any) => {

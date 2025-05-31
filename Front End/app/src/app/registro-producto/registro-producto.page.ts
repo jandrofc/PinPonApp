@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular'; // Importa IonicModule completo
 
 // lo imrpotamos para poder subir imagenes para los productos
-import { FilePicker } from '@capawesome/capacitor-file-picker'; 
+import { FilePicker } from '@capawesome/capacitor-file-picker';
 
 // lo importamos para conocer si un dispotivo tiene la camara y obtener los valores del escaneo
 import { BarcodeScanner, Barcode } from '@capacitor-mlkit/barcode-scanning';
@@ -18,6 +18,11 @@ import { createOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { ModalController } from '@ionic/angular';
 import { FormularioRegistroProductoModalComponent } from '../modales/formulario-registro-producto-modal/formulario-registro-producto-modal.component';
+
+import { ConexionBackendService } from '../services/conexion-backend.service';
+
+
+import { Router } from '@angular/router';
 
 
 export interface ProductoEscaneado {
@@ -36,11 +41,11 @@ export interface ProductoEscaneado {
   standalone: true,
   imports: [
     IonicModule,
-    CommonModule, 
-    FormsModule, 
-    
+    CommonModule,
+    FormsModule,
+
   ]
-  
+
 })
 export class RegistroProductoPage implements OnInit {
 
@@ -49,7 +54,7 @@ export class RegistroProductoPage implements OnInit {
   public isSupported = false;
   // Tiene el estado si barcode scanner tiene permisos
   public isPermissionGranted = false;
-  
+
 
   // Almacena los codigos de barras escaneados
   public productosEscaneados: ProductoEscaneado[] = [];
@@ -57,15 +62,18 @@ export class RegistroProductoPage implements OnInit {
   // Almacena los codigos de barras escaneados para mostrar en la vista
   // debe borrarse, solo fue para pruebas
   public valoresEscaneados: string[] = [];
-  
+
   constructor(
     private outputsEmergentesService: OutputsEmergentesService,
-    private modalController: ModalController
+    private modalController: ModalController,
+
+    private conexionBackendService: ConexionBackendService,
+    private router: Router
 
 
   ) { addIcons({ createOutline }) }
 
-  
+
   async editarProducto(producto: any) {
     const modal = await this.modalController.create({
       component: FormularioRegistroProductoModalComponent,
@@ -155,10 +163,53 @@ export class RegistroProductoPage implements OnInit {
           header: 'AVISO',
           message: 'El código ya fue escaneado',
           buttons: ['OK'],
-        });
+         });
+      } else if (!barcode && this.productosEscaneados.length === 0) {
+        // Si NO se escaneó nada y la lista está vacía, volver al inventario
+        this.router.navigate(['/tabs/tab1']);
       }
     });
   }
+
+public guardarProductosEscaneados() {
+  // Validar que haya productos para guardar
+  if (this.productosEscaneados.length === 0) {
+    this.outputsEmergentesService.showErrorAlert({
+      header: 'AVISO',
+      message: 'No hay productos para registrar',
+      buttons: ['OK'],
+    });
+    return;
+  }
+
+  // Prepara los datos para enviar (ajusta los nombres de campos si es necesario)
+  const productos = this.productosEscaneados.map(p => ({
+    producto: p.nombre,
+    marca: p.marca,
+    formato: p.formato,
+    cantidad: p.cantidad,
+    codigo_barra: p.codigo,
+    precio: p.precio
+  }));
+
+  this.conexionBackendService.registrarProductos(productos).subscribe({
+    next: (res) => {
+      this.outputsEmergentesService.showErrorAlert({
+        header: 'Éxito',
+        message: 'Productos registrados correctamente',
+        buttons: ['OK'],
+      });
+      this.productosEscaneados = [];
+    },
+    error: (err) => {
+      this.outputsEmergentesService.showErrorAlert({
+        header: 'Error',
+        message: 'No se pudieron registrar los productos',
+        buttons: ['OK'],
+      });
+    }
+  });
+}
 
   // public async scan(): Promise<void> {
   //   const formats = this.formGroup.get('formats')?.value || [];

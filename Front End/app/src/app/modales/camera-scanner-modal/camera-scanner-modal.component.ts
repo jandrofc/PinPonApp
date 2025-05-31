@@ -8,6 +8,10 @@ import {
   ViewChild,       // Para obtener referencias de elementos del template
 } from '@angular/core';
 
+import { addIcons } from 'ionicons';
+import { close, closeOutline, flashlight, flashlightOutline, barcodeOutline } from 'ionicons/icons';
+
+
 import { CommonModule } from '@angular/common'; // Módulo común de Angular
 import { IonicModule } from '@ionic/angular';
 import {
@@ -31,12 +35,10 @@ import { InputCustomEvent } from '@ionic/angular'; // Eventos de input de Ionic
   template: `
     <ion-header>
       <ion-toolbar>
-        <ion-title>Scanning</ion-title>
-        <ion-buttons slot="end">
-          <ion-button (click)="closeModal()">
-            <ion-icon name="close"></ion-icon>
-          </ion-button>
-        </ion-buttons>
+        <ion-title>
+          <ion-icon name="barcode-outline" style="margin-right: 8px;"></ion-icon>
+          Escaneando Producto
+        </ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -44,40 +46,184 @@ import { InputCustomEvent } from '@ionic/angular'; // Eventos de input de Ionic
       @if (isWeb) {
         <video #video autoplay class="video"></video>
       }
-      <div #square class="square"></div>
-      <div class="zoom-ratio-wrapper">
+      
+      <!-- ✅ BOTÓN DE CERRAR PERSONALIZADO -->
+      <div class="close-button-container">
+        <button class="close-button" (click)="closeModal()">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </div>
+      
+      <!-- Área de escaneo -->
+      <div #square class="square">
+        <div class="corner corner-tl"></div>
+        <div class="corner corner-tr"></div>
+        <div class="corner corner-bl"></div>
+        <div class="corner corner-br"></div>
+      </div>
+      
+      <!-- Instrucciones -->
+      <div class="instructions">
+        <p>Apunta la cámara hacia el código de barras</p>
+        <p class="subtitle">El escaneo se realizará automáticamente</p>
+      </div>
+      
+      <!-- Control de zoom -->
+      <div class="zoom-ratio-wrapper" *ngIf="minZoomRatio && maxZoomRatio">
         <ion-range
           [min]="minZoomRatio"
           [max]="maxZoomRatio"
           [disabled]="minZoomRatio === undefined || maxZoomRatio === undefined"
           (ionChange)="setZoomRatio($any($event))"
+          color="light"
         ></ion-range>
       </div>
+      
+      <!-- Botón de flash -->
       @if (isTorchAvailable) {
         <ion-fab slot="fixed" horizontal="end" vertical="bottom">
-          <ion-fab-button (click)="toggleTorch()">
-            <ion-icon name="flashlight"></ion-icon>
+          <ion-fab-button (click)="toggleTorch()" color="light">
+            <ion-icon name="flashlight-outline"></ion-icon>
           </ion-fab-button>
         </ion-fab>
       }
     </ion-content>
   `,
   styles: [
-    `
+    ` 
       ion-content {
         --background: transparent;
       }
 
+      /* ✅ BOTÓN DE CERRAR PERSONALIZADO */
+      .close-button-container {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+      }
+
+      .close-button {
+        background: rgba(0, 0, 0, 0.6);
+        border: 2px solid rgba(255, 255, 255, 0.8);
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        
+        ion-icon {
+          color: white;
+          font-size: 1.5rem;
+        }
+        
+        &:hover {
+          background: rgba(255, 255, 255, 0.1);
+          border-color: white;
+          transform: scale(1.1);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        &:active {
+          transform: scale(0.95);
+        }
+      }
+
+      /* ✅ ÁREA DE ESCANEO MEJORADA */
       .square {
         position: absolute;
         left: 50%;
         top: 50%;
         transform: translate(-50%, -50%);
-        border-radius: 16px;
-        width: 200px;
-        height: 200px;
-        border: 6px solid white;
-        box-shadow: 0 0 0 4000px rgba(0, 0, 0, 0.3);
+        width: 280px;
+        height: 280px;
+        box-shadow: 0 0 0 4000px rgba(0, 0, 0, 0.6);
+        border-radius: 20px;
+      }
+
+      /* ✅ ESQUINAS ANIMADAS */
+      .corner {
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        border: 4px solid #00ff88;
+        animation: cornerPulse 2s infinite;
+      }
+
+      .corner-tl {
+        top: 0;
+        left: 0;
+        border-right: none;
+        border-bottom: none;
+        border-top-left-radius: 20px;
+      }
+
+      .corner-tr {
+        top: 0;
+        right: 0;
+        border-left: none;
+        border-bottom: none;
+        border-top-right-radius: 20px;
+      }
+
+      .corner-bl {
+        bottom: 0;
+        left: 0;
+        border-right: none;
+        border-top: none;
+        border-bottom-left-radius: 20px;
+      }
+
+      .corner-br {
+        bottom: 0;
+        right: 0;
+        border-left: none;
+        border-top: none;
+        border-bottom-right-radius: 20px;
+      }
+
+      @keyframes cornerPulse {
+        0%, 100% {
+          border-color: #00ff88;
+          opacity: 1;
+        }
+        50% {
+          border-color: #ffffff;
+          opacity: 0.7;
+        }
+      }
+
+      /* ✅ LÍNEA DE ESCANEO ANIMADA */
+      .square::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, transparent 0%, #00ff88 50%, transparent 100%);
+        animation: scanLine 2s linear infinite;
+      }
+
+      @keyframes scanLine {
+        0% {
+          top: 0;
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        90% {
+          opacity: 1;
+        }
+        100% {
+          top: 100%;
+          opacity: 0;
+        }
       }
 
       .video {
@@ -89,12 +235,117 @@ import { InputCustomEvent } from '@ionic/angular'; // Eventos de input de Ionic
         object-fit: cover;
       }
 
+      /* ✅ INSTRUCCIONES MEJORADAS */
+      .instructions {
+        position: absolute;
+        top: 15%;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        color: white;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 1.5rem;
+        border-radius: 16px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        max-width: 90%;
+        
+        p {
+          margin: 0;
+          font-size: 1.1rem;
+          font-weight: 600;
+          
+          &.subtitle {
+            font-size: 0.9rem;
+            font-weight: 400;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+          }
+        }
+      }
+
       .zoom-ratio-wrapper {
         position: absolute;
         left: 50%;
-        bottom: 16px;
+        bottom: 120px;
         transform: translateX(-50%);
-        width: 50%;
+        width: 60%;
+        
+        ion-range {
+          --bar-background: rgba(255, 255, 255, 0.3);
+          --bar-background-active: #00ff88;
+          --knob-background: #00ff88;
+          --knob-border: 2px solid white;
+        }
+      }
+
+      /* ✅ BOTÓN DE FLASH MEJORADO */
+      ion-fab-button {
+        --background: rgba(0, 0, 0, 0.6);
+        --color: white;
+        --border-radius: 50%;
+        --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+        
+        &:hover {
+          --background: rgba(255, 255, 255, 0.1);
+          transform: scale(1.1);
+        }
+      }
+
+      /* ✅ TOOLBAR LIMPIO */
+      ion-header {
+        ion-toolbar {
+          --background: rgba(0, 0, 0, 0.8);
+          --color: white;
+          backdrop-filter: blur(10px);
+          
+          ion-title {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            
+            ion-icon {
+              color: #00ff88;
+            }
+          }
+        }
+      }
+
+      /* ✅ RESPONSIVE */
+      @media (max-width: 768px) {
+        .close-button-container {
+          top: 15px;
+          right: 15px;
+        }
+        
+        .close-button {
+          width: 45px;
+          height: 45px;
+          
+          ion-icon {
+            font-size: 1.3rem;
+          }
+        }
+        
+        .square {
+          width: 250px;
+          height: 250px;
+        }
+        
+        .instructions {
+          top: 10%;
+          padding: 1rem;
+          
+          p {
+            font-size: 1rem;
+            
+            &.subtitle {
+              font-size: 0.8rem;
+            }
+          }
+        }
       }
     `,
   ],
@@ -138,7 +389,13 @@ export class CameraScannerModalComponent implements AfterViewInit, OnDestroy {
     
     
 
-  ) {}
+  ) {addIcons({
+      'barcode-outline': barcodeOutline,
+      'close': close,
+      'close-outline': closeOutline,
+      'flashlight': flashlight,
+      'flashlight-outline': flashlightOutline,
+    });}
 
   // Comienza el escaneo despues de 500ms para esperar que cargue la vista, ademas que permite
   // usar el flash si esta disponible
@@ -160,6 +417,12 @@ export class CameraScannerModalComponent implements AfterViewInit, OnDestroy {
   // Al cerrar el modal se detiene el escaneo
   ngOnDestroy(): void {
     this.stopScan();
+  }
+
+  //Reproducir el sonido de beep
+  playBeepSound() {
+    const audio = new Audio('assets/sonido/beep.mp3');
+    audio.play();
   }
 
   // Funcion que cambia el zoom
@@ -193,8 +456,7 @@ export class CameraScannerModalComponent implements AfterViewInit, OnDestroy {
       const devices = await BrowserMultiFormatReader.listVideoInputDevices();
       const selectedDeviceId = devices[0]?.deviceId;
       if (!selectedDeviceId) {
-        alert('No se encontró ninguna cámara disponible.');
-        return;
+        throw new Error('No se encontró ninguna cámara disponible.');
       }
       // Inicia el escaneo con ZXing
       this.zxingControls = this.zxingReader.decodeFromVideoDevice(
@@ -203,12 +465,13 @@ export class CameraScannerModalComponent implements AfterViewInit, OnDestroy {
         (result: Result | undefined, err, controls) => {
           if (result) {
             this.ngZone.run(() => {
+              this.playBeepSound(); // Reproducir sonido de beep
               this.closeModal({ rawValue: result.getText() } as any);
               controls.stop();
             });
           }
           if (err) {
-            console.error('Error ZXing:', err);
+            throw new Error(`Error al escanear con zxing: ${err.message}`);
           }
         }
       );
@@ -287,6 +550,7 @@ export class CameraScannerModalComponent implements AfterViewInit, OnDestroy {
               return;
             }
           }
+          this.playBeepSound(); // Reproducir sonido de beep
           listener.remove();
           this.closeModal(firstBarcode);
         });

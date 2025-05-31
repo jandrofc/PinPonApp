@@ -25,7 +25,7 @@
             </ion-badge>
           </div>
           <p class="product-details">
-            Existente:  · Total: ${{ producto.precio }} · Cantidad: {{ producto.cantidad }}
+            Existente:  · Cantidad: {{ producto.cantidad }} · Total: ${{ producto.precio }}
           </p>
         </div>
         <div class="product-edit">
@@ -37,12 +37,12 @@
       </div>
     </div>
   </div>
-  
+
   <div class="confirm-container">
     <ion-button expand="block" color="secondary" class="scan-button" (click)="escanear_Productos()">
       Seguir escaneando
     </ion-button>
-    <ion-button expand="block" color="primary" class="confirm-button">
+    <ion-button expand="block" color="primary" class="confirm-button" (click)="guardarProductosEscaneados()">
       Confirme los productos escaneados
     </ion-button>
   </div>

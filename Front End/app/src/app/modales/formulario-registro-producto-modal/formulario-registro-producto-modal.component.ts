@@ -11,7 +11,7 @@ import { ModalController } from '@ionic/angular';
   template: `
   <ion-header>
     <ion-toolbar>
-      <ion-title>Escaneo Código QR</ion-title>
+      <ion-title>Formulario de Registro de Producto</ion-title>
     </ion-toolbar>
   </ion-header>
   <ion-content>
@@ -90,6 +90,14 @@ import { ModalController } from '@ionic/angular';
       font-size: 12px;
       display: block;
       margin-bottom: 16px;
+    }
+
+    ion-label.sc-ion-label-md-h.sc-ion-label-md-s.md.label-stacked {
+      font-size: 20px;
+    }
+
+    h2 {
+      color:rgb(51, 45, 177);
     }
 `],
 })
