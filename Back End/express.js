@@ -163,7 +163,7 @@ app.post('/api/post/producto', (req, res) => {
         } = productoObj;
 
         // Validar campos obligatorios
-        if (!producto || !marca || !formato || cantidad == null || !codigo_barra || precio == null || stock_min == null) {
+        if (!producto || !marca || !formato || cantidad == null || !codigo_barra || precio == null || stock_min == 5) {
             resultados.push({ idx, error: 'Faltan datos obligatorios en el body', producto: productoObj });
             procesados++;
             if (procesados === productos.length) {
@@ -190,7 +190,7 @@ app.post('/api/post/producto', (req, res) => {
                     const nuevaCantidad = Number(formato.cantidad) + Number(cantidad);
                     const updateCantidadQuery = `
                         UPDATE formato_producto
-                        SET cantidad = ?, stock_min = ?
+                        SET cantidad = ?
                         WHERE id = ?
                     `;
                     db.query(updateCantidadQuery, [nuevaCantidad, formato.id], (err, updateRes) => {
@@ -253,7 +253,7 @@ app.post('/api/post/producto', (req, res) => {
                     const insertFmtQ = `
                         INSERT INTO formato_producto
                             (producto_id, formato, cantidad, codigo_barra, precio, stock_min)
-                        VALUES (?, ?, ?, ?, ?)
+                        VALUES (?, ?, ?, ?, ?, ?)
                     `;
                     db.query(
                         insertFmtQ,
