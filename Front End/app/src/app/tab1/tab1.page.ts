@@ -20,6 +20,7 @@ export interface Producto {
   marca: string;
   cantidad: string;
   precio: string;
+  stock_min: string;
   codigo: string;
   fecha_creacion: string;
   fecha_actualizacion: string;
@@ -113,6 +114,7 @@ export class Tab1Page implements OnInit, OnDestroy{
   cantidad: '',
   precio: '',
   codigo: '',
+  stock_min: '',
   fecha_creacion: '',
   fecha_actualizacion: '',
   imagen: '',

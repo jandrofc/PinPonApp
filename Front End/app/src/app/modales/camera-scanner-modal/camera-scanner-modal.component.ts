@@ -470,9 +470,6 @@ export class CameraScannerModalComponent implements AfterViewInit, OnDestroy {
               controls.stop();
             });
           }
-          if (err) {
-            throw new Error(`Error al escanear con zxing: ${err.message}`);
-          }
         }
       );
       return;

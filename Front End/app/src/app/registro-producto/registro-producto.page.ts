@@ -32,6 +32,7 @@ export interface ProductoEscaneado {
   formato: string;
   cantidad: number | null;
   precio: number | null;
+  stock_min: number | null;
 }
 
 @Component({
@@ -110,7 +111,8 @@ export class RegistroProductoPage implements OnInit {
         marca: '',
         formato: '',
         cantidad: null,
-        precio: null
+        precio: null,
+        stock_min: null
       });
     } else if (data?.barcode && this.productosEscaneados.some(p => p.codigo === data.barcode.rawValue)) {
       this.outputsEmergentesService.showErrorAlert({
@@ -156,7 +158,8 @@ export class RegistroProductoPage implements OnInit {
           marca: '',
           formato: '',
           cantidad: null,
-          precio: null
+          precio: null,
+          stock_min: null
         });
       } else if (barcode && this.productosEscaneados.some(p => p.codigo === barcode.rawValue)) {
         this.outputsEmergentesService.showErrorAlert({
@@ -189,7 +192,8 @@ public guardarProductosEscaneados() {
     formato: p.formato,
     cantidad: p.cantidad,
     codigo_barra: p.codigo,
-    precio: p.precio
+    precio: p.precio,
+    stock_min: p.stock_min
   }));
 
   this.conexionBackendService.registrarProductos(productos).subscribe({

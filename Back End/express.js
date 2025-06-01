@@ -2,6 +2,8 @@
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
+const admin = require('firebase-admin');
+const serviceAccount = require('./.pinponClaveCuenta.json');
 require('dotenv').config();
 
 const app = express();
@@ -23,7 +25,9 @@ app.use(cors({
 
 app.use(express.json());
 
-
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
 
 const os = require('os');
 
@@ -97,6 +101,7 @@ app.get('/api/get/lista_productos', (request, response) => {
                     P.marca,
                     FP.cantidad,
                     FP.precio,
+                    FP.stock_min,
                     FP.codigo_barra,
                     FP.fecha_creacion,
                     FP.fecha_actualizado
@@ -144,6 +149,8 @@ app.post('/api/post/producto', (req, res) => {
         return res.status(400).json({ error: 'No se enviaron productos para registrar' });
     }
 
+    console.log('Productos recibidos:', productos);
+
     productos.forEach((productoObj, idx) => {
         const {
             producto,
@@ -151,11 +158,12 @@ app.post('/api/post/producto', (req, res) => {
             formato,
             cantidad,
             codigo_barra,
-            precio
+            precio,
+            stock_min
         } = productoObj;
 
         // Validar campos obligatorios
-        if (!producto || !marca || !formato || cantidad == null || !codigo_barra || precio == null) {
+        if (!producto || !marca || !formato || cantidad == null || !codigo_barra || precio == null || stock_min == null) {
             resultados.push({ idx, error: 'Faltan datos obligatorios en el body', producto: productoObj });
             procesados++;
             if (procesados === productos.length) {
@@ -182,7 +190,7 @@ app.post('/api/post/producto', (req, res) => {
                     const nuevaCantidad = Number(formato.cantidad) + Number(cantidad);
                     const updateCantidadQuery = `
                         UPDATE formato_producto
-                        SET cantidad = ?
+                        SET cantidad = ?, stock_min = ?
                         WHERE id = ?
                     `;
                     db.query(updateCantidadQuery, [nuevaCantidad, formato.id], (err, updateRes) => {
@@ -244,12 +252,12 @@ app.post('/api/post/producto', (req, res) => {
                 const insertarFormato = (productId) => {
                     const insertFmtQ = `
                         INSERT INTO formato_producto
-                            (producto_id, formato, cantidad, codigo_barra, precio)
+                            (producto_id, formato, cantidad, codigo_barra, precio, stock_min)
                         VALUES (?, ?, ?, ?, ?)
                     `;
                     db.query(
                         insertFmtQ,
-                        [productId, formato, cantidad, codigo_barra, precio],
+                        [productId, formato, cantidad, codigo_barra, precio, stock_min],
                         (err, fmtRes) => {
                             if (err) {
                                 resultados.push({ idx, error: 'Error al insertar formato', details: err, producto: productoObj });
@@ -367,10 +375,11 @@ app.put('/api/put/formato', (req, res) => {
     formato,
     cantidad,
     codigo_barra,
-    precio
+    precio,
+    stock_min
   } = req.body;
 
-  // Validación de datos dependiendo de si esta vacion o no es String o numero negativos
+  // Validación de datos dependiendo de si esta vacio o no es String o numero negativos
   if (!id_formato) {
     return res.status(400).json({ error: 'Falta el id_formato' });
   }
@@ -392,6 +401,9 @@ app.put('/api/put/formato', (req, res) => {
   if (precio == null || isNaN(Number(precio)) || Number(precio) < 0) {
     return res.status(400).json({ error: 'Precio inválido' });
   }
+  if (stock_min == null || isNaN(Number(stock_min)) || Number(stock_min) < 0) {
+    return res.status(400).json({ error: 'Stock mínimo inválido' });
+  }
 
   const updateQuery = `
     UPDATE formato_producto AS fp
@@ -403,6 +415,7 @@ app.put('/api/put/formato', (req, res) => {
       fp.cantidad          = ?,
       fp.codigo_barra      = ?,
       fp.precio            = ?,
+      fp.stock_min         = ?,
       fp.fecha_actualizado = NOW(),
       p.producto           = ?
     WHERE fp.id = ?
@@ -414,6 +427,7 @@ app.put('/api/put/formato', (req, res) => {
     cantidad,
     codigo_barra,
     precio,
+    stock_min,
     nombre_producto,
     id_formato
   ];
@@ -497,6 +511,31 @@ app.get('/api/get/producto_por_codigo/:codigo', (req, res) => {
   });
 });
 
+// Función para enviar notificaciones a todos los tokens
+function notificarStockBajo(productos) {
+  db.query('SELECT token FROM fcm_tokens', (err, results) => {
+    if (err) return;
+    const tokens = results.map(r => r.token);
+    if (tokens.length === 0) return;
+
+    const mensaje = {
+      notification: {
+        title: '¡Stock bajo!',
+        body: `Productos: ${productos.map(p => p.nombre).join(', ')}`
+      },
+      tokens: tokens
+    };
+
+    admin.messaging().sendMulticast(mensaje)
+      .then(response => {
+        console.log('Notificaciones enviadas:', response.successCount);
+      })
+      .catch(error => {
+        console.error('Error enviando notificaciones:', error);
+      });
+  });
+}
+
 // Endpoint para realizar una compra y actualizar el stock
 
 // Esta función maneja la compra y hace rollback en caso de error
@@ -566,10 +605,23 @@ app.post('/api/post/realizar_compra', (req, res) => {
               connection.commit(err => {
                 if (err) return rollback(connection, res, 'Error al confirmar', err);
                 connection.release();
+
+                // 4. Consultar productos con stock bajo y notificar
+                const queryStockBajo = `
+                  SELECT fp.id, p.producto AS nombre, fp.cantidad, fp.formato, fp.codigo_barra, fp.precio, fp.stock_min
+                  FROM formato_producto fp
+                  INNER JOIN producto p ON fp.producto_id = p.id
+                  WHERE fp.cantidad < fp.stock_min
+                `;
+                db.query(queryStockBajo, (err, productosBajoStock) => {
+                  if (!err && productosBajoStock.length > 0) {
+                    notificarStockBajo(productosBajoStock);
+                  }
                 res.status(201).json({ mensaje: 'Venta registrada', id_venta: idVenta });
               });
-            })
-            .catch(err => rollback(connection, res, 'Error al actualizar stock', err));
+            });
+          })
+          .catch(err => rollback(connection, res, 'Error al actualizar stock', err));
         });
       });
     });
@@ -591,6 +643,16 @@ app.post('/api/post/fcm_token', (req, res) => {
   });
 });
 
+// Endpoint para obtener productos con stock bajo
+app.get('/api/get/productos_stock_bajo', (req, res) => {
+  const query = 'SELECT * FROM productos WHERE stock < stock_min';
+  db.query(query, (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: 'Error al consultar productos', details: err });
+    }
+    res.json(results);
+  });
+});
 
 // Middleware para manejar rutas no definidas
 app.use((req, res) => {
