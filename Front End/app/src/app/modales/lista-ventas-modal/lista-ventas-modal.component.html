@@ -1,3 +1,160 @@
-<p>
-  lista-ventas-modal works!
-</p>
+
+<ion-content>
+  <div class="container">
+  <header class="header">
+      <h1>Panel de Ventas</h1>
+      <div class="close-button-container">
+        <button class="close-button" (click)="closeModal()">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </div>
+  </header>
+
+  <!-- Estadísticas -->
+  <div class="stats-grid">
+      <div class="stat-card">
+          <div class="stat-header">
+              <ion-icon name="cash-outline" class="stat-icon stat-icon-success"></ion-icon>
+              <span class="stat-label">Ventas Hoy</span>
+          </div>
+          <div class="stat-value" id="total-sales">$0</div>
+      </div>
+
+      <div class="stat-card">
+          <div class="stat-header">
+              <ion-icon name="receipt" class="stat-icon stat-icon-primary"></ion-icon>
+              <span class="stat-label">Boletas</span>
+          </div>
+          <div class="stat-value" id="total-receipts">0</div>
+      </div>
+
+      <div class="stat-card">
+          <div class="stat-header">
+              <ion-icon name="package" class="stat-icon stat-icon-secondary"></ion-icon>
+              <span class="stat-label">Productos</span>
+          </div>
+          <div class="stat-value" id="total-products">0</div>
+      </div>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="main-card">
+      <div class="card-header">
+          <h2>Ventas Recientes</h2>
+      </div>
+      
+      <div class="card-content">
+          <!-- Pestañas -->
+          <div class="tabs">
+              <button 
+                  class="tab-button" 
+                  [class.active]="activeTab === 'receipts'"
+                  (click)="switchTab('receipts')">
+                  Por Boletas
+              </button>
+              <button 
+                  class="tab-button" 
+                  [class.active]="activeTab === 'products'"
+                  (click)="switchTab('products')">
+                  Por Productos
+              </button>
+          </div>
+
+          <!-- Vista por boletas -->
+          <div id="receipts-view" class="tab-content" [class.active]="activeTab === 'receipts'">
+              <div id="receipts-container" class="receipts-container">
+                  <div *ngIf="loading" class="loading-container">
+                      <ion-spinner></ion-spinner>
+                      <p>Cargando boletas...</p>
+                  </div>
+              
+                  <!-- Lista de boletas -->
+                  <div *ngIf="!loading && salesData">
+                      <div *ngIf="selectedSegment === 'receipts'" class="receipts-view">
+                        <div *ngFor="let receipt of salesData.today.receipts" class="receipt-container">
+                          <ion-item 
+                            button 
+                            class="receipt-item"
+                            [class.receipt-expanded]="selectedReceipt === receipt.id">
+                            
+                            <ion-icon name="receipt" class="boleta-icon stat-icon-primary"></ion-icon>
+
+                            <ion-label>
+                              <h2 class="receipt-title">{{ generateReceiptTitle(receipt) }}</h2>
+                              <div class="receipt-info">
+                                <span class="info-item">
+                                  <ion-icon name="time-outline"></ion-icon>
+                                  {{ receipt.date_time }}
+                                </span>
+                              </div>
+                            </ion-label>
+
+                            <div slot="end" class="receipt-summary">
+                              <div class="receipt-total">${{ receipt.total.toFixed(2) }}</div>
+                              <div class="receipt-count">{{ receipt.items.length }} productos</div>
+                              <!-- <ion-button 
+                                fill="clear" 
+                                size="small"
+                                (click)="toggleReceiptDetail(receipt.id); $event.stopPropagation()">
+                                <ion-icon 
+                                  [name]="selectedReceipt === receipt.id ? 'eye-off-outline' : 'eye-outline'">
+                                </ion-icon>
+                              </ion-button> -->
+                            </div>
+                          </ion-item>
+
+                          <!-- Detalle expandible -->
+                          <div *ngIf="selectedReceipt === receipt.id" class="receipt-detail">
+                            <div class="detail-header">
+                              <h4>Detalle de productos:</h4>
+                            </div>
+                            <div class="detail-items">
+                              <div *ngFor="let item of receipt.items" class="detail-item">
+                                <div class="item-info">
+                                  <ion-icon name="cube-outline"></ion-icon>
+                                  <span>{{ item.name }}</span>
+                                  <span *ngIf="item.quantity > 1" class="quantity">x{{ item.quantity }}</span>
+                                </div>
+                                <span class="item-price">${{ item.price.toFixed(2) }}</span>
+                              </div>
+                              <div class="detail-total">
+                                <div class="total-row">
+                                  <span class="total-label">Total</span>
+                                  <span class="total-amount">${{ receipt.total.toFixed(2) }}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+
+        <!-- Mensaje cuando no hay datos -->
+        <div *ngIf="!loading && !salesData" class="no-data">
+            <p>No hay boletas para mostrar</p>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+              </div>
+          </div>
+
+          <!-- Vista por productos -->
+          <div id="products-view" class="tab-content" [class.active]="activeTab === 'products'">
+              <div id="products-container" class="products-container">
+                  <!-- Los productos se generarán dinámicamente -->
+              </div>
+          </div>
+      </div>
+  </div>
+  </div>
+</ion-content>
