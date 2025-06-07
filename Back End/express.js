@@ -6,6 +6,18 @@ const admin = require('firebase-admin');
 const serviceAccount = require('./.pinponClaveCuenta.json');
 require('dotenv').config();
 
+
+
+// Crear la conexión a la base de datos
+const db = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT
+});
+
+
 const app = express();
 app.use(cors({
   origin: ['http://localhost:8100','capacitor://localhost','*'], // IP de tu notebook con el frontend
@@ -79,14 +91,7 @@ function getIPv4Address() {
 
 
 
-// Crear la conexión a la base de datos
-const db = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT
-});
+
 
 
 app.get('/api/get/lista_productos', (request, response) => {
@@ -148,8 +153,6 @@ app.post('/api/post/producto', (req, res) => {
     if (productos.length === 0) {
         return res.status(400).json({ error: 'No se enviaron productos para registrar' });
     }
-
-    console.log('Productos recibidos:', productos);
 
     productos.forEach((productoObj, idx) => {
         const {
@@ -237,48 +240,50 @@ app.post('/api/post/producto', (req, res) => {
                 }
             }
 
-            // Comprobar si existe el producto genérico
-            const checkQuery = `SELECT id FROM producto WHERE producto = ? AND marca = ?`;
-            db.query(checkQuery, [producto, marca], (err, prodRes) => {
-                if (err) {
-                    resultados.push({ idx, error: 'Error al comprobar producto', details: err, producto: productoObj });
-                    procesados++;
-                    if (procesados === productos.length) {
-                        return res.json({ resultados });
-                    }
-                    return;
-                }
-
-                const insertarFormato = (productId) => {
-                    const insertFmtQ = `
-                        INSERT INTO formato_producto
-                            (producto_id, formato, cantidad, codigo_barra, precio, stock_min)
-                        VALUES (?, ?, ?, ?, ?, ?)
-                    `;
-                    db.query(
-                        insertFmtQ,
-                        [productId, formato, cantidad, codigo_barra, precio, stock_min],
-                        (err, fmtRes) => {
-                            if (err) {
-                                resultados.push({ idx, error: 'Error al insertar formato', details: err, producto: productoObj });
-                            } else {
-                                resultados.push({
-                                    idx,
-                                    success: true,
-                                    message: prodRes.length > 0
-                                        ? 'Formato agregado a producto existente'
-                                        : 'Producto y formato creados correctamente',
-                                    formatoId: fmtRes.insertId,
-                                    productoId: productId
-                                });
-                            }
+                    // Comprobar si existe el producto genérico
+                    const checkQuery = `SELECT id FROM producto WHERE producto = ? AND marca = ?`;
+                    db.query(checkQuery, [producto, marca], (err, prodRes) => {
+                        if (err) {
+                            resultados.push({ idx, error: 'Error al comprobar producto', details: err, producto: productoObj });
                             procesados++;
                             if (procesados === productos.length) {
                                 return res.json({ resultados });
                             }
+                            return;
                         }
-                    );
-                };
+
+                        const insertarFormato = (productId) => {
+            const insertFmtQ = `
+                INSERT INTO formato_producto
+                    (producto_id, formato, cantidad, codigo_barra, precio, stock_min)
+                VALUES (?, ?, ?, ?, ?, ?)
+            `;
+            db.query(
+                insertFmtQ,
+                [productId, formato, cantidad, codigo_barra, precio, stock_min],
+                (err, fmtRes) => {
+                    if (err) {
+                        console.log('Error al insertar formato:', err);
+                        resultados.push({ idx, error: 'Error al insertar formato', details: err, producto: productoObj });
+                    } else {
+                        //console.log('Resultado INSERT formato_producto:', fmtRes);
+                        resultados.push({
+                            idx,
+                            success: true,
+                            message: prodRes.length > 0
+                                ? 'Formato agregado a producto existente'
+                                : 'Producto y formato creados correctamente',
+                            formatoId: fmtRes.insertId,
+                            productoId: productId
+                        });
+                    }
+                    procesados++;
+                    if (procesados === productos.length) {
+                        return res.json({ resultados });
+                    }
+                }
+            );
+        };
 
                 if (prodRes.length > 0) {
                     // Producto ya existe → sólo insertamos formato
@@ -286,9 +291,10 @@ app.post('/api/post/producto', (req, res) => {
                     insertarFormato(existingId);
                 } else {
                     // Producto no existe → insertamos producto y luego formato
-                    const insertProdQ = `INSERT INTO producto (producto, marca) VALUES (?, ?)`;
+                   const insertProdQ = `INSERT INTO producto (producto, marca) VALUES (?, ?)`;
                     db.query(insertProdQ, [producto, marca], (err, prodInsertRes) => {
                         if (err) {
+                            console.log('Error al crear producto:', err);
                             resultados.push({ idx, error: 'Error al crear producto', details: err, producto: productoObj });
                             procesados++;
                             if (procesados === productos.length) {
@@ -296,6 +302,7 @@ app.post('/api/post/producto', (req, res) => {
                             }
                             return;
                         }
+                        //console.log('Resultado INSERT producto:', prodInsertRes);
                         const newProductId = prodInsertRes.insertId;
                         insertarFormato(newProductId);
                     });
@@ -518,22 +525,24 @@ function notificarStockBajo(productos) {
     const tokens = results.map(r => r.token);
     if (tokens.length === 0) return;
 
-    const mensaje = {
+    const notification = {
       notification: {
         title: '¡Stock bajo!',
         body: `Productos: ${productos.map(p => p.nombre).join(', ')}`
-      },
-      tokens: tokens
+      }
     };
 
-    console.log('Tokens a notificar:', tokens);
-    admin.messaging().sendMulticast(mensaje)
-      .then(response => {
-        console.log('Notificaciones enviadas:', response.successCount);
-      })
-      .catch(error => {
-        console.error('Error enviando notificaciones:', error);
-      });
+    tokens.forEach(token => {
+      const mensaje = { ...notification, token };
+      console.log('Enviando notificación FCM a:', token, JSON.stringify(mensaje, null, 2));
+      admin.messaging().send(mensaje)
+        .then(response => {
+          console.log('Notificación enviada a', token, response);
+        })
+        .catch(error => {
+          console.error('Error enviando a', token, error);
+        });
+    });
   });
 }
 
@@ -551,20 +560,27 @@ function rollback(connection, res, msg, err) {
   }
 }
 
+
 app.post('/api/post/realizar_compra', (req, res) => {
   const { productos } = req.body;
   if (!productos || !Array.isArray(productos) || productos.length === 0) {
+    console.log('No se enviaron productos para la compra');
     return res.status(400).json({ error: 'Debes enviar productos' });
   }
 
   // Calcula el total de la venta
   const total = productos.reduce((acc, p) => acc + (p.cantidad * p.precio), 0);
+  console.log('Iniciando compra. Productos:', productos, 'Total:', total);
 
   db.getConnection((err, connection) => {
-    if (err) return res.status(500).json({ error: 'Error de conexión', details: err });
+    if (err) {
+      console.error('Error de conexión a la base de datos:', err);
+      return res.status(500).json({ error: 'Error de conexión', details: err });
+    }
 
     connection.beginTransaction(err => {
       if (err) {
+        console.error('Error al iniciar la transacción:', err);
         connection.release();
         return res.status(500).json({ error: 'Error al iniciar la compra', details: err });
       }
@@ -572,19 +588,28 @@ app.post('/api/post/realizar_compra', (req, res) => {
       // 1. Insertar la venta
       const insertVenta = 'INSERT INTO venta (total) VALUES (?)';
       connection.query(insertVenta, [total], (err, resultVenta) => {
-        if (err) return rollback(connection, res, 'Error al insertar venta', err);
+        if (err) {
+          console.error('Error al insertar venta:', err);
+          return rollback(connection, res, 'Error al insertar venta', err);
+        }
         if (!resultVenta || !resultVenta.insertId) {
+          console.error('No se pudo obtener el ID de la venta');
           return rollback(connection, res, 'No se pudo obtener el ID de la venta', new Error('insertId indefinido'));
         }
 
         const idVenta = resultVenta.insertId;
+        console.log('Venta insertada con ID:', idVenta);
 
         // 2. Insertar los detalles de la venta
         const insertDetalle = 'INSERT INTO detalle_venta (id_venta, id_formato_producto, cantidad, precio_unitario) VALUES ?';
         const detalleValues = productos.map(p => [idVenta, p.id_formato, p.cantidad, p.precio]);
 
         connection.query(insertDetalle, [detalleValues], (err) => {
-          if (err) return rollback(connection, res, 'Error al insertar detalle', err);
+          if (err) {
+            console.error('Error al insertar detalle de venta:', err);
+            return rollback(connection, res, 'Error al insertar detalle', err);
+          }
+          console.log('Detalles de venta insertados:', detalleValues);
 
           // 3. Descontar stock de cada producto
           const updates = productos.map(p => {
@@ -594,8 +619,15 @@ app.post('/api/post/realizar_compra', (req, res) => {
                 SET cantidad = cantidad - ?
                 WHERE id = ? AND cantidad >= ?`;
               connection.query(updateStock, [p.cantidad, p.id_formato, p.cantidad], (err, result) => {
-                if (err) return reject(err);
-                if (result.affectedRows === 0) return reject(new Error('Stock insuficiente para el producto ' + p.id_formato));
+                if (err) {
+                  console.error('Error al actualizar stock para formato:', p.id_formato, err);
+                  return reject(err);
+                }
+                if (result.affectedRows === 0) {
+                  console.error('Stock insuficiente para el producto', p.id_formato);
+                  return reject(new Error('Stock insuficiente para el producto ' + p.id_formato));
+                }
+                console.log('Stock actualizado para formato:', p.id_formato);
                 resolve();
               });
             });
@@ -604,8 +636,12 @@ app.post('/api/post/realizar_compra', (req, res) => {
           Promise.all(updates)
             .then(() => {
               connection.commit(err => {
-                if (err) return rollback(connection, res, 'Error al confirmar', err);
+                if (err) {
+                  console.error('Error al confirmar la transacción:', err);
+                  return rollback(connection, res, 'Error al confirmar', err);
+                }
                 connection.release();
+                console.log('Transacción confirmada. Consultando productos con stock bajo...');
 
                 // 4. Consultar productos con stock bajo y notificar
                 const queryStockBajo = `
@@ -615,19 +651,28 @@ app.post('/api/post/realizar_compra', (req, res) => {
                   WHERE fp.cantidad < fp.stock_min
                 `;
                 db.query(queryStockBajo, (err, productosBajoStock) => {
-                  if (!err && productosBajoStock.length > 0) {
+                  if (err) {
+                    console.error('Error al consultar productos con stock bajo:', err);
+                  } else if (productosBajoStock.length > 0) {
+                    console.log('Productos con stock bajo encontrados:', productosBajoStock);
                     notificarStockBajo(productosBajoStock);
+                  } else {
+                    console.log('No hay productos con stock bajo.');
                   }
-                res.status(201).json({ mensaje: 'Venta registrada', id_venta: idVenta });
+                  res.status(201).json({ mensaje: 'Venta registrada', id_venta: idVenta });
+                });
               });
+            })
+            .catch(err => {
+              console.error('Error al actualizar stock:', err);
+              rollback(connection, res, 'Error al actualizar stock', err);
             });
-          })
-          .catch(err => rollback(connection, res, 'Error al actualizar stock', err));
         });
-      });
+        });
     });
   });
 });
+
 
 // Endpoint para guardar el token de FCM
 app.post('/api/post/fcm_token', (req, res) => {
