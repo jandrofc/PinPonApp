@@ -31,15 +31,13 @@
             <i class="icon-calendar"></i>
             <span>Filtrar por fecha</span>
           </label>
-          <select 
-            [(ngModel)]="selectedDate" 
-            (change)="onDateChange()"
+          <ion-datetime
+            presentation="date"
+            [(ngModel)]="selectedDate"
+            (ionChange)="onDateChange()"
+            [max]="maxDate"
             class="filter-select">
-            <option value="">Todas las fechas</option>
-            <option *ngFor="let date of availableDates" [value]="date">
-              {{ formatDate(date) }}
-            </option>
-          </select>
+          </ion-datetime>
         </div>
 
         <!-- Filtro por producto -->
@@ -61,7 +59,7 @@
       <div *ngIf="hasActiveFilters()" class="active-filters">
         <div *ngIf="selectedDate" class="filter-badge">
           <i class="icon-calendar"></i>
-          <span>Fecha: {{ formatDate(selectedDate) }}</span>
+          <span>Fecha: {{ selectedDate }}</span>
           <button (click)="clearDateFilter()" class="filter-badge-close">
             <i class="icon-x"></i>
           </button>

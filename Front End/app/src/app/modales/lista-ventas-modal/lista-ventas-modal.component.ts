@@ -4,7 +4,7 @@ import { IonicModule } from '@ionic/angular'; // Import IonicModule for Ionic co
 import { closeOutline, receipt, cube, logoUsd, timeOutline, pricetagOutline } from 'ionicons/icons'; // Import the close icon
 import { OutputsEmergentesService } from '../../services/outputs-emergentes/outputs-emergentes.service';
 import { addIcons,  } from 'ionicons';
-
+import { FormsModule } from '@angular/forms';
 
 import { BehaviorSubject, type Observable } from 'rxjs';
 export interface SaleItem {
@@ -45,7 +45,7 @@ export interface IndividualProduct {
   templateUrl: './lista-ventas-modal.component.html',
   styleUrls: ['./lista-ventas-modal.component.scss'],
   standalone: true,
-  imports: [CommonModule, IonicModule]
+  imports: [CommonModule, IonicModule, FormsModule]
 })
 export class ListaVentasModalComponent  implements OnInit {
 
@@ -95,6 +95,9 @@ export class ListaVentasModalComponent  implements OnInit {
   selectedSegment = "receipts"
 
 
+  maxDate = new Date().toISOString().split('T')[0]; // formato 'YYYY-MM-DD'
+  selectedDate = ''
+  searchProduct = ''
 
 
 
@@ -127,6 +130,39 @@ export class ListaVentasModalComponent  implements OnInit {
         
       });
     }
+
+
+  applyFilters(): void {
+  
+  }
+
+  clearFilters(): void {
+    this.selectedDate = ""
+    this.searchProduct = ""
+    this.applyFilters()
+  }
+
+  clearDateFilter(): void {
+    this.selectedDate = ""
+    this.applyFilters()
+  }
+
+  clearProductFilter(): void {
+    this.searchProduct = ""
+    this.applyFilters()
+  }
+
+  hasActiveFilters(): boolean {
+    return !!(this.selectedDate || this.searchProduct)
+  }
+
+  onDateChange(): void {
+    this.applyFilters()
+  }
+
+  onProductSearch(): void {
+    this.applyFilters()
+  }
 
 
   public switchTab(tabName: string): void {
