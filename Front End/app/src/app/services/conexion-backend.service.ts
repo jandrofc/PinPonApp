@@ -71,7 +71,9 @@ export class ConexionBackendService {
       .pipe(catchError(this.handleError));
   }
 
-
+  enviarLog(log: any) {
+    return this.http.post(`${this.configService.apiUrl}log`, { log });
+  }
 
 
 // Metodo para registrar un token FCM (para notificaciones push)

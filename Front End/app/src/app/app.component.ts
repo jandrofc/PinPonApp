@@ -22,6 +22,7 @@ export class AppComponent {
 
   async ngOnInit() {
     await FirebaseMessaging.requestPermissions();
+    await LocalNotifications.requestPermissions();
 
     // Registrar el token inicial
     const token = await FirebaseMessaging.getToken();
@@ -34,7 +35,8 @@ export class AppComponent {
     });
 
     FirebaseMessaging.addListener('notificationReceived', async (notification) => {
-      console.log('Notificación recibida:', notification);
+      // Envía el log al backend
+      this.conexionBackend.enviarLog(notification).subscribe();
 
       // Mostrar notificación local si la app está en primer plano
       await LocalNotifications.schedule({

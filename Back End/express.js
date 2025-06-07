@@ -722,3 +722,9 @@ app.use((req, res) => {
   });
 });
 
+// Endpoint para recibir logs desde la app
+app.post('/api/log', express.json(), (req, res) => {
+  const { log } = req.body;
+  console.log('Log recibido desde la app:', log);
+  res.json({ status: 'ok' });
+});
