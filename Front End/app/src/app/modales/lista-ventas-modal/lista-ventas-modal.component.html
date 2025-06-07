@@ -10,12 +10,78 @@
       </div>
   </header>
 
+  <!-- Filtros -->
+  <div class="filter-card">
+    <div class="filter-header">
+      <h3>Filtros de Búsqueda</h3>
+      <button 
+        *ngIf="hasActiveFilters()" 
+        class="btn btn-outline btn-sm"
+        (click)="clearFilters()">
+        <i class="icon-x"></i>
+        Limpiar filtros
+      </button>
+    </div>
+    
+    <div class="filter-content">
+      <div class="filter-grid">
+        <!-- Filtro por fecha -->
+        <div class="filter-group">
+          <label class="filter-label">
+            <i class="icon-calendar"></i>
+            <span>Filtrar por fecha</span>
+          </label>
+          <select 
+            [(ngModel)]="selectedDate" 
+            (change)="onDateChange()"
+            class="filter-select">
+            <option value="">Todas las fechas</option>
+            <option *ngFor="let date of availableDates" [value]="date">
+              {{ formatDate(date) }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Filtro por producto -->
+        <div class="filter-group">
+          <label class="filter-label">
+            <i class="icon-search"></i>
+            <span>Buscar producto</span>
+          </label>
+          <input 
+            type="text"
+            [(ngModel)]="searchProduct"
+            (input)="onProductSearch()"
+            placeholder="Escribe el nombre del producto..."
+            class="filter-input">
+        </div>
+      </div>
+
+      <!-- Indicadores de filtros activos -->
+      <div *ngIf="hasActiveFilters()" class="active-filters">
+        <div *ngIf="selectedDate" class="filter-badge">
+          <i class="icon-calendar"></i>
+          <span>Fecha: {{ formatDate(selectedDate) }}</span>
+          <button (click)="clearDateFilter()" class="filter-badge-close">
+            <i class="icon-x"></i>
+          </button>
+        </div>
+        <div *ngIf="searchProduct" class="filter-badge">
+          <i class="icon-search"></i>
+          <span>Producto: {{ searchProduct }}</span>
+          <button (click)="clearProductFilter()" class="filter-badge-close">
+            <i class="icon-x"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
   <!-- Estadísticas -->
   <div class="stats-grid">
       <div class="stat-card">
           <div class="stat-header">
               <ion-icon name="cash-outline" class="stat-icon stat-icon-success"></ion-icon>
-              <span class="stat-label">Ventas Hoy</span>
+              <span class="stat-label">Ventas</span>
           </div>
           <div class="stat-value" id="total-sales">$0</div>
       </div>
@@ -60,6 +126,10 @@
               </button>
           </div>
 
+
+
+
+
           <!-- Vista por boletas -->
           <div id="receipts-view" class="tab-content" [class.active]="activeTab === 'receipts'">
               <div id="receipts-container" class="receipts-container">
@@ -75,7 +145,8 @@
                           <ion-item 
                             button 
                             class="receipt-item"
-                            [class.receipt-expanded]="selectedReceipt === receipt.id">
+                            [class.receipt-expanded]="selectedReceipt === receipt.id"
+                            (click)="toggleReceiptDetail(receipt.id); $event.stopPropagation()">
                             
                             <ion-icon name="receipt" class="boleta-icon stat-icon-primary"></ion-icon>
 
@@ -92,14 +163,6 @@
                             <div slot="end" class="receipt-summary">
                               <div class="receipt-total">${{ receipt.total.toFixed(2) }}</div>
                               <div class="receipt-count">{{ receipt.items.length }} productos</div>
-                              <!-- <ion-button 
-                                fill="clear" 
-                                size="small"
-                                (click)="toggleReceiptDetail(receipt.id); $event.stopPropagation()">
-                                <ion-icon 
-                                  [name]="selectedReceipt === receipt.id ? 'eye-off-outline' : 'eye-outline'">
-                                </ion-icon>
-                              </ion-button> -->
                             </div>
                           </ion-item>
 
@@ -129,30 +192,56 @@
                       </div>
                   </div>
 
-        <!-- Mensaje cuando no hay datos -->
-        <div *ngIf="!loading && !salesData" class="no-data">
-            <p>No hay boletas para mostrar</p>
-        </div>
-
-
-
-
-
-
-
-
-
-
-
-
+                  <!-- Mensaje cuando no hay datos -->
+                  <div *ngIf="!loading && !salesData" class="empty-state">
+                      <i class="icon-package empty-icon"></i>
+                      <h4>No se encontraron ventas</h4>
+                      <p>No hay ventas que coincidan con los filtros aplicados.</p>
+                      <button class="btn btn-outline" (click)="clearFilters()">
+                        Limpiar filtros
+                      </button>
+                  </div>
               </div>
           </div>
-
           <!-- Vista por productos -->
           <div id="products-view" class="tab-content" [class.active]="activeTab === 'products'">
-              <div id="products-container" class="products-container">
-                  <!-- Los productos se generarán dinámicamente -->
+            <div id="products-container" class="products-container">
+              <div *ngIf="loading" class="loading-container">
+                <ion-spinner></ion-spinner>
+                <p>Cargando productos...</p>
               </div>
+              <div *ngIf="!loading">
+                <div *ngIf="selectedSegment === 'receipts'" class="products-view">
+                  <div *ngFor="let product of products" class="product-container">
+                    <ion-item class="product-item">
+                      <div class="icon-container">
+                        <ion-icon name="cube-outline" class="product-icon stat-icon-secondary"></ion-icon>
+                      </div>
+                      <ion-label>
+                        <h2 class="product-title">{{ product.name }}</h2>
+                        <div class="product-info">
+                          <span class="info-item">
+                            <ion-icon name="pricetag-outline"></ion-icon>
+                            Unidades vendidas: {{ product.sold }}
+                          </span>
+                        </div>
+                      </ion-label>
+                      <div slot="end" class="product-summary">
+                        <div class="product-total">Total: ${{ product.revenue }}</div>
+                      </div>
+                    </ion-item>
+                  </div>
+              </div>
+              <div *ngIf="products.length === 0" class="empty-state">
+                <i class="icon-package empty-icon"></i>
+                <h4>No se encontraron ventas</h4>
+                <p>No hay ventas que coincidan con los filtros aplicados.</p>
+                <button class="btn btn-outline" (click)="clearFilters()">
+                  Limpiar filtros
+                </button>
+              </div>
+              </div>
+            </div>
           </div>
       </div>
   </div>

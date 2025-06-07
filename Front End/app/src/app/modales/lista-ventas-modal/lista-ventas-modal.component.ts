@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular'; // Import IonicModule for Ionic components
-import { closeOutline, receipt, cube, logoUsd, timeOutline } from 'ionicons/icons'; // Import the close icon
+import { closeOutline, receipt, cube, logoUsd, timeOutline, pricetagOutline } from 'ionicons/icons'; // Import the close icon
 import { OutputsEmergentesService } from '../../services/outputs-emergentes/outputs-emergentes.service';
 import { addIcons,  } from 'ionicons';
 
@@ -113,7 +113,8 @@ export class ListaVentasModalComponent  implements OnInit {
       'cash-outline': logoUsd,
       'receipt': receipt,
       'package': cube,
-      'time-outline': timeOutline
+      'time-outline': timeOutline,
+      'pricetag-outline': pricetagOutline
     });
    }
 
@@ -170,6 +171,12 @@ export class ListaVentasModalComponent  implements OnInit {
   // Más de 2 productos
   return `${receipt.items[0].name}, ${receipt.items[1].name}...`;
 }
+
+
+
+  toggleReceiptDetail(receiptId: string) {
+    this.selectedReceipt = this.selectedReceipt === receiptId ? null : receiptId
+  }
 
 
 
