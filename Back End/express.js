@@ -84,16 +84,6 @@ function getIPv4Address() {
 
 
 
-
-
-
-
-
-
-
-
-
-
 app.get('/api/get/lista_productos', (request, response) => {
   const marca =  request.query.marca || 'any';
   const orden =  request.query.orden  === 'desc' ? 'DESC' : 'ASC';
@@ -266,7 +256,7 @@ app.post('/api/post/producto', (req, res) => {
                         console.log('Error al insertar formato:', err);
                         resultados.push({ idx, error: 'Error al insertar formato', details: err, producto: productoObj });
                     } else {
-                        //console.log('Resultado INSERT formato_producto:', fmtRes);
+                        console.log('Resultado INSERT formato_producto:', fmtRes);
                         resultados.push({
                             idx,
                             success: true,
@@ -285,28 +275,28 @@ app.post('/api/post/producto', (req, res) => {
             );
         };
 
-                if (prodRes.length > 0) {
-                    // Producto ya existe → sólo insertamos formato
-                    const existingId = prodRes[0].id;
-                    insertarFormato(existingId);
-                } else {
-                    // Producto no existe → insertamos producto y luego formato
-                   const insertProdQ = `INSERT INTO producto (producto, marca) VALUES (?, ?)`;
-                    db.query(insertProdQ, [producto, marca], (err, prodInsertRes) => {
-                        if (err) {
-                            console.log('Error al crear producto:', err);
-                            resultados.push({ idx, error: 'Error al crear producto', details: err, producto: productoObj });
-                            procesados++;
-                            if (procesados === productos.length) {
-                                return res.json({ resultados });
-                            }
-                            return;
-                        }
-                        //console.log('Resultado INSERT producto:', prodInsertRes);
-                        const newProductId = prodInsertRes.insertId;
-                        insertarFormato(newProductId);
-                    });
+        if (prodRes.length > 0) {
+            // Producto ya existe → sólo insertamos formato
+            const existingId = prodRes[0].id;
+            insertarFormato(existingId);
+        } else {
+            // Producto no existe → insertamos producto y luego formato
+            const insertProdQ = `INSERT INTO producto (producto, marca) VALUES (?, ?)`;
+            db.query(insertProdQ, [producto, marca], (err, prodInsertRes) => {
+                if (err) {
+                    console.log('Error al crear producto:', err);
+                    resultados.push({ idx, error: 'Error al crear producto', details: err, producto: productoObj });
+                    procesados++;
+                    if (procesados === productos.length) {
+                        return res.json({ resultados });
+                    }
+                    return;
                 }
+                console.log('Resultado INSERT producto:', prodInsertRes);
+                const newProductId = prodInsertRes.insertId;
+                insertarFormato(newProductId);
+            });
+        }
             });
         });
     });
@@ -523,8 +513,8 @@ function notificarStockBajo(productos) {
   db.query('SELECT token FROM fcm_tokens', (err, results) => {
     if (err) return;
     const tokens = results.map(r => r.token);
-    if (tokens.length === 0) return;
-
+    
+    if (tokens.length === 0) return;  
     const notification = {
       notification: {
         title: '¡Stock bajo!',
@@ -703,8 +693,8 @@ app.get('/api/get/productos_stock_bajo', (req, res) => {
 
 // Endpoint para recibir logs desde la app
 app.post('/api/log', express.json(), (req, res) => {
-  const { log } = req.body;
-  console.log('Log recibido desde la app:', log);
+  // const { log } = req.body;
+  // console.log('Log recibido desde la app:', log);
   res.json({ status: 'ok' });
 });
 

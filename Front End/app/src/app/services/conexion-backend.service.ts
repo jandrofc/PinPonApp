@@ -72,7 +72,7 @@ export class ConexionBackendService {
   }
 
   enviarLog(log: any) {
-    return this.http.post(`${this.configService.apiUrl}api/log`, { log });
+    return this.http.post(`${this.configService.apiUrl}log`, { log });
   }
 
 
