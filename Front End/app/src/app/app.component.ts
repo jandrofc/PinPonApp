@@ -15,7 +15,7 @@ export class AppComponent {
     private configService: ConfigService,
     private conexionBackend: ConexionBackendService
   ) { };
-  
+
   getIPFILE(): string {
     return this.configService.apiUrl;
   }

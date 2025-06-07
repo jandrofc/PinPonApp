@@ -700,6 +700,15 @@ app.get('/api/get/productos_stock_bajo', (req, res) => {
   });
 });
 
+
+// Endpoint para recibir logs desde la app
+app.post('/api/log', express.json(), (req, res) => {
+  const { log } = req.body;
+  console.log('Log recibido desde la app:', log);
+  res.json({ status: 'ok' });
+});
+
+
 // Middleware para manejar rutas no definidas
 app.use((req, res) => {
   const endpoints = {
@@ -720,11 +729,4 @@ app.use((req, res) => {
     message: 'Ruta no encontrada. Aquí están los endpoints disponibles:',
     endpoints
   });
-});
-
-// Endpoint para recibir logs desde la app
-app.post('/api/log', express.json(), (req, res) => {
-  const { log } = req.body;
-  console.log('Log recibido desde la app:', log);
-  res.json({ status: 'ok' });
 });
