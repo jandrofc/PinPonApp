@@ -526,6 +526,7 @@ function notificarStockBajo(productos) {
       tokens: tokens
     };
 
+    console.log('Tokens a notificar:', tokens);
     admin.messaging().sendMulticast(mensaje)
       .then(response => {
         console.log('Notificaciones enviadas:', response.successCount);
