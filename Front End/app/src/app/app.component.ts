@@ -3,6 +3,7 @@ import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 import { ConfigService } from './services/config.service';
 import { ConexionBackendService } from './services/conexion-backend.service';
+import { LocalNotifications } from '@capacitor/local-notifications';
 
 @Component({
   selector: 'app-root',
@@ -32,8 +33,20 @@ export class AppComponent {
       this.registrarToken(event.token);
     });
 
-    FirebaseMessaging.addListener('notificationReceived', (notification) => {
+    FirebaseMessaging.addListener('notificationReceived', async (notification) => {
       console.log('Notificación recibida:', notification);
+
+      // Mostrar notificación local si la app está en primer plano
+      await LocalNotifications.schedule({
+        notifications: [
+          {
+            title: notification.notification?.title || 'Notificación',
+            body: notification.notification?.body || '',
+            id: Date.now(),
+            schedule: { at: new Date(Date.now()) },
+          }
+        ]
+      });
     });
   }
 
