@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular'; // Import IonicModule for Ionic components
-import { closeOutline, receipt, cube, logoUsd, timeOutline, pricetagOutline } from 'ionicons/icons'; // Import the close icon
+import { closeOutline, receipt, cube, logoUsd, timeOutline, pricetagOutline,
+calendarOutline, searchOutline  } from 'ionicons/icons'; // Import the close icon
 import { OutputsEmergentesService } from '../../services/outputs-emergentes/outputs-emergentes.service';
 import { addIcons,  } from 'ionicons';
 import { FormsModule } from '@angular/forms';
 
 import { BehaviorSubject, type Observable } from 'rxjs';
+
 export interface SaleItem {
   name: string
   price: number
@@ -98,7 +100,7 @@ export class ListaVentasModalComponent  implements OnInit {
   maxDate = new Date().toISOString().split('T')[0]; // formato 'YYYY-MM-DD'
   selectedDate = ''
   searchProduct = ''
-
+  showDateModal = false;
 
 
   activeTab: string = 'receipts'; // Pestaña activa por defecto
@@ -117,7 +119,9 @@ export class ListaVentasModalComponent  implements OnInit {
       'receipt': receipt,
       'package': cube,
       'time-outline': timeOutline,
-      'pricetag-outline': pricetagOutline
+      'pricetag-outline': pricetagOutline,
+      'lupa': searchOutline,
+      'calendario': calendarOutline
     });
    }
 

@@ -18,7 +18,7 @@
         *ngIf="hasActiveFilters()" 
         class="btn btn-outline btn-sm"
         (click)="clearFilters()">
-        <i class="icon-x"></i>
+        <ion-icon name="close-outline"></ion-icon>
         Limpiar filtros
       </button>
     </div>
@@ -28,22 +28,44 @@
         <!-- Filtro por fecha -->
         <div class="filter-group">
           <label class="filter-label">
-            <i class="icon-calendar"></i>
+            <ion-icon name="calendario"></ion-icon>
             <span>Filtrar por fecha</span>
           </label>
-          <ion-datetime
-            presentation="date"
-            [(ngModel)]="selectedDate"
-            (ionChange)="onDateChange()"
-            [max]="maxDate"
-            class="filter-select">
-          </ion-datetime>
+          <button (click)="showDateModal = true" class="filter-input">
+            <ion-icon name="calendario"></ion-icon>
+            <span>{{ selectedDate ? selectedDate : 'Selecciona una fecha' }}</span>
+          </button>
+
+          <!-- Modal con ion-datetime -->
+          <ion-modal [isOpen]="showDateModal"
+            (didDismiss)="showDateModal = false">
+            <ng-template>
+              <ion-header>
+                <ion-toolbar>
+                  <ion-title>Fecha</ion-title>
+                  <div class="close-button-container" slot="end">
+                    <button class="close-button" (click)="showDateModal = false">
+                      <ion-icon name="close-outline"></ion-icon>
+                    </button>
+                  </div>
+                </ion-toolbar>
+              </ion-header>
+              <ion-content class="ion-padding">
+                <ion-datetime
+                  presentation="date"
+                  [(ngModel)]="selectedDate"
+                  (ionChange)="onDateChange(); showDateModal = false"
+                  [max]="maxDate">
+                </ion-datetime>
+                </ion-content>
+            </ng-template>
+          </ion-modal>
         </div>
 
         <!-- Filtro por producto -->
         <div class="filter-group">
           <label class="filter-label">
-            <i class="icon-search"></i>
+            <ion-icon name="lupa"></ion-icon>
             <span>Buscar producto</span>
           </label>
           <input 
@@ -58,17 +80,17 @@
       <!-- Indicadores de filtros activos -->
       <div *ngIf="hasActiveFilters()" class="active-filters">
         <div *ngIf="selectedDate" class="filter-badge">
-          <i class="icon-calendar"></i>
+          <ion-icon name="calendario"></ion-icon>
           <span>Fecha: {{ selectedDate }}</span>
           <button (click)="clearDateFilter()" class="filter-badge-close">
-            <i class="icon-x"></i>
+            <ion-icon name="close-outline"></ion-icon>
           </button>
         </div>
         <div *ngIf="searchProduct" class="filter-badge">
-          <i class="icon-search"></i>
+          <ion-icon name="lupa"></ion-icon>
           <span>Producto: {{ searchProduct }}</span>
           <button (click)="clearProductFilter()" class="filter-badge-close">
-            <i class="icon-x"></i>
+            <ion-icon name="close-outline"></ion-icon>
           </button>
         </div>
       </div>
