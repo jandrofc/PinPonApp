@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1029700670598:android:05b008bd2edae666e2ad07",
+        "mobilesdk_app_id": "1:1029700670598:android:10367365633a9489e2ad07",
         "android_client_info": {
-          "package_name": "pin.pon.app"
+          "package_name": "www.PINPON.PINPON"
         }
       },
       "oauth_client": [],

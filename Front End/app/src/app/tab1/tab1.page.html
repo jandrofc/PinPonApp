@@ -59,6 +59,17 @@
             ></ion-input>
           </ion-item>
 
+          <!-- Stock Minimo -->
+          <ion-item>
+            <ion-label position="stacked">Stock Mínimo</ion-label>
+            <ion-input
+              type="number"
+              [(ngModel)]="productoSeleccionado.stock_min"
+              name="stock_min"
+              required
+            ></ion-input>
+          </ion-item>
+
           <!-- Precio -->
           <ion-item>
             <ion-label position="stacked">Precio</ion-label>

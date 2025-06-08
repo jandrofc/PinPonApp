@@ -1,35 +1,61 @@
 import { Component } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { FirebaseMessaging } from '@capacitor-firebase/messaging';
-import { ConfigService } from './services/config.service';
+import { ConexionBackendService } from './services/conexion-backend.service';
+import { LocalNotifications } from '@capacitor/local-notifications';
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
   imports: [IonApp, IonRouterOutlet],
 })
-export class AppComponent {
+export class AppComponent  {
   constructor(
-      private configService: ConfigService
-    ) { };
-  
-    getIPFILE(): string {
-      return this.configService.apiUrl;
-    }
+    private conexionBackend: ConexionBackendService
+  ) { };
+
+
 
   async ngOnInit() {
-    FirebaseMessaging.requestPermissions().then(() => {
-      FirebaseMessaging.getToken().then(token => {
-        console.log('FCM Token:', token.token);
-        fetch(`${this.getIPFILE()}post/fcm_token`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: token.token })
+    
+    
+    await FirebaseMessaging.requestPermissions();
+    await LocalNotifications.requestPermissions();
+
+    // Registrar el token inicial
+    const token = await FirebaseMessaging.getToken();
+    this.registrarToken(token.token);
+
+    // Escuchar cambios de token
+    FirebaseMessaging.addListener('tokenReceived', (event: { token: string }) => {
+      console.log('Nuevo token FCM:', event.token);
+      this.registrarToken(event.token);
+    });
+
+    FirebaseMessaging.addListener('notificationReceived', async (notification) => {
+      // Envía el log al backend
+      console.log("notificacion recibida")
+      console.log(notification)
+      this.conexionBackend.enviarLog(notification).subscribe();
+
+      // Mostrar notificación local si la app está en primer plano
+      await LocalNotifications.schedule({
+        notifications: [
+          {
+            title: notification.notification?.title || 'Notificación',
+            body: notification.notification?.body || '',
+            id: Math.floor(Date.now() / 1000),
+            schedule: { at: new Date(Date.now()+1000) },
+          }
+        ]
       });
     });
-  });
+  }
 
-  FirebaseMessaging.addListener('notificationReceived', (notification) => {
-    console.log('Notificación recibida:', notification);
-  });
-}}
+  private registrarToken(token: string) {
+    this.conexionBackend.registrarFcmToken(token).subscribe({
+      next: (res) => console.log('Token registrado:', res),
+      error: (err) => console.error('Error registrando token:', err)
+    });
+  }
+}

@@ -2,11 +2,25 @@
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
+const admin = require('firebase-admin');
+const serviceAccount = require('./.pinponClaveCuenta.json');
 require('dotenv').config();
+
+
+
+// Crear la conexión a la base de datos
+const db = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT
+});
+
 
 const app = express();
 app.use(cors({
-  origin: ['http://localhost:8100','capacitor://localhost',"*"], // IP de tu notebook con el frontend
+  origin: ['http://localhost:8100','capacitor://localhost','*'], // IP de tu notebook con el frontend
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
@@ -23,7 +37,9 @@ app.use(cors({
 
 app.use(express.json());
 
-
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
 
 const os = require('os');
 
@@ -68,23 +84,6 @@ function getIPv4Address() {
 
 
 
-
-
-
-
-
-
-
-// Crear la conexión a la base de datos
-const db = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT
-});
-
-
 app.get('/api/get/lista_productos', (request, response) => {
   const marca =  request.query.marca || 'any';
   const orden =  request.query.orden  === 'desc' ? 'DESC' : 'ASC';
@@ -97,6 +96,7 @@ app.get('/api/get/lista_productos', (request, response) => {
                     P.marca,
                     FP.cantidad,
                     FP.precio,
+                    FP.stock_min,
                     FP.codigo_barra,
                     FP.fecha_creacion,
                     FP.fecha_actualizado
@@ -151,11 +151,12 @@ app.post('/api/post/producto', (req, res) => {
             formato,
             cantidad,
             codigo_barra,
-            precio
+            precio,
+            stock_min
         } = productoObj;
 
         // Validar campos obligatorios
-        if (!producto || !marca || !formato || cantidad == null || !codigo_barra || precio == null) {
+        if (!producto || !marca || !formato || cantidad == null || !codigo_barra || precio == null || stock_min == 5) {
             resultados.push({ idx, error: 'Faltan datos obligatorios en el body', producto: productoObj });
             procesados++;
             if (procesados === productos.length) {
@@ -229,69 +230,73 @@ app.post('/api/post/producto', (req, res) => {
                 }
             }
 
-            // Comprobar si existe el producto genérico
-            const checkQuery = `SELECT id FROM producto WHERE producto = ? AND marca = ?`;
-            db.query(checkQuery, [producto, marca], (err, prodRes) => {
-                if (err) {
-                    resultados.push({ idx, error: 'Error al comprobar producto', details: err, producto: productoObj });
-                    procesados++;
-                    if (procesados === productos.length) {
-                        return res.json({ resultados });
-                    }
-                    return;
-                }
-
-                const insertarFormato = (productId) => {
-                    const insertFmtQ = `
-                        INSERT INTO formato_producto
-                            (producto_id, formato, cantidad, codigo_barra, precio)
-                        VALUES (?, ?, ?, ?, ?)
-                    `;
-                    db.query(
-                        insertFmtQ,
-                        [productId, formato, cantidad, codigo_barra, precio],
-                        (err, fmtRes) => {
-                            if (err) {
-                                resultados.push({ idx, error: 'Error al insertar formato', details: err, producto: productoObj });
-                            } else {
-                                resultados.push({
-                                    idx,
-                                    success: true,
-                                    message: prodRes.length > 0
-                                        ? 'Formato agregado a producto existente'
-                                        : 'Producto y formato creados correctamente',
-                                    formatoId: fmtRes.insertId,
-                                    productoId: productId
-                                });
-                            }
-                            procesados++;
-                            if (procesados === productos.length) {
-                                return res.json({ resultados });
-                            }
-                        }
-                    );
-                };
-
-                if (prodRes.length > 0) {
-                    // Producto ya existe → sólo insertamos formato
-                    const existingId = prodRes[0].id;
-                    insertarFormato(existingId);
-                } else {
-                    // Producto no existe → insertamos producto y luego formato
-                    const insertProdQ = `INSERT INTO producto (producto, marca) VALUES (?, ?)`;
-                    db.query(insertProdQ, [producto, marca], (err, prodInsertRes) => {
+                    // Comprobar si existe el producto genérico
+                    const checkQuery = `SELECT id FROM producto WHERE producto = ? AND marca = ?`;
+                    db.query(checkQuery, [producto, marca], (err, prodRes) => {
                         if (err) {
-                            resultados.push({ idx, error: 'Error al crear producto', details: err, producto: productoObj });
+                            resultados.push({ idx, error: 'Error al comprobar producto', details: err, producto: productoObj });
                             procesados++;
                             if (procesados === productos.length) {
                                 return res.json({ resultados });
                             }
                             return;
                         }
-                        const newProductId = prodInsertRes.insertId;
-                        insertarFormato(newProductId);
-                    });
+
+                        const insertarFormato = (productId) => {
+            const insertFmtQ = `
+                INSERT INTO formato_producto
+                    (producto_id, formato, cantidad, codigo_barra, precio, stock_min)
+                VALUES (?, ?, ?, ?, ?, ?)
+            `;
+            db.query(
+                insertFmtQ,
+                [productId, formato, cantidad, codigo_barra, precio, stock_min],
+                (err, fmtRes) => {
+                    if (err) {
+                        console.log('Error al insertar formato:', err);
+                        resultados.push({ idx, error: 'Error al insertar formato', details: err, producto: productoObj });
+                    } else {
+                        console.log('Resultado INSERT formato_producto:', fmtRes);
+                        resultados.push({
+                            idx,
+                            success: true,
+                            message: prodRes.length > 0
+                                ? 'Formato agregado a producto existente'
+                                : 'Producto y formato creados correctamente',
+                            formatoId: fmtRes.insertId,
+                            productoId: productId
+                        });
+                    }
+                    procesados++;
+                    if (procesados === productos.length) {
+                        return res.json({ resultados });
+                    }
                 }
+            );
+        };
+
+        if (prodRes.length > 0) {
+            // Producto ya existe → sólo insertamos formato
+            const existingId = prodRes[0].id;
+            insertarFormato(existingId);
+        } else {
+            // Producto no existe → insertamos producto y luego formato
+            const insertProdQ = `INSERT INTO producto (producto, marca) VALUES (?, ?)`;
+            db.query(insertProdQ, [producto, marca], (err, prodInsertRes) => {
+                if (err) {
+                    console.log('Error al crear producto:', err);
+                    resultados.push({ idx, error: 'Error al crear producto', details: err, producto: productoObj });
+                    procesados++;
+                    if (procesados === productos.length) {
+                        return res.json({ resultados });
+                    }
+                    return;
+                }
+                console.log('Resultado INSERT producto:', prodInsertRes);
+                const newProductId = prodInsertRes.insertId;
+                insertarFormato(newProductId);
+            });
+        }
             });
         });
     });
@@ -367,10 +372,11 @@ app.put('/api/put/formato', (req, res) => {
     formato,
     cantidad,
     codigo_barra,
-    precio
+    precio,
+    stock_min
   } = req.body;
 
-  // Validación de datos dependiendo de si esta vacion o no es String o numero negativos
+  // Validación de datos dependiendo de si esta vacio o no es String o numero negativos
   if (!id_formato) {
     return res.status(400).json({ error: 'Falta el id_formato' });
   }
@@ -392,6 +398,9 @@ app.put('/api/put/formato', (req, res) => {
   if (precio == null || isNaN(Number(precio)) || Number(precio) < 0) {
     return res.status(400).json({ error: 'Precio inválido' });
   }
+  if (stock_min == null || isNaN(Number(stock_min)) || Number(stock_min) < 0) {
+    return res.status(400).json({ error: 'Stock mínimo inválido' });
+  }
 
   const updateQuery = `
     UPDATE formato_producto AS fp
@@ -403,6 +412,7 @@ app.put('/api/put/formato', (req, res) => {
       fp.cantidad          = ?,
       fp.codigo_barra      = ?,
       fp.precio            = ?,
+      fp.stock_min         = ?,
       fp.fecha_actualizado = NOW(),
       p.producto           = ?
     WHERE fp.id = ?
@@ -414,6 +424,7 @@ app.put('/api/put/formato', (req, res) => {
     cantidad,
     codigo_barra,
     precio,
+    stock_min,
     nombre_producto,
     id_formato
   ];
@@ -497,6 +508,34 @@ app.get('/api/get/producto_por_codigo/:codigo', (req, res) => {
   });
 });
 
+// Función para enviar notificaciones a todos los tokens
+function notificarStockBajo(productos) {
+  db.query('SELECT token FROM fcm_tokens', (err, results) => {
+    if (err) return;
+    const tokens = results.map(r => r.token);
+    
+    if (tokens.length === 0) return;  
+    const notification = {
+      notification: {
+        title: '¡Stock bajo!',
+        body: `Productos: ${productos.map(p => p.nombre).join(', ')}`
+      }
+    };
+
+    tokens.forEach(token => {
+      const mensaje = { ...notification, token };
+      console.log('Enviando notificación FCM a:', token, JSON.stringify(mensaje, null, 2));
+      admin.messaging().send(mensaje)
+        .then(response => {
+          console.log('Notificación enviada a', token, response);
+        })
+        .catch(error => {
+          console.error('Error enviando a', token, error);
+        });
+    });
+  });
+}
+
 // Endpoint para realizar una compra y actualizar el stock
 
 // Esta función maneja la compra y hace rollback en caso de error
@@ -511,20 +550,27 @@ function rollback(connection, res, msg, err) {
   }
 }
 
+
 app.post('/api/post/realizar_compra', (req, res) => {
   const { productos } = req.body;
   if (!productos || !Array.isArray(productos) || productos.length === 0) {
+    console.log('No se enviaron productos para la compra');
     return res.status(400).json({ error: 'Debes enviar productos' });
   }
 
   // Calcula el total de la venta
   const total = productos.reduce((acc, p) => acc + (p.cantidad * p.precio), 0);
+  console.log('Iniciando compra. Productos:', productos, 'Total:', total);
 
   db.getConnection((err, connection) => {
-    if (err) return res.status(500).json({ error: 'Error de conexión', details: err });
+    if (err) {
+      console.error('Error de conexión a la base de datos:', err);
+      return res.status(500).json({ error: 'Error de conexión', details: err });
+    }
 
     connection.beginTransaction(err => {
       if (err) {
+        console.error('Error al iniciar la transacción:', err);
         connection.release();
         return res.status(500).json({ error: 'Error al iniciar la compra', details: err });
       }
@@ -532,19 +578,28 @@ app.post('/api/post/realizar_compra', (req, res) => {
       // 1. Insertar la venta
       const insertVenta = 'INSERT INTO venta (total) VALUES (?)';
       connection.query(insertVenta, [total], (err, resultVenta) => {
-        if (err) return rollback(connection, res, 'Error al insertar venta', err);
+        if (err) {
+          console.error('Error al insertar venta:', err);
+          return rollback(connection, res, 'Error al insertar venta', err);
+        }
         if (!resultVenta || !resultVenta.insertId) {
+          console.error('No se pudo obtener el ID de la venta');
           return rollback(connection, res, 'No se pudo obtener el ID de la venta', new Error('insertId indefinido'));
         }
 
         const idVenta = resultVenta.insertId;
+        console.log('Venta insertada con ID:', idVenta);
 
         // 2. Insertar los detalles de la venta
         const insertDetalle = 'INSERT INTO detalle_venta (id_venta, id_formato_producto, cantidad, precio_unitario) VALUES ?';
         const detalleValues = productos.map(p => [idVenta, p.id_formato, p.cantidad, p.precio]);
 
         connection.query(insertDetalle, [detalleValues], (err) => {
-          if (err) return rollback(connection, res, 'Error al insertar detalle', err);
+          if (err) {
+            console.error('Error al insertar detalle de venta:', err);
+            return rollback(connection, res, 'Error al insertar detalle', err);
+          }
+          console.log('Detalles de venta insertados:', detalleValues);
 
           // 3. Descontar stock de cada producto
           const updates = productos.map(p => {
@@ -554,8 +609,15 @@ app.post('/api/post/realizar_compra', (req, res) => {
                 SET cantidad = cantidad - ?
                 WHERE id = ? AND cantidad >= ?`;
               connection.query(updateStock, [p.cantidad, p.id_formato, p.cantidad], (err, result) => {
-                if (err) return reject(err);
-                if (result.affectedRows === 0) return reject(new Error('Stock insuficiente para el producto ' + p.id_formato));
+                if (err) {
+                  console.error('Error al actualizar stock para formato:', p.id_formato, err);
+                  return reject(err);
+                }
+                if (result.affectedRows === 0) {
+                  console.error('Stock insuficiente para el producto', p.id_formato);
+                  return reject(new Error('Stock insuficiente para el producto ' + p.id_formato));
+                }
+                console.log('Stock actualizado para formato:', p.id_formato);
                 resolve();
               });
             });
@@ -564,17 +626,47 @@ app.post('/api/post/realizar_compra', (req, res) => {
           Promise.all(updates)
             .then(() => {
               connection.commit(err => {
-                if (err) return rollback(connection, res, 'Error al confirmar', err);
+                if (err) {
+                  console.error('Error al confirmar la transacción:', err);
+                  return rollback(connection, res, 'Error al confirmar', err);
+                }
                 connection.release();
-                res.status(201).json({ mensaje: 'Venta registrada', id_venta: idVenta });
+                console.log('Transacción confirmada. Consultando productos con stock bajo...');
+
+                // 4. Consultar SOLO los productos comprados que quedaron bajo stock y notificar
+                const idsFormatos = productos.map(p => p.id_formato);
+                if (idsFormatos.length === 0) {
+                  return res.status(201).json({ mensaje: 'Venta registrada', id_venta: idVenta });
+                }
+                const queryStockBajo = `
+                  SELECT fp.id, p.producto AS nombre, fp.cantidad, fp.formato, fp.codigo_barra, fp.precio, fp.stock_min
+                  FROM formato_producto fp
+                  INNER JOIN producto p ON fp.producto_id = p.id
+                  WHERE fp.id IN (${idsFormatos.map(() => '?').join(',')}) AND fp.cantidad < fp.stock_min
+                `;
+                db.query(queryStockBajo,idsFormatos, (err, productosBajoStock) => {
+                  if (err) {
+                    console.error('Error al consultar productos con stock bajo:', err);
+                  } else if (productosBajoStock.length > 0) {
+                    console.log('Productos con stock bajo encontrados:', productosBajoStock);
+                    notificarStockBajo(productosBajoStock);
+                  } else {
+                    console.log('No hay productos con stock bajo.');
+                  }
+                  res.status(201).json({ mensaje: 'Venta registrada', id_venta: idVenta });
+                });
               });
             })
-            .catch(err => rollback(connection, res, 'Error al actualizar stock', err));
+            .catch(err => {
+              console.error('Error al actualizar stock:', err);
+              rollback(connection, res, 'Error al actualizar stock', err);
+            });
         });
-      });
+        });
     });
   });
 });
+
 
 // Endpoint para guardar el token de FCM
 app.post('/api/post/fcm_token', (req, res) => {
@@ -588,6 +680,90 @@ app.post('/api/post/fcm_token', (req, res) => {
       return res.status(500).json({ error: 'Error al guardar el token', details: err });
     }
     res.json({ success: true, message: 'Token guardado' });
+  });
+});
+
+// Endpoint para obtener productos con stock bajo
+app.get('/api/get/productos_stock_bajo', (req, res) => {
+  const query = 'SELECT * FROM productos WHERE stock < stock_min';
+  db.query(query, (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: 'Error al consultar productos', details: err });
+    }
+    res.json(results);
+  });
+});
+
+
+// Endpoint para recibir logs desde la app
+app.post('/api/log', express.json(), (req, res) => {
+  // const { log } = req.body;
+  // console.log('Log recibido desde la app:', log);
+  res.json({ status: 'ok' });
+});
+
+// Endpoint para obtener todas las ventas con sus detalles
+app.get('/api/get/ventas_con_detalles', (req, res) => {
+  // Consulta para obtener ventas y sus detalles, junto con información del producto y formato
+  const query = `
+    SELECT 
+      v.id AS id_venta,
+      v.fecha,
+      v.total,
+      dv.id AS id_detalle,
+      dv.id_formato_producto,
+      dv.cantidad AS cantidad_vendida,
+      dv.precio_unitario,
+      fp.formato,
+      fp.codigo_barra,
+      fp.precio AS precio_formato,
+      fp.stock_min,
+      p.producto AS nombre_producto,
+      p.marca
+    FROM venta v
+    LEFT JOIN detalle_venta dv ON v.id = dv.id_venta
+    LEFT JOIN formato_producto fp ON dv.id_formato_producto = fp.id
+    LEFT JOIN producto p ON fp.producto_id = p.id
+    ORDER BY v.fecha DESC, v.id DESC, dv.id ASC
+  `;
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error al obtener ventas y detalles:', err);
+      return res.status(500).json({ error: 'Error al obtener ventas y detalles', details: err });
+    }
+
+    // Procesar resultados para agrupar detalles por venta
+    const ventas = [];
+    const ventasMap = {};
+
+    results.forEach(row => {
+      if (!ventasMap[row.id_venta]) {
+        ventasMap[row.id_venta] = {
+          id_venta: row.id_venta,
+          fecha: row.fecha,
+          total: row.total,
+          detalles: []
+        };
+        ventas.push(ventasMap[row.id_venta]);
+      }
+      if (row.id_detalle) {
+        ventasMap[row.id_venta].detalles.push({
+          id_detalle: row.id_detalle,
+          id_formato_producto: row.id_formato_producto,
+          cantidad_vendida: row.cantidad_vendida,
+          precio_unitario: row.precio_unitario,
+          formato: row.formato,
+          codigo_barra: row.codigo_barra,
+          precio_formato: row.precio_formato,
+          stock_min: row.stock_min,
+          nombre_producto: row.nombre_producto,
+          marca: row.marca
+        });
+      }
+    });
+
+    res.json({ success: true, ventas });
   });
 });
 
@@ -613,4 +789,3 @@ app.use((req, res) => {
     endpoints
   });
 });
-
