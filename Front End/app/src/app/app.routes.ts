@@ -38,5 +38,4 @@ export const routes: Routes = [
     loadComponent: () => import('./registro-producto/registro-producto.page').then( m => m.RegistroProductoPage)
   }
 
-
 ];
