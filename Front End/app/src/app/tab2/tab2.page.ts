@@ -7,6 +7,21 @@ import { ListaVentasModalComponent } from '../modales/lista-ventas-modal/lista-v
 import { ModalController } from '@ionic/angular'; // Importa ModalController para manejar modales
 import { OutputsEmergentesService } from '../services/outputs-emergentes/outputs-emergentes.service';
 import { DashboardModalComponent } from '../modales/dashboard-modal/dashboard-modal.component';
+
+export interface today_sales{
+  valor_ventas : number
+  porcentaje: number
+}
+export interface today_products{
+  cantidad_vendidos: number
+  porcentaje: number
+}
+export interface ProductsHoy{
+  nombre: string
+  tiempo: Date
+  ganancia: number
+}
+
 @Component({
   selector: 'app-tab2',
   templateUrl: 'tab2.page.html',
@@ -20,6 +35,18 @@ export class Tab2Page {
     private readonly outputsEmergentesService: OutputsEmergentesService,
     private modalController: ModalController
   ) {}
+
+
+  today_sales: today_sales | null= null
+
+
+
+
+  today_products: today_products | null = null
+
+
+  // Contiene los ultimos 3 productos vendidos
+  lastThreeProducts : ProductsHoy[] | null = null
 
 
 
