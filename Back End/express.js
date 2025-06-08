@@ -633,14 +633,18 @@ app.post('/api/post/realizar_compra', (req, res) => {
                 connection.release();
                 console.log('Transacción confirmada. Consultando productos con stock bajo...');
 
-                // 4. Consultar productos con stock bajo y notificar
+                // 4. Consultar SOLO los productos comprados que quedaron bajo stock y notificar
+                const idsFormatos = productos.map(p => p.id_formato);
+                if (idsFormatos.length === 0) {
+                  return res.status(201).json({ mensaje: 'Venta registrada', id_venta: idVenta });
+                }
                 const queryStockBajo = `
                   SELECT fp.id, p.producto AS nombre, fp.cantidad, fp.formato, fp.codigo_barra, fp.precio, fp.stock_min
                   FROM formato_producto fp
                   INNER JOIN producto p ON fp.producto_id = p.id
-                  WHERE fp.cantidad < fp.stock_min
+                  WHERE fp.id IN (${idsFormatos.map(() => '?').join(',')}) AND fp.cantidad < fp.stock_min
                 `;
-                db.query(queryStockBajo, (err, productosBajoStock) => {
+                db.query(queryStockBajo,idsFormatos, (err, productosBajoStock) => {
                   if (err) {
                     console.error('Error al consultar productos con stock bajo:', err);
                   } else if (productosBajoStock.length > 0) {
@@ -696,6 +700,71 @@ app.post('/api/log', express.json(), (req, res) => {
   // const { log } = req.body;
   // console.log('Log recibido desde la app:', log);
   res.json({ status: 'ok' });
+});
+
+// Endpoint para obtener todas las ventas con sus detalles
+app.get('/api/get/ventas_con_detalles', (req, res) => {
+  // Consulta para obtener ventas y sus detalles, junto con información del producto y formato
+  const query = `
+    SELECT 
+      v.id AS id_venta,
+      v.fecha,
+      v.total,
+      dv.id AS id_detalle,
+      dv.id_formato_producto,
+      dv.cantidad AS cantidad_vendida,
+      dv.precio_unitario,
+      fp.formato,
+      fp.codigo_barra,
+      fp.precio AS precio_formato,
+      fp.stock_min,
+      p.producto AS nombre_producto,
+      p.marca
+    FROM venta v
+    LEFT JOIN detalle_venta dv ON v.id = dv.id_venta
+    LEFT JOIN formato_producto fp ON dv.id_formato_producto = fp.id
+    LEFT JOIN producto p ON fp.producto_id = p.id
+    ORDER BY v.fecha DESC, v.id DESC, dv.id ASC
+  `;
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error al obtener ventas y detalles:', err);
+      return res.status(500).json({ error: 'Error al obtener ventas y detalles', details: err });
+    }
+
+    // Procesar resultados para agrupar detalles por venta
+    const ventas = [];
+    const ventasMap = {};
+
+    results.forEach(row => {
+      if (!ventasMap[row.id_venta]) {
+        ventasMap[row.id_venta] = {
+          id_venta: row.id_venta,
+          fecha: row.fecha,
+          total: row.total,
+          detalles: []
+        };
+        ventas.push(ventasMap[row.id_venta]);
+      }
+      if (row.id_detalle) {
+        ventasMap[row.id_venta].detalles.push({
+          id_detalle: row.id_detalle,
+          id_formato_producto: row.id_formato_producto,
+          cantidad_vendida: row.cantidad_vendida,
+          precio_unitario: row.precio_unitario,
+          formato: row.formato,
+          codigo_barra: row.codigo_barra,
+          precio_formato: row.precio_formato,
+          stock_min: row.stock_min,
+          nombre_producto: row.nombre_producto,
+          marca: row.marca
+        });
+      }
+    });
+
+    res.json({ success: true, ventas });
+  });
 });
 
 
