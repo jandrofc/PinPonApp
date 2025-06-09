@@ -13,7 +13,7 @@ import { RespuestaAPI } from '../modelos/ventas.interfaces';
   providedIn: 'root'
 })
 export class ConexionBackendService {
-  
+
 
 
   constructor(
@@ -37,6 +37,7 @@ export class ConexionBackendService {
     );
   }
 
+  //obtenciones de las boletas
   getBoletas(filtro_producto: string, filtro_fecha: string){
     const api = `${this.configService.apiUrl}get/ventas_con_detalles`;
     const params = { filtro_producto, filtro_fecha}; // Convert Date to stringa}
@@ -44,9 +45,23 @@ export class ConexionBackendService {
     return this.http.get<RespuestaAPI>(api,{params}).pipe(
       catchError(this.handleError)
     )
-
-
+}
+  getUltimas3boletas(endpoint: string): Observable<any> {
+    // Construir la URL completa
+    const url = `${this.configService.apiUrl}${endpoint}`; // URL del endpoint
+    return this.http.get(url).pipe(
+      catchError(this.handleError)
+    );
   }
+
+    getTotalVentasHoy(): Observable<any> {
+    return this.http.get(`${this.configService.apiUrl}ventas_total_hoy`);
+  }
+
+  getCantidadProductosVendidosHoy(): Observable<any> {
+  return this.http.get(`${this.configService.apiUrl}cantidad_productos_vendidos_hoy`);
+  }
+
 
 
 
