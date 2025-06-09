@@ -26,8 +26,10 @@ ALTER TABLE producto
 ADD COLUMN habilitado TINYINT(1) DEFAULT 1;
 
 -- Agregar campo 'stock_min' a la tabla 'formato_producto'
+
 ALTER TABLE formato_producto
 ADD COLUMN stock_min INT DEFAULT 5;
+
 
 -- Agregar campo 'habilitado' a la tabla 'formato_producto'
 ALTER TABLE formato_producto
