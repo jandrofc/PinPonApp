@@ -104,7 +104,7 @@
               <span class="stat-label">Ventas</span>
           </div>
           <div class="stat-value" id="total-sales">
-            ${{ resumen?.total_ventas | number:'1.0-0' }}
+            ${{ resumen?.total_ventas ?? 0 | number:'1.0-0' }}
           </div>
       </div>
 
@@ -113,8 +113,8 @@
               <ion-icon name="receipt" class="stat-icon stat-icon-primary"></ion-icon>
               <span class="stat-label">Boletas</span>
           </div>
-          <div class="stat-value" id="total-products">
-            {{ resumen?.total_productos }}
+          <div class="stat-value" id="total-receipts">
+            {{ resumen?.total_boletas ?? 0  }}
           </div>
       </div>
 
@@ -123,7 +123,9 @@
               <ion-icon name="package" class="stat-icon stat-icon-secondary"></ion-icon>
               <span class="stat-label">Productos</span>
           </div>
-          <div class="stat-value" id="total-products">0</div>
+          <div class="stat-value" id="total-products">
+            {{ resumen?.total_productos ?? 0}}
+          </div>
       </div>
   </div>
 
@@ -217,7 +219,7 @@
                   </div>
 
                   <!-- Mensaje cuando no hay datos -->
-                  <div *ngIf="!loading && !salesData" class="empty-state">
+                  <div *ngIf="!loading && (!salesData || salesData.length <= 1)" class="empty-state">
                       <i class="icon-package empty-icon"></i>
                       <h4>No se encontraron ventas</h4>
                       <p>No hay ventas que coincidan con los filtros aplicados.</p>

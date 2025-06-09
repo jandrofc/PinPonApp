@@ -453,6 +453,7 @@ export class CameraScannerModalComponent implements AfterViewInit, OnDestroy {
     // Configura las opciones para el escaneo, formato que lee, camara a usar y si sera en web o telefono
     if (Capacitor.getPlatform() === 'web') {
       // ZXing para escaneo en web
+      await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
       const devices = await BrowserMultiFormatReader.listVideoInputDevices();
       const selectedDeviceId = devices[0]?.deviceId;
       if (!selectedDeviceId) {
