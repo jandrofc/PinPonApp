@@ -703,9 +703,6 @@ app.post('/api/log', express.json(), (req, res) => {
 });
 
 // Endpoint para obtener todas las ventas con sus detalles
-
-
-// 
 app.get('/api/get/ventas_con_detalles', (req, res) => {
   const {filtro_fecha, filtro_producto}= req.query
 
@@ -815,6 +812,59 @@ app.get('/api/get/ventas_con_detalles', (req, res) => {
   });
 });
 
+// Endpoint para obtener todos los productos con la cantidad de 
+app.get('/api/get/productos_mas_vendidos', (req, res) => {
+  const {filtro_fecha, filtro_producto}= req.query
+
+  let query = `
+    SELECT
+      p.producto AS nombre_producto,
+      p.marca,
+      fp.formato,
+      fp.codigo_barra,
+      SUM(dv.cantidad) AS cantidad_total_vendida,
+      dv.precio_unitario,
+      SUM(dv.cantidad * dv.precio_unitario) AS total_ventas
+    FROM venta v
+    LEFT JOIN detalle_venta dv ON v.id = dv.id_venta
+    LEFT JOIN formato_producto fp ON dv.id_formato_producto = fp.id
+    LEFT JOIN producto p ON fp.producto_id = p.id
+    `;
+
+const where = [];
+const params = [];
+
+if (filtro_fecha && filtro_fecha !== '') {
+  where.push('DATE(v.fecha) = ?');
+  params.push(filtro_fecha);
+}
+
+if (filtro_producto && filtro_producto !== '') {
+  where.push('LOWER(p.producto) LIKE ?');
+  params.push(`%${filtro_producto.toLowerCase()}%`);
+}
+
+if (where.length) {
+  query += ' WHERE ' + where.join(' AND ');
+}
+
+query += `
+GROUP BY p.id, fp.id, dv.precio_unitario
+ORDER BY total_ventas DESC
+`;
+
+db.query(query, params, (err, results) => {
+  if (err) {
+      console.error('Error al obtener ventas y detalles:', err);
+      return res.status(500).json({ error: 'Error al obtener ventas y detalles', details: err });
+    }
+  res.json({ 
+        success: true, 
+        results
+      });
+});
+});
+
 //endpoint para mostrar las ultimas 3 boletas
 
 app.get('/api/ultimas_boletas', (req, res) => {
@@ -903,6 +953,7 @@ app.get('/api/cantidad_productos_vendidos_hoy', (req, res) => {
     res.json({ total });
   });
 });
+
 
 
 // Middleware para manejar rutas no definidas
