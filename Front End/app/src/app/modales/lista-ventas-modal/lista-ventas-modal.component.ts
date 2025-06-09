@@ -99,7 +99,7 @@ export class ListaVentasModalComponent  implements OnInit {
 
 
   applyFilters(): void {
-  
+    this.loadReceiptsData()
   }
 
   clearFilters(): void {
@@ -146,9 +146,7 @@ export class ListaVentasModalComponent  implements OnInit {
       next: (data: RespuestaAPI) =>{
         this.resumen= data.resumen;
         this.salesData = data.ventas
-        for (const boleta of this.salesData) {
-          console.log(`Boleta ID: ${boleta.id_venta}, productos: ${boleta.detalle.length}`);
-        }
+        console.log(this.salesData)
         this.loading = false;
       },
       error: (err) => {
