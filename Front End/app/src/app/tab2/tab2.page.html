@@ -3,7 +3,7 @@
     <ion-title>
       Reportes
     </ion-title>
-    
+
   </ion-toolbar>
 </ion-header>
 
@@ -13,20 +13,22 @@
         <div class="sales-main-content">
             <!-- Quick Stats -->
             <div class="sales-quick-stats">
+                <!-- Tarjeta Ventas Hoy -->
                 <div class="sales-stat-card">
-                    <p class="sales-stat-label">Ventas Hoy</p>
-                    <p class="sales-stat-value">$2,450</p>
-                    <p class="sales-stat-change positive">+12%</p>
+                    <p class="sales-stat-label">Total de Ventas del dia</p>
+                    <p class="sales-stat-value">$ {{totalVentas | number:'1.0-0'}}</p>
+                    <ng-template #loadingSales>
+                        <ion-spinner name="crescent"></ion-spinner>
+                    </ng-template>
                 </div>
+
+                <!-- Tarjeta Productos Vendidos -->
                 <div class="sales-stat-card">
                     <p class="sales-stat-label">Productos Vendidos</p>
-                    <p class="sales-stat-value">156</p>
-                    <p class="sales-stat-change positive">+8%</p>
-                </div>
-                <div class="sales-stat-card">
-                    <p class="sales-stat-label">Categorías Activas</p>
-                    <p class="sales-stat-value">12</p>
-                    <p class="sales-stat-change neutral">0%</p>
+                    <p class="sales-stat-value">{{productosVendidos | number:'1.0-0'}} </p>
+                    <ng-template #loadingProducts>
+                        <ion-spinner name="crescent"></ion-spinner>
+                    </ng-template>
                 </div>
             </div>
 
@@ -90,36 +92,31 @@
             </div>
 
             <!-- Recent Activity -->
-            <div class="sales-activity-card">
-                <div class="sales-activity-header">
-                    <h3 class="sales-activity-title">Actividad Reciente</h3>
-                    <p class="sales-activity-subtitle">Últimas ventas registradas</p>
-                </div>
-                <div class="sales-activity-content">
-                    <div class="sales-activity-item">
-                        <div class="sales-activity-info">
-                            <h4>Producto A</h4>
-                            <p>10:30 AM</p>
-                        </div>
-                        <div class="sales-activity-amount">$125.00</div>
-                    </div>
-                    <div class="sales-activity-item">
-                        <div class="sales-activity-info">
-                            <h4>Producto B</h4>
-                            <p>09:45 AM</p>
-                        </div>
-                        <div class="sales-activity-amount">$89.50</div>
-                    </div>
-                    <div class="sales-activity-item">
-                        <div class="sales-activity-info">
-                            <h4>Producto C</h4>
-                            <p>09:15 AM</p>
-                        </div>
-                        <div class="sales-activity-amount">$234.00</div>
-                    </div>
-                </div>
-            </div>
+        <div class="sales-activity-card">
+          <div class="sales-activity-header">
+            <h3 class="sales-activity-title">Actividad Reciente</h3>
+            <p class="sales-activity-subtitle">Últimas ventas registradas</p>
+          </div>
 
+          <div class="sales-activity-content">
+            <ng-container *ngIf="boletas.length > 0; else loadingRecent">
+              <div class="sales-activity-item" *ngFor="let boleta of boletas">
+                <div class="sales-activity-info">
+                  <!-- Nombres de productos concatenados -->
+                  <h4>{{ getNombresProductosConcatenados(boleta) }}</h4>
+                </div>
+                <!-- Total de la boleta -->
+                <div class="sales-activity-amount">${{ boleta.total | number:'1.0-0' }}</div>
+              </div>
+            </ng-container>
+
+            <ng-template #loadingRecent>
+              <div class="sales-activity-spinner">
+                <ion-spinner name="crescent"></ion-spinner>
+              </div>
+            </ng-template>
+          </div>
+        </div>
             <!-- Bottom Spacer -->
             <div class="sales-bottom-spacer"></div>
       </div>

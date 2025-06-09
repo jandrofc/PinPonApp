@@ -350,6 +350,19 @@ ion-modal{
   display: block;
 }
 
+.loading-container{
+  display: flex;
+  flex-direction: column;
+  align-items: center; // Centra horizontalmente el contenido
+  justify-content: center; // Centra verticalmente si la altura lo permite
+  color: #1a1a1a;
+  ion-spinner{
+    color: #1a1a1a;
+  }
+}
+
+
+
 /* Vista de boletas */
 .receipts-container {
   display: flex;

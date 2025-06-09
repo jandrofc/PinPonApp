@@ -8,38 +8,12 @@ import { addIcons,  } from 'ionicons';
 import { FormsModule } from '@angular/forms';
 
 import { BehaviorSubject, type Observable } from 'rxjs';
+import { ConexionBackendService } from 'src/app/services/conexion-backend.service';
+import { error } from 'console';
 
-export interface SaleItem {
-  name: string
-  price: number
-  quantity: number
-}
+import { VentaDetalleItem, boleta, Resumen, IndividualProduct, RespuestaAPI } from "src/app/modelos/ventas.interfaces"
 
-export interface Receipt {
-  id: string
-  customer: string
-  date_time: string
-  total: number
-  items: SaleItem[]
-  status: "completed" | "pending"
-}
 
-export interface SalesData {
-  today: {
-    total: number
-    count: number
-    receipts: Receipt[]
-  }
-}
-
-export interface IndividualProduct {
-  name: string
-  price: number
-  quantity: number
-  customer: string
-  time: string
-  receiptId: string
-}
 
 
 @Component({
@@ -50,68 +24,9 @@ export interface IndividualProduct {
   imports: [CommonModule, IonicModule, FormsModule]
 })
 export class ListaVentasModalComponent  implements OnInit {
-
-
-
-  private salesDataSubject = new BehaviorSubject<SalesData>({
-    today: {
-      total: 492.24,
-      count: 3,
-      receipts: [
-        {
-          id: "R001",
-          customer: "María González",
-          date_time: "10:30",
-          total: 156.5,
-          items: [
-            { name: "Laptop HP", price: 120.0, quantity: 1 },
-            { name: "Mouse Inalámbrico", price: 18.25, quantity: 2 },
-          ],
-          status: "completed",
-        },
-        {
-          id: "R002",
-          customer: "Carlos Ruiz",
-          date_time: "14:15",
-          total: 89.99,
-          items: [{ name: "Teclado Mecánico", price: 89.99, quantity: 1 }],
-          status: "completed",
-        },
-        {
-          id: "R003",
-          customer: "Ana Martínez",
-          date_time: "16:45",
-          total: 245.75,
-          items: [
-            { name: 'Monitor 24"', price: 199.99, quantity: 1 },
-            { name: "Cable HDMI", price: 15.99, quantity: 1 },
-            { name: "Soporte Monitor", price: 29.77, quantity: 1 },
-          ],
-          status: "pending",
-        },
-      ],
-    },
-  })
-
-  selectedReceipt: string | null = null
-  selectedSegment = "receipts"
-
-
-  maxDate = new Date().toISOString().split('T')[0]; // formato 'YYYY-MM-DD'
-  selectedDate = ''
-  searchProduct = ''
-  showDateModal = false;
-
-
-  activeTab: string = 'receipts'; // Pestaña activa por defecto
-
-  salesData: SalesData | null = null
-
-  products: any[] = []; // Array para almacenar los productos
-  loading: boolean = true; // Indicador de carga
-
   constructor(
-    private readonly OutPuts_Emergentes: OutputsEmergentesService
+    private readonly OutPuts_Emergentes: OutputsEmergentesService,
+    private readonly conexionBackend: ConexionBackendService
   ) {
     addIcons({
       'close-outline': closeOutline,
@@ -124,6 +39,53 @@ export class ListaVentasModalComponent  implements OnInit {
       'calendario': calendarOutline
     });
    }
+
+
+
+  
+
+  // FILTROS
+  maxDate = new Date().toISOString().split('T')[0]; // formato 'YYYY-MM-DD'
+  selectedDate = ''
+  searchProduct = ''
+  showDateModal = false;
+
+  // indica el estado de la vista de las ventas, receipts / products
+  activeTab: string = 'receipts'; // Pestaña activa por defecto
+
+
+
+  public switchTab(tabName: string): void {
+    this.activeTab = tabName;
+    console.log(`Cambiando a la pestaña: ${tabName}`);
+
+    // Cargar datos según la pestaña activa
+    if (tabName === 'receipts') {
+      this.loadReceiptsData();
+    } else if (tabName === 'products') {
+      this.loadProductsData();
+    }
+  }
+
+
+
+  // Indica la boleta que se secciono
+  selectedReceipt: string | null = null
+
+  
+
+
+  // Obtiene la informacion de las boletas como productos
+  salesData: boleta[] | null = null
+  resumen: Resumen | null = null
+
+  products: any[] = []; // Array para almacenar los productos
+  
+  
+  
+  loading: boolean = true; // Indicador de carga
+
+  
 
   ngOnInit() {
     this.loadReceiptsData(); // Cargar datos iniciales
@@ -161,6 +123,7 @@ export class ListaVentasModalComponent  implements OnInit {
   }
 
   onDateChange(): void {
+    this.selectedDate = this.selectedDate.split("T")[0];
     this.applyFilters()
   }
 
@@ -169,47 +132,56 @@ export class ListaVentasModalComponent  implements OnInit {
   }
 
 
-  public switchTab(tabName: string): void {
-    this.activeTab = tabName;
-    console.log(`Cambiando a la pestaña: ${tabName}`);
-
-    // Cargar datos según la pestaña activa
-    if (tabName === 'receipts') {
-      this.loadReceiptsData();
-    } else if (tabName === 'products') {
-      this.loadProductsData();
-    }
-  }
+  
 
 
 
   // Cargar datos de boletas
-  private loadReceiptsData(): void {
+  private async loadReceiptsData(): Promise<void> {
     console.log('Cargando datos de boletas...');
     this.loading = true;
-    // Simulación de datos - reemplazar con servicio real
-    setTimeout(() => {
-      this.salesData = this.salesDataSubject.value;
-      this.loading = false;
-    }, 1000);
+    
+    this.conexionBackend.getBoletas(this.searchProduct,this.selectedDate)
+    .subscribe({
+      next: (data: RespuestaAPI) =>{
+        this.resumen= data.resumen;
+        this.salesData = data.ventas
+        for (const boleta of this.salesData) {
+          console.log(`Boleta ID: ${boleta.id_venta}, productos: ${boleta.detalle.length}`);
+        }
+        this.loading = false;
+      },
+      error: (err) => {
+        throw new Error(err);
+      }
+      
+    })
+    
   }
 
 
-  generateReceiptTitle(receipt: Receipt): string {
-  if (!receipt.items || receipt.items.length === 0) {
+  formatFecha(fecha: string): string {
+  if (!fecha) return '';
+  const d = new Date(fecha);
+  const pad = (n: number) => n.toString().padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+
+  generateReceiptTitle(receipt: boleta): string {
+  if (!receipt.detalle || receipt.detalle.length === 0) {
     return 'Sin productos';
   }
 
-  if (receipt.items.length === 1) {
-    return receipt.items[0].name;
+  if (receipt.detalle.length === 1) {
+    return receipt.detalle[0].nombre_producto;
   }
 
-  if (receipt.items.length === 2) {
-    return `${receipt.items[0].name}, ${receipt.items[1].name}`;
+  if (receipt.detalle.length === 2) {
+    return `${receipt.detalle[0].nombre_producto}, ${receipt.detalle[1].nombre_producto}`;
   }
 
   // Más de 2 productos
-  return `${receipt.items[0].name}, ${receipt.items[1].name}...`;
+  return `${receipt.detalle[0].nombre_producto}, ${receipt.detalle[1].nombre_producto}...`;
 }
 
 

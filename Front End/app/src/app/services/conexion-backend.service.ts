@@ -4,6 +4,11 @@ import { Observable , catchError, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { ConfigService } from './config.service';
 
+// Update the path below if the file is located elsewhere or has a different extension (e.g., .ts)
+import { RespuestaAPI } from '../modelos/ventas.interfaces';
+
+
+
 @Injectable({
   providedIn: 'root'
 })
@@ -31,6 +36,35 @@ export class ConexionBackendService {
       catchError(this.handleError)
     );
   }
+
+  //obtenciones de las boletas
+  getBoletas(filtro_producto: string, filtro_fecha: string){
+    const api = `${this.configService.apiUrl}get/ventas_con_detalles`;
+    const params = { filtro_producto, filtro_fecha}; // Convert Date to stringa}
+
+    return this.http.get<RespuestaAPI>(api,{params}).pipe(
+      catchError(this.handleError)
+    )
+}
+  getUltimas3boletas(endpoint: string): Observable<any> {
+    // Construir la URL completa
+    const url = `${this.configService.apiUrl}${endpoint}`; // URL del endpoint
+    return this.http.get(url).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+    getTotalVentasHoy(): Observable<any> {
+    return this.http.get(`${this.configService.apiUrl}ventas_total_hoy`);
+  }
+
+  getCantidadProductosVendidosHoy(): Observable<any> {
+  return this.http.get(`${this.configService.apiUrl}cantidad_productos_vendidos_hoy`);
+  }
+
+
+
+
 
   // Método POST de ejemplo
   postData(endpoint: string, data: any): Observable<any> {
