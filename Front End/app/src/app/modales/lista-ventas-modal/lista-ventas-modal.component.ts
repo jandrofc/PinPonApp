@@ -99,9 +99,9 @@ export class ListaVentasModalComponent  implements OnInit {
 
 
   applyFilters(): void {
-    if (this.activeTab === "receipt")
+    if (this.activeTab === "receipts")
       this.loadReceiptsData()
-    else{
+    else if (this.activeTab === "products"){
       this.loadProductsData()
     }
   }
@@ -166,7 +166,7 @@ export class ListaVentasModalComponent  implements OnInit {
       next: (data: RespuestaAPI) =>{
         this.resumen= data.resumen;
         this.salesData = data.ventas
-        console.log(this.salesData)
+        
         this.loading = false;
       },
       error: (err) => {
