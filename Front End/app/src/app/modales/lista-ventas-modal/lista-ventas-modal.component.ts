@@ -99,7 +99,11 @@ export class ListaVentasModalComponent  implements OnInit {
 
 
   applyFilters(): void {
-    this.loadReceiptsData()
+    if (this.activeTab === "receipt")
+      this.loadReceiptsData()
+    else{
+      this.loadProductsData()
+    }
   }
 
   clearFilters(): void {
@@ -138,7 +142,6 @@ export class ListaVentasModalComponent  implements OnInit {
 
   // Cargar datos de boletas
   private async loadReceiptsData(): Promise<void> {
-    console.log('Cargando datos de boletas...');
     this.loading = true;
     
     this.conexionBackend.getBoletas(this.searchProduct,this.selectedDate)
@@ -152,10 +155,26 @@ export class ListaVentasModalComponent  implements OnInit {
       error: (err) => {
         throw new Error(err);
       }
-      
     })
-    
   }
+
+  private async loadProductsData(): Promise<void>{
+    this.loading = true;
+
+    this.conexionBackend.getProductos(this.searchProduct,this.selectedDate)
+    .subscribe({
+      next: (data: RespuestaAPI) =>{
+        this.resumen= data.resumen;
+        this.salesData = data.ventas
+        console.log(this.salesData)
+        this.loading = false;
+      },
+      error: (err) => {
+        throw new Error(err);
+      }
+    })
+  }
+
 
 
   formatFecha(fecha: string): string {
@@ -182,8 +201,6 @@ export class ListaVentasModalComponent  implements OnInit {
   return `${receipt.detalle[0].nombre_producto}, ${receipt.detalle[1].nombre_producto}...`;
 }
 
-
-
   toggleReceiptDetail(receiptId: string) {
     this.selectedReceipt = this.selectedReceipt === receiptId ? null : receiptId
   }
@@ -191,33 +208,33 @@ export class ListaVentasModalComponent  implements OnInit {
 
 
   // Cargar datos de productos
-  private loadProductsData(): void {
-    console.log('Cargando datos de productos...');
-    this.loading = true;
+  // private loadProductsData(): void {
+  //   console.log('Cargando datos de productos...');
+  //   this.loading = true;
     
-    // Simulación de datos - reemplazar con servicio real
-    setTimeout(() => {
-      this.products = [
-        {
-          id: 1,
-          name: 'Producto A',
-          category: 'Electrónicos',
-          sold: 25,
-          revenue: 750.00,
-          stock: 15
-        },
-        {
-          id: 2,
-          name: 'Producto B',
-          category: 'Ropa',
-          sold: 40,
-          revenue: 1200.00,
-          stock: 8
-        }
-      ];
-      this.loading = false;
-    }, 1000);
-  }
+  //   // Simulación de datos - reemplazar con servicio real
+  //   setTimeout(() => {
+  //     this.products = [
+  //       {
+  //         id: 1,
+  //         name: 'Producto A',
+  //         category: 'Electrónicos',
+  //         sold: 25,
+  //         revenue: 750.00,
+  //         stock: 15
+  //       },
+  //       {
+  //         id: 2,
+  //         name: 'Producto B',
+  //         category: 'Ropa',
+  //         sold: 40,
+  //         revenue: 1200.00,
+  //         stock: 8
+  //       }
+  //     ];
+  //     this.loading = false;
+  //   }, 1000);
+  // }
 
 
 

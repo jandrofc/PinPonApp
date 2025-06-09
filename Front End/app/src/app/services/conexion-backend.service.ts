@@ -44,8 +44,14 @@ export class ConexionBackendService {
     return this.http.get<RespuestaAPI>(api,{params}).pipe(
       catchError(this.handleError)
     )
+  }
+  getProductos(filtro_producto: string, filtro_fecha: string){
+    const api = `${this.configService.apiUrl}get/productos_mas_vendidos`;
+    const params = { filtro_producto, filtro_fecha}; // Convert Date to stringa}
 
-
+    return this.http.get<RespuestaAPI>(api,{params}).pipe(
+      catchError(this.handleError)
+    )
   }
 
 
