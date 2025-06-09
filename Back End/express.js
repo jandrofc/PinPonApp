@@ -865,6 +865,95 @@ db.query(query, params, (err, results) => {
 });
 });
 
+//endpoint para mostrar las ultimas 3 boletas
+
+app.get('/api/ultimas_boletas', (req, res) => {
+  const query = `
+    SELECT 
+      v.id AS boleta_id,
+      v.fecha,
+      v.total,
+      p.producto,
+      dv.cantidad
+    FROM venta v
+    INNER JOIN detalle_venta dv ON v.id = dv.id_venta
+    INNER JOIN formato_producto fp ON dv.id_formato_producto = fp.id
+    INNER JOIN producto p ON fp.producto_id = p.id
+    WHERE DATE(v.fecha) = CURDATE()
+    ORDER BY v.fecha DESC, v.id DESC
+    LIMIT 3
+  `;
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error al consultar boletas:', err);
+      return res.status(500).json({ error: 'Error al obtener boletas', details: err });
+    }
+
+    // Agrupar productos por boleta
+    const boletasMap = {};
+    results.forEach(row => {
+      if (!boletasMap[row.boleta_id]) {
+        boletasMap[row.boleta_id] = {
+          id: row.boleta_id,
+          fecha: row.fecha,
+          total: row.total,
+          productos: []
+        };
+      }
+      boletasMap[row.boleta_id].productos.push({
+        nombre: row.producto,
+        cantidad: row.cantidad
+      });
+    });
+
+    // Tomar las últimas 3 boletas
+    const ultimas3 = Object.values(boletasMap).slice(0, 3);
+
+    res.json({ boletas: ultimas3 });
+  });
+});
+
+//obtener el total de las ventas del dia actual
+
+app.get('/api/ventas_total_hoy', (req, res) => {
+  const query = `
+    SELECT IFNULL(SUM(total), 0) AS total_ventas
+    FROM venta
+    WHERE DATE(fecha) = CURDATE()
+  `;
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error al obtener total de ventas de hoy:', err);
+      return res.status(500).json({ error: 'Error al consultar total de ventas', details: err });
+    }
+
+    const total = results[0].total_ventas;
+    res.json({ total });
+  });
+});
+
+//sumar la cantidad de las boletas del dia actual
+app.get('/api/cantidad_productos_vendidos_hoy', (req, res) => {
+  const query = `
+    SELECT IFNULL(SUM(dv.cantidad), 0) AS total_productos
+    FROM detalle_venta dv
+    INNER JOIN venta v ON dv.id_venta = v.id
+    WHERE DATE(v.fecha) = CURDATE()
+  `;
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error al obtener cantidad de productos vendidos hoy:', err);
+      return res.status(500).json({ error: 'Error al consultar cantidad de productos vendidos', details: err });
+    }
+
+    const total = results[0].total_productos;
+    res.json({ total });
+  });
+});
+
 
 
 // Middleware para manejar rutas no definidas

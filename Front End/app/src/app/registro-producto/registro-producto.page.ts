@@ -33,6 +33,8 @@ export interface ProductoEscaneado {
   cantidad: number | null;
   precio: number | null;
   stock_min: number | null;
+  nuevo: boolean;
+  existente: number;
 }
 
 @Component({
@@ -103,18 +105,75 @@ export class RegistroProductoPage implements OnInit {
     await modal.present();
 
     const { data } = await modal.onWillDismiss();
-    // Si se escaneó un código y no está repetido, lo agregamos
-    if (data?.barcode && !this.productosEscaneados.some(p => p.codigo === data.barcode.rawValue)) {
-      this.productosEscaneados.push({
-        codigo: data.barcode.rawValue,
-        nombre: '',
-        marca: '',
-        formato: '',
-        cantidad: null,
-        precio: null,
-        stock_min: null
+    const codigo = data?.barcode?.rawValue;
+
+    if (codigo && !this.productosEscaneados.some(p => p.codigo === codigo)) {
+      // Consultar si el código existe en la base de datos
+      this.conexionBackendService.validarCodigoBarra(codigo).subscribe({
+        next: (res) => {
+          // Si el producto existe, buscar su cantidad
+          if (res.mensaje === 'Producto ya existente') {
+            // Traer datos del producto existente
+            this.conexionBackendService.registrarProductoPorcodigo('/get/producto_por_codigo/', codigo).subscribe({
+              next: (prodRes) => {
+                this.productosEscaneados.push({
+                  codigo,
+                  nombre: prodRes.producto.nombre_producto,
+                  marca: prodRes.producto.marca,
+                  formato: prodRes.producto.formato,
+                  cantidad: null,
+                  precio: prodRes.producto.precio,
+                  stock_min: prodRes.producto.stock_min ?? 5,
+                  nuevo: false,
+                  existente: prodRes.producto.cantidad ?? 0
+                });
+              },
+              error: () => {
+                // Si hay error, igual lo agregas como nuevo
+                this.productosEscaneados.push({
+                  codigo,
+                  nombre: '',
+                  marca: '',
+                  formato: '',
+                  cantidad: null,
+                  precio: null,
+                  stock_min: null,
+                  nuevo: true,
+                  existente: 0
+                });
+              }
+            });
+          } else {
+            // Producto no existe, es nuevo
+            this.productosEscaneados.push({
+              codigo,
+              nombre: '',
+              marca: '',
+              formato: '',
+              cantidad: null,
+              precio: null,
+              stock_min: null,
+              nuevo: true,
+              existente: 0
+            });
+          }
+        },
+        error: () => {
+          // Si hay error en la consulta, lo agregas como nuevo
+          this.productosEscaneados.push({
+            codigo,
+            nombre: '',
+            marca: '',
+            formato: '',
+            cantidad: null,
+            precio: null,
+            stock_min: null,
+            nuevo: true,
+            existente: 0
+          });
+        }
       });
-    } else if (data?.barcode && this.productosEscaneados.some(p => p.codigo === data.barcode.rawValue)) {
+    } else if (codigo && this.productosEscaneados.some(p => p.codigo === codigo)) {
       this.outputsEmergentesService.showErrorAlert({
         header: 'AVISO',
         message: 'El código ya fue escaneado',
@@ -159,7 +218,9 @@ export class RegistroProductoPage implements OnInit {
           formato: '',
           cantidad: null,
           precio: null,
-          stock_min: null
+          stock_min: null,
+          nuevo: true,
+          existente: 0
         });
       } else if (barcode && this.productosEscaneados.some(p => p.codigo === barcode.rawValue)) {
         this.outputsEmergentesService.showErrorAlert({

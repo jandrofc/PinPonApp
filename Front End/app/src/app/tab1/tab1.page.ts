@@ -150,9 +150,11 @@ export class Tab1Page implements OnInit, OnDestroy{
   }
 
   get filteredProducts() {
-    return this.productos.filter(producto =>
-      producto.nombre_producto.toLowerCase().includes(this.searchQuery.toLowerCase())
-    );
+    return this.productos
+      .filter(producto =>
+        producto.nombre_producto.toLowerCase().includes(this.searchQuery.toLowerCase())
+      )
+      .sort((a, b) => a.nombre_producto.localeCompare(b.nombre_producto));
   }
   escanear_Productos_Nuevos(){
     this.router.navigate(['/registro-producto']);
