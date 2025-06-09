@@ -4,7 +4,8 @@ import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ModalController } from '@ionic/angular';
-
+import { addIcons } from 'ionicons';
+import {  arrowBack, search, notifications, camera, bag, cubeOutline, cartOutline, barChartOutline, createOutline, trashOutline, trendingUp, trendingDown, logoUsd, alertCircleOutline, informationCircle, barcodeOutline, documentTextOutline, pricetagOutline, alertCircle, businessOutline, resizeOutline, layersOutline, warningOutline, cashOutline, cardOutline, save, close } from 'ionicons/icons';
 @Component({
   selector: 'app-formulario-registro-producto-modal',
   imports: [IonicModule, CommonModule, ReactiveFormsModule],
@@ -19,7 +20,37 @@ export class FormularioRegistroProductoModalComponent  implements OnInit {
   constructor(
     private fb: FormBuilder,
     private modalController: ModalController
-  ) { }
+    )
+   {
+    addIcons({   
+          "arrowBack":arrowBack, 
+          "search":search, 
+          "notifications":notifications, 
+          "create-outline":createOutline, 
+          "camera":camera , 
+          "bag":bag, 
+          "cube-outline":cubeOutline ,
+          "cart-outline":cartOutline, 
+          "barChart-outline":barChartOutline ,
+          "trash-outline":trashOutline, 
+          "trendingUp":trendingUp, 
+          "trendingDown":trendingDown, 
+          "logoUsd":logoUsd, 
+          "alertCircle-outline":alertCircleOutline, 
+          "informationCircle":informationCircle, 
+          "barcode-outline":barcodeOutline, 
+          "documentText-outline":documentTextOutline, 
+          "pricetag-outline":pricetagOutline, 
+          "alertCircle":alertCircle, 
+          "business-outline":businessOutline, 
+          "resize-outline":resizeOutline, 
+          "layers-outline":layersOutline, 
+          "warning-outline":warningOutline, 
+          "cash-outline":cashOutline, 
+          "card-outline":cardOutline, 
+          "save":save, 
+          "close":close });
+   }
 
   ngOnInit() {
     // Inicializa el formulario
@@ -65,4 +96,9 @@ export class FormularioRegistroProductoModalComponent  implements OnInit {
       console.error('Formulario inválido');
     }
   }
+
+  async cancelarEdicion() {
+    await this.modalController.dismiss(null); // Cierra el modal sin pasar datos
+  }
+
 }

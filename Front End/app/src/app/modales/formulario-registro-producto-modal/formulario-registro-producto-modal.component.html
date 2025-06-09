@@ -1,82 +1,197 @@
 <ion-header>
-    <ion-toolbar>
-      <ion-title>Formulario de Registro de Producto</ion-title>
-    </ion-toolbar>
-  </ion-header>
-  <ion-content>
-  <ng-container class="barcode-scanner-modal">
-    <div>
-      <h2>Información del Producto</h2>
-      
-      <form [formGroup]="productForm">
-        <ion-item>
-          <ion-label position="stacked">Código</ion-label>
-          <ion-input formControlName="code" readonly></ion-input>
-        </ion-item>
-  
-        <ion-item>
-          <ion-label position="stacked">Nombre del Producto <ion-text color="danger">*</ion-text></ion-label>
-          <ion-input formControlName="name" placeholder="Ej: Leche entera"></ion-input>
-        </ion-item>
-        <ion-text color="danger" *ngIf="productForm.get('name')?.touched && productForm.get('name')?.errors?.['required']" class="ion-padding-start">
-          El nombre es obligatorio
-        </ion-text>
-  
-        <ion-item>
-          <ion-label position="stacked">Marca <ion-text color="danger">*</ion-text></ion-label>
-          <ion-input formControlName="brand" placeholder="Ej: Alpura"></ion-input>
-        </ion-item>
-        <ion-text color="danger" *ngIf="productForm.get('brand')?.touched && productForm.get('brand')?.errors?.['required']" class="ion-padding-start">
-          La marca es obligatoria
-        </ion-text>
-  
-        <ion-item>
-          <ion-label position="stacked">Formato <ion-text color="danger">*</ion-text></ion-label>
-          <ion-input formControlName="format" placeholder="Ej: Botella 1L"></ion-input>
-        </ion-item>
-        <ion-text color="danger" *ngIf="productForm.get('format')?.touched && productForm.get('format')?.errors?.['required']" class="ion-padding-start">
-          El formato es obligatorio
-        </ion-text>
-  
-        <ion-item>
-          <ion-label position="stacked">Cantidad <ion-text color="danger">*</ion-text></ion-label>
-          <ion-input formControlName="quantity" type="number" placeholder="Ej: 1"></ion-input>
-        </ion-item>
-        <ion-text color="danger" *ngIf="productForm.get('quantity')?.touched && productForm.get('quantity')?.errors?.['required']" class="ion-padding-start">
-          La cantidad es obligatoria
-        </ion-text>
-        <ion-text color="danger" *ngIf="productForm.get('quantity')?.touched && productForm.get('quantity')?.errors?.['min']" class="ion-padding-start">
-          La cantidad debe ser mayor a 0
-        </ion-text>
+  <ion-toolbar color="primary">
+    <ion-title>
+      <ion-icon name="cube-outline" slot="start"></ion-icon>
+      Registro de Producto
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
 
-        <ion-item>
-          <ion-label position="stacked">Stock Minimo <ion-text color="danger">*</ion-text></ion-label>
-          <ion-input formControlName="stock_min" type="number" placeholder="Ej: 5"></ion-input>
-        </ion-item>
-        <ion-text color="danger" *ngIf="productForm.get('stock_min')?.touched && productForm.get('stock_min')?.errors?.['required']" class="ion-padding-start">
-          El stock minimo es obligatorio
-        </ion-text>
-        <ion-text color="danger" *ngIf="productForm.get('stock_min')?.touched && productForm.get('stock_min')?.errors?.['min']" class="ion-padding-start">
-          El stock minimo debe ser mayor a 0
-        </ion-text>
-  
-        <ion-item>
-          <ion-label position="stacked">Precio <ion-text color="danger">*</ion-text></ion-label>
-          <ion-input formControlName="price" type="number" placeholder="Ej: 25.50"></ion-input>
-        </ion-item>
-        <ion-text color="danger" *ngIf="productForm.get('price')?.touched && productForm.get('price')?.errors?.['required']" class="ion-padding-start">
-          El precio es obligatorio
-        </ion-text>
-        <ion-text color="danger" *ngIf="productForm.get('price')?.touched && productForm.get('price')?.errors?.['min']" class="ion-padding-start">
-          El precio debe ser mayor o igual a 0
-        </ion-text>
-  
-        <div class="ion-padding">
-          <ion-button expand="block" (click)="guardarCambios(producto.codigo)" [disabled]="productForm.invalid">
-            Guardar cambios
-          </ion-button>
-        </div>
-      </form>
+<ion-content class="ion-padding">
+  <div class="form-container">
+    <!-- Header Section -->
+    <div class="form-header">
+      <ion-icon name="information-circle" class="icon-white"></ion-icon>
+      <h2>Información del Producto</h2>
+      <p>Complete todos los campos del formulario</p>
     </div>
-  </ng-container>
-  </ion-content>
+
+    <form [formGroup]="productForm" class="product-form">
+      <!-- Código Section -->
+      <div class="form-section">
+        <ion-item lines="full" class="form-item">
+          <ion-icon name="barcode-outline" slot="start" color="medium"></ion-icon>
+          <ion-label position="stacked" color="dark">
+            <strong>Código del Producto</strong>
+          </ion-label>
+          <ion-input 
+            formControlName="code" 
+            readonly
+            class="readonly-input">
+          </ion-input>
+        </ion-item>
+      </div>
+
+      <!-- Información Básica Section -->
+      <div class="form-section">
+        <div class="section-title">
+          <ion-icon name="document-text-outline" color="primary"></ion-icon>
+          <h3>Información Básica</h3>
+        </div>
+
+        <ion-item lines="full" class="form-item" [class.error]="productForm.get('name')?.touched && productForm.get('name')?.errors?.['required']">
+          <ion-icon name="pricetag-outline" slot="start" color="medium"></ion-icon>
+          <ion-label position="stacked" color="dark">
+            <strong>Nombre del Producto</strong> <ion-text class="danger-red"> *</ion-text>
+          </ion-label>
+          <ion-input 
+            formControlName="name" 
+            placeholder="Ej: Leche entera"
+            class="custom-input">
+          </ion-input>
+        </ion-item>
+        <div class="error-message" *ngIf="productForm.get('name')?.touched && productForm.get('name')?.errors?.['required']">
+          <ion-icon name="alert-circle" class="icon-white"></ion-icon>
+          <ion-text color="danger">El nombre es obligatorio</ion-text>
+        </div>
+
+        <ion-item lines="full" class="form-item" [class.error]="productForm.get('brand')?.touched && productForm.get('brand')?.errors?.['required']">
+          <ion-icon name="business-outline" slot="start" color="medium"></ion-icon>
+          <ion-label position="stacked" color="dark">
+            <strong>Marca</strong> <ion-text class="danger-red"> *</ion-text>
+          </ion-label>
+          <ion-input 
+            formControlName="brand" 
+            placeholder="Ej: Alpura"
+            class="custom-input">
+          </ion-input>
+        </ion-item>
+        <div class="error-message" *ngIf="productForm.get('brand')?.touched && productForm.get('brand')?.errors?.['required']">
+          <ion-icon name="alert-circle" class="icon-white"></ion-icon>
+          <ion-text color="danger">La marca es obligatoria</ion-text>
+        </div>
+
+        <ion-item lines="full" class="form-item" [class.error]="productForm.get('format')?.touched && productForm.get('format')?.errors?.['required']">
+          <ion-icon name="resize-outline" slot="start" color="medium"></ion-icon>
+          <ion-label position="stacked" color="dark">
+            <strong>Formato</strong> <ion-text class="danger-red"> *</ion-text>
+          </ion-label>
+          <ion-input 
+            formControlName="format" 
+            placeholder="Ej: Botella 1L"
+            class="custom-input">
+          </ion-input>
+        </ion-item>
+        <div class="error-message" *ngIf="productForm.get('format')?.touched && productForm.get('format')?.errors?.['required']">
+          <ion-icon name="alert-circle" class="icon-white"></ion-icon>
+          <ion-text color="danger">El formato es obligatorio</ion-text>
+        </div>
+      </div>
+
+      <!-- Inventario Section -->
+      <div class="form-section">
+        <div class="section-title">
+          <ion-icon name="layers-outline" color="primary"></ion-icon>
+          <h3>Control de Inventario</h3>
+        </div>
+
+        <div class="two-column">
+          <ion-item lines="full" class="form-item" [class.error]="productForm.get('quantity')?.touched && (productForm.get('quantity')?.errors?.['required'] || productForm.get('quantity')?.errors?.['min'])">
+            <ion-icon name="cube-outline" slot="start" color="medium"></ion-icon>
+            <ion-label position="stacked" color="dark">
+              <strong>Cantidad</strong> <ion-text class="danger-red"> *</ion-text>
+            </ion-label>
+            <ion-input 
+              formControlName="quantity" 
+              type="number" 
+              placeholder="Ej: 1"
+              class="custom-input">
+            </ion-input>
+          </ion-item>
+
+          <ion-item lines="full" class="form-item" [class.error]="productForm.get('stock_min')?.touched && (productForm.get('stock_min')?.errors?.['required'] || productForm.get('stock_min')?.errors?.['min'])">
+            <ion-icon name="warning-outline" slot="start" color="medium"></ion-icon>
+            <ion-label position="stacked" color="dark">
+              <strong>Stock Mínimo</strong> <ion-text class="danger-red"> *</ion-text>
+            </ion-label>
+            <ion-input 
+              formControlName="stock_min" 
+              type="number" 
+              placeholder="Ej: 5"
+              class="custom-input">
+            </ion-input>
+          </ion-item>
+        </div>
+
+        <div class="error-message" *ngIf="productForm.get('quantity')?.touched && productForm.get('quantity')?.errors?.['required']">
+          <ion-icon name="alert-circle" class="icon-white"></ion-icon>
+          <ion-text color="danger">La cantidad es obligatoria</ion-text>
+        </div>
+        <div class="error-message" *ngIf="productForm.get('quantity')?.touched && productForm.get('quantity')?.errors?.['min']">
+          <ion-icon name="alert-circle" class="icon-white"></ion-icon>
+          <ion-text color="danger">La cantidad debe ser mayor a 0</ion-text>
+        </div>
+        <div class="error-message" *ngIf="productForm.get('stock_min')?.touched && productForm.get('stock_min')?.errors?.['required']">
+          <ion-icon name="alert-circle" class="icon-white"></ion-icon>
+          <ion-text color="danger">El stock mínimo es obligatorio</ion-text>
+        </div>
+        <div class="error-message" *ngIf="productForm.get('stock_min')?.touched && productForm.get('stock_min')?.errors?.['min']">
+          <ion-icon name="alert-circle" class="icon-white"></ion-icon>
+          <ion-text color="danger">El stock mínimo debe ser mayor a 0</ion-text>
+        </div>
+      </div>
+
+      <!-- Precio Section -->
+      <div class="form-section">
+        <div class="section-title">
+          <ion-icon name="cash-outline" color="primary"></ion-icon>
+          <h3>Información de Precio</h3>
+        </div>
+
+        <ion-item lines="full" class="form-item price-item" [class.error]="productForm.get('price')?.touched && (productForm.get('price')?.errors?.['required'] || productForm.get('price')?.errors?.['min'])">
+          <ion-icon name="card-outline" slot="start" color="medium"></ion-icon>
+          <ion-label position="stacked" color="dark">
+            <strong>Precio</strong> <ion-text class="danger-red"> *</ion-text>
+          </ion-label>
+          <ion-input 
+            formControlName="price" 
+            type="number" 
+            placeholder="Ej: 1000"
+            class="custom-input price-input">
+            <div slot="start" class="currency-symbol">$</div>
+          </ion-input>
+        </ion-item>
+        <div class="error-message" *ngIf="productForm.get('price')?.touched && productForm.get('price')?.errors?.['required']">
+          <ion-icon name="alert-circle" class="icon-white"></ion-icon>
+          <ion-text color="danger">El precio es obligatorio</ion-text>
+        </div>
+        <div class="error-message" *ngIf="productForm.get('price')?.touched && productForm.get('price')?.errors?.['min']">
+          <ion-icon name="alert-circle" class="icon-white"></ion-icon>
+          <ion-text color="danger">El precio debe ser mayor o igual a 0</ion-text>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="form-actions">
+        <ion-button 
+          expand="block" 
+          size="large"
+          (click)="guardarCambios(producto.codigo)" 
+          [disabled]="productForm.invalid"
+          class="save-button">
+          <ion-icon name="save" slot="start"></ion-icon>
+          Guardar Producto
+        </ion-button>
+        
+        <ion-button 
+          expand="block" 
+          size="large"
+          (click)="cancelarEdicion()"
+          class="cancel-button">
+          <ion-icon name="close" slot="start"></ion-icon>
+          Cancelar
+        </ion-button>
+      </div>
+    </form>
+  </div>
+</ion-content>

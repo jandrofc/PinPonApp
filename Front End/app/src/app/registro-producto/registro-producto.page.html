@@ -8,31 +8,31 @@
   <div class="product-list">
     <div class="product-item" *ngFor="let producto of productosEscaneados; let i = index">
       <div class="product-content">
-        <div class="product-info">
-          <div class="product-code-container">
-            Codigo: {{producto.codigo}}
-          </div>
-          <div class="product-name-container"*ngIf="producto.nombre || producto.marca || producto.formato">
-            <h3>
-              <span *ngIf="producto.nombre">{{ producto.nombre }}</span>
-              <span *ngIf="producto.nombre && (producto.marca || producto.formato)"> - </span>
-              <span *ngIf="producto.marca">{{ producto.marca }}</span>
-              <span *ngIf="(producto.nombre || producto.marca) && producto.formato"> - </span>
-              <span *ngIf="producto.formato">{{ producto.formato }}</span>
-            </h3>
-            <ion-badge color="primary" class="new-badge">
-              ¡Nuevo!
-            </ion-badge>
-          </div>
-          <p class="product-details">
-            Existente:  · Cantidad: {{ producto.cantidad }} · Total: ${{ producto.precio }}
-          </p>
+        <!-- Primera fila: Código y botón editar -->
+        <div class="product-row product-row-top">
+          <span class="product-code">#{{ producto.codigo }}</span>
+          <ion-button class="icon-button edit-button" (click)="editarProducto(producto)">
+            <ion-icon name="create-outline" class="edit-icon"></ion-icon>
+            <span class="edit-text">Editar</span>
+          </ion-button>
         </div>
-        <div class="product-edit">
-            <button class="icon-button edit-button" (click)="editarProducto(producto)">
-              <ion-icon name="create-outline"></ion-icon>
-              <span class="edit-text">Editar</span>
-            </button>
+        <!-- Segunda fila: Nombre, marca, formato y badge -->
+        <div class="product-row product-row-middle" *ngIf="producto.nombre || producto.marca || producto.formato">
+          <h3>
+            <span *ngIf="producto.nombre">{{ producto.nombre }}</span>
+            <span *ngIf="producto.nombre && (producto.marca || producto.formato)"> - </span>
+            <span *ngIf="producto.marca">{{ producto.marca }}</span>
+            <span *ngIf="(producto.nombre || producto.marca) && producto.formato"> - </span>
+            <span *ngIf="producto.formato">{{ producto.formato }}</span>
+          </h3>
+          <ion-badge *ngIf="producto.nuevo" color="primary" class="new-badge">¡Nuevo!</ion-badge>
+        </div>
+        <hr class="product-divider" />
+        <!-- Tercera fila: Existente, cantidad y total -->
+        <div class="product-details-row">
+          <span>Existente: {{ producto.existente ?? 0 }}</span>
+          <span>Cantidad: {{ producto.cantidad }}</span>
+          <span>Precio: ${{ producto.precio }}</span>
         </div>
       </div>
     </div>
