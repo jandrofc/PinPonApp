@@ -4,11 +4,16 @@ import { Observable , catchError, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { ConfigService } from './config.service';
 
+// Update the path below if the file is located elsewhere or has a different extension (e.g., .ts)
+import { RespuestaAPI } from '../modelos/ventas.interfaces';
+
+
+
 @Injectable({
   providedIn: 'root'
 })
 export class ConexionBackendService {
-
+  
 
 
   constructor(
@@ -31,6 +36,20 @@ export class ConexionBackendService {
       catchError(this.handleError)
     );
   }
+
+  getBoletas(filtro_producto: string, filtro_fecha: string){
+    const api = `${this.configService.apiUrl}get/ventas_con_detalles`;
+    const params = { filtro_producto, filtro_fecha}; // Convert Date to stringa}
+
+    return this.http.get<RespuestaAPI>(api,{params}).pipe(
+      catchError(this.handleError)
+    )
+
+
+  }
+
+
+
 
   // Método POST de ejemplo
   postData(endpoint: string, data: any): Observable<any> {

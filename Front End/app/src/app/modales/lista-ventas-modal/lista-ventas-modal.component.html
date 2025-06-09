@@ -103,7 +103,9 @@
               <ion-icon name="cash-outline" class="stat-icon stat-icon-success"></ion-icon>
               <span class="stat-label">Ventas</span>
           </div>
-          <div class="stat-value" id="total-sales">$0</div>
+          <div class="stat-value" id="total-sales">
+            ${{ resumen?.total_ventas | number:'1.0-0' }}
+          </div>
       </div>
 
       <div class="stat-card">
@@ -111,7 +113,9 @@
               <ion-icon name="receipt" class="stat-icon stat-icon-primary"></ion-icon>
               <span class="stat-label">Boletas</span>
           </div>
-          <div class="stat-value" id="total-receipts">0</div>
+          <div class="stat-value" id="total-products">
+            {{ resumen?.total_productos }}
+          </div>
       </div>
 
       <div class="stat-card">
@@ -154,19 +158,19 @@
           <div id="receipts-view" class="tab-content" [class.active]="activeTab === 'receipts'">
               <div id="receipts-container" class="receipts-container">
                   <div *ngIf="loading" class="loading-container">
-                      <ion-spinner></ion-spinner>
+                      <ion-spinner name="crescent"></ion-spinner>
                       <p>Cargando boletas...</p>
                   </div>
               
                   <!-- Lista de boletas -->
                   <div *ngIf="!loading && salesData">
-                      <div *ngIf="selectedSegment === 'receipts'" class="receipts-view">
-                        <div *ngFor="let receipt of salesData.today.receipts" class="receipt-container">
+                      <div class="receipts-view">
+                        <div *ngFor="let receipt of salesData" class="receipt-container">
                           <ion-item 
                             button 
                             class="receipt-item"
-                            [class.receipt-expanded]="selectedReceipt === receipt.id"
-                            (click)="toggleReceiptDetail(receipt.id); $event.stopPropagation()">
+                            [class.receipt-expanded]="selectedReceipt === receipt.id_venta"
+                            (click)="toggleReceiptDetail(receipt.id_venta); $event.stopPropagation()">
                             
                             <ion-icon name="receipt" class="boleta-icon stat-icon-primary"></ion-icon>
 
@@ -175,35 +179,35 @@
                               <div class="receipt-info">
                                 <span class="info-item">
                                   <ion-icon name="time-outline"></ion-icon>
-                                  {{ receipt.date_time }}
+                                  {{ formatFecha(receipt.fecha) }}
                                 </span>
                               </div>
                             </ion-label>
 
                             <div slot="end" class="receipt-summary">
-                              <div class="receipt-total">${{ receipt.total.toFixed(2) }}</div>
-                              <div class="receipt-count">{{ receipt.items.length }} productos</div>
+                              <div class="receipt-total">${{ receipt.total | number:'1.0-0' }}</div>
+                              <div class="receipt-count">{{ receipt.detalle.length }} productos</div>
                             </div>
                           </ion-item>
 
                           <!-- Detalle expandible -->
-                          <div *ngIf="selectedReceipt === receipt.id" class="receipt-detail">
+                          <div *ngIf="selectedReceipt === receipt.id_venta" class="receipt-detail">
                             <div class="detail-header">
                               <h4>Detalle de productos:</h4>
                             </div>
                             <div class="detail-items">
-                              <div *ngFor="let item of receipt.items" class="detail-item">
+                              <div *ngFor="let item of receipt.detalle" class="detail-item">
                                 <div class="item-info">
                                   <ion-icon name="cube-outline"></ion-icon>
-                                  <span>{{ item.name }}</span>
-                                  <span *ngIf="item.quantity > 1" class="quantity">x{{ item.quantity }}</span>
+                                  <span>{{ item.nombre_producto }}</span>
+                                  <span *ngIf="item.cantidad_vendida > 1" class="quantity">x{{ item.cantidad_vendida }}</span>
                                 </div>
-                                <span class="item-price">${{ item.price.toFixed(2) }}</span>
+                                <span class="item-price">${{ item.precio_unitario| number:'1.0-0' }}</span>
                               </div>
                               <div class="detail-total">
                                 <div class="total-row">
                                   <span class="total-label">Total</span>
-                                  <span class="total-amount">${{ receipt.total.toFixed(2) }}</span>
+                                  <span class="total-amount">${{ receipt.total | number:'1.0-0' }}</span>
                                 </div>
                               </div>
                             </div>
@@ -227,11 +231,11 @@
           <div id="products-view" class="tab-content" [class.active]="activeTab === 'products'">
             <div id="products-container" class="products-container">
               <div *ngIf="loading" class="loading-container">
-                <ion-spinner></ion-spinner>
+                <ion-spinner name="crescent"></ion-spinner>
                 <p>Cargando productos...</p>
               </div>
               <div *ngIf="!loading">
-                <div *ngIf="selectedSegment === 'receipts'" class="products-view">
+                <div class="products-view">
                   <div *ngFor="let product of products" class="product-container">
                     <ion-item class="product-item">
                       <div class="icon-container">

@@ -703,9 +703,13 @@ app.post('/api/log', express.json(), (req, res) => {
 });
 
 // Endpoint para obtener todas las ventas con sus detalles
+
+
+// 
 app.get('/api/get/ventas_con_detalles', (req, res) => {
-  // Consulta para obtener ventas y sus detalles, junto con información del producto y formato
-  const query = `
+  const {filtro_fecha, filtro_producto}= req.query
+
+  let query = `
     SELECT 
       v.id AS id_venta,
       v.fecha,
@@ -724,46 +728,90 @@ app.get('/api/get/ventas_con_detalles', (req, res) => {
     LEFT JOIN detalle_venta dv ON v.id = dv.id_venta
     LEFT JOIN formato_producto fp ON dv.id_formato_producto = fp.id
     LEFT JOIN producto p ON fp.producto_id = p.id
-    ORDER BY v.fecha DESC, v.id DESC, dv.id ASC
   `;
+  const where = [];
+  const params = [];
 
-  db.query(query, (err, results) => {
+  if (filtro_fecha !== '' && filtro_fecha) {
+    where.push('DATE(v.fecha) = ?');
+    params.push(filtro_fecha);
+  }
+  if (filtro_producto !=='' && filtro_producto) {
+    where.push('LOWER(p.producto) LIKE ?');
+    params.push(`%${filtro_producto.toLowerCase()}%`);
+  } 
+
+  if (where.length) {
+    query += ' WHERE ' + where.join(' AND ');
+  }
+
+  query += ' ORDER BY v.fecha DESC, v.id DESC, dv.id ASC';
+
+  // Consulta para los totales
+  let resumenQuery = `
+    SELECT 
+      COUNT(DISTINCT v.id) AS total_boletas,
+      SUM(dv.cantidad) AS total_productos,
+      SUM(v.total) AS total_ventas
+    FROM venta v
+    LEFT JOIN detalle_venta dv ON v.id = dv.id_venta
+    LEFT JOIN formato_producto fp ON dv.id_formato_producto = fp.id
+    LEFT JOIN producto p ON fp.producto_id = p.id
+  `;
+  if (where.length) {
+    resumenQuery += ' WHERE ' + where.join(' AND ');
+  }
+
+  // Ejecutar ambas consultas
+  db.query(query, params, (err, results) => {
     if (err) {
       console.error('Error al obtener ventas y detalles:', err);
       return res.status(500).json({ error: 'Error al obtener ventas y detalles', details: err });
     }
 
-    // Procesar resultados para agrupar detalles por venta
-    const ventas = [];
-    const ventasMap = {};
+    db.query(resumenQuery, params, (err, resumenResults) => {
+      if (err) {
+        console.error('Error al obtener resumen:', err);
+        return res.status(500).json({ error: 'Error al obtener resumen', details: err });
+      }
 
-    results.forEach(row => {
-      if (!ventasMap[row.id_venta]) {
-        ventasMap[row.id_venta] = {
-          id_venta: row.id_venta,
-          fecha: row.fecha,
-          total: row.total,
-          detalles: []
-        };
-        ventas.push(ventasMap[row.id_venta]);
-      }
-      if (row.id_detalle) {
-        ventasMap[row.id_venta].detalles.push({
-          id_detalle: row.id_detalle,
-          id_formato_producto: row.id_formato_producto,
-          cantidad_vendida: row.cantidad_vendida,
-          precio_unitario: row.precio_unitario,
-          formato: row.formato,
-          codigo_barra: row.codigo_barra,
-          precio_formato: row.precio_formato,
-          stock_min: row.stock_min,
-          nombre_producto: row.nombre_producto,
-          marca: row.marca
-        });
-      }
+      // Procesar resultados para agrupar detalles por venta
+      const ventas = [];
+      const ventasMap = {};
+
+      results.forEach(row => {
+        if (!ventasMap[row.id_venta]) {
+          ventasMap[row.id_venta] = {
+            id_venta: row.id_venta,
+            fecha: row.fecha,
+            total: row.total,
+            detalle: []
+          };
+          ventas.push(ventasMap[row.id_venta]);
+        }
+        if (row.id_detalle) {
+          ventasMap[row.id_venta].detalle.push({
+            id_formato_producto: row.id_formato_producto,
+            cantidad_vendida: row.cantidad_vendida,
+            precio_unitario: row.precio_unitario,
+            formato: row.formato,
+            precio_formato: row.precio_formato,
+            stock_min: row.stock_min,
+            nombre_producto: row.nombre_producto,
+            marca: row.marca
+          });
+        }
+      });
+
+      // Resumen
+      const resumen = resumenResults[0] || { total_boletas: 0, total_productos: 0, total_ventas: 0 };
+
+      res.json({ 
+        success: true, 
+        ventas,
+        resumen
+      });
     });
-
-    res.json({ success: true, ventas });
   });
 });
 

@@ -1,4 +1,4 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common'; // Módulo común de Angular
 import { IonicModule } from '@ionic/angular';
 
@@ -29,7 +29,7 @@ export interface ProductsHoy{
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [ CommonModule, IonicModule ]
 })
-export class Tab2Page {
+export class Tab2Page implements OnInit{
 
   constructor(
     private readonly outputsEmergentesService: OutputsEmergentesService,
@@ -47,6 +47,14 @@ export class Tab2Page {
 
   // Contiene los ultimos 3 productos vendidos
   lastThreeProducts : ProductsHoy[] | null = null
+
+  async ngOnInit() {
+    // obtener 
+  }
+
+
+
+
 
 
 
