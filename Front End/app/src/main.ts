@@ -23,15 +23,6 @@ import localeEsCL from '@angular/common/locales/es-CL';
 registerLocaleData(localeEsCL);
 import { LOCALE_ID } from '@angular/core';
 
-
-// Cambia el formato de la informacion a como se usa en chile
-import { registerLocaleData } from '@angular/common';
-import localeEsCL from '@angular/common/locales/es-CL';
-registerLocaleData(localeEsCL);
-import { LOCALE_ID } from '@angular/core';
-
-
-
 bootstrapApplication(AppComponent, {
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
