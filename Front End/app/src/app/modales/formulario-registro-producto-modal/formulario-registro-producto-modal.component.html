@@ -1,0 +1,82 @@
+<ion-header>
+    <ion-toolbar>
+      <ion-title>Formulario de Registro de Producto</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content>
+  <ng-container class="barcode-scanner-modal">
+    <div>
+      <h2>Información del Producto</h2>
+      
+      <form [formGroup]="productForm">
+        <ion-item>
+          <ion-label position="stacked">Código</ion-label>
+          <ion-input formControlName="code" readonly></ion-input>
+        </ion-item>
+  
+        <ion-item>
+          <ion-label position="stacked">Nombre del Producto <ion-text color="danger">*</ion-text></ion-label>
+          <ion-input formControlName="name" placeholder="Ej: Leche entera"></ion-input>
+        </ion-item>
+        <ion-text color="danger" *ngIf="productForm.get('name')?.touched && productForm.get('name')?.errors?.['required']" class="ion-padding-start">
+          El nombre es obligatorio
+        </ion-text>
+  
+        <ion-item>
+          <ion-label position="stacked">Marca <ion-text color="danger">*</ion-text></ion-label>
+          <ion-input formControlName="brand" placeholder="Ej: Alpura"></ion-input>
+        </ion-item>
+        <ion-text color="danger" *ngIf="productForm.get('brand')?.touched && productForm.get('brand')?.errors?.['required']" class="ion-padding-start">
+          La marca es obligatoria
+        </ion-text>
+  
+        <ion-item>
+          <ion-label position="stacked">Formato <ion-text color="danger">*</ion-text></ion-label>
+          <ion-input formControlName="format" placeholder="Ej: Botella 1L"></ion-input>
+        </ion-item>
+        <ion-text color="danger" *ngIf="productForm.get('format')?.touched && productForm.get('format')?.errors?.['required']" class="ion-padding-start">
+          El formato es obligatorio
+        </ion-text>
+  
+        <ion-item>
+          <ion-label position="stacked">Cantidad <ion-text color="danger">*</ion-text></ion-label>
+          <ion-input formControlName="quantity" type="number" placeholder="Ej: 1"></ion-input>
+        </ion-item>
+        <ion-text color="danger" *ngIf="productForm.get('quantity')?.touched && productForm.get('quantity')?.errors?.['required']" class="ion-padding-start">
+          La cantidad es obligatoria
+        </ion-text>
+        <ion-text color="danger" *ngIf="productForm.get('quantity')?.touched && productForm.get('quantity')?.errors?.['min']" class="ion-padding-start">
+          La cantidad debe ser mayor a 0
+        </ion-text>
+
+        <ion-item>
+          <ion-label position="stacked">Stock Minimo <ion-text color="danger">*</ion-text></ion-label>
+          <ion-input formControlName="stock_min" type="number" placeholder="Ej: 5"></ion-input>
+        </ion-item>
+        <ion-text color="danger" *ngIf="productForm.get('stock_min')?.touched && productForm.get('stock_min')?.errors?.['required']" class="ion-padding-start">
+          El stock minimo es obligatorio
+        </ion-text>
+        <ion-text color="danger" *ngIf="productForm.get('stock_min')?.touched && productForm.get('stock_min')?.errors?.['min']" class="ion-padding-start">
+          El stock minimo debe ser mayor a 0
+        </ion-text>
+  
+        <ion-item>
+          <ion-label position="stacked">Precio <ion-text color="danger">*</ion-text></ion-label>
+          <ion-input formControlName="price" type="number" placeholder="Ej: 25.50"></ion-input>
+        </ion-item>
+        <ion-text color="danger" *ngIf="productForm.get('price')?.touched && productForm.get('price')?.errors?.['required']" class="ion-padding-start">
+          El precio es obligatorio
+        </ion-text>
+        <ion-text color="danger" *ngIf="productForm.get('price')?.touched && productForm.get('price')?.errors?.['min']" class="ion-padding-start">
+          El precio debe ser mayor o igual a 0
+        </ion-text>
+  
+        <div class="ion-padding">
+          <ion-button expand="block" (click)="guardarCambios(producto.codigo)" [disabled]="productForm.invalid">
+            Guardar cambios
+          </ion-button>
+        </div>
+      </form>
+    </div>
+  </ng-container>
+  </ion-content>

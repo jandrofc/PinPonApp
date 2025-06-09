@@ -3,6 +3,10 @@ node_modules
 cert.pem
 key.pem
 .env
+**/.env
+*.env
+.env.*
+!.env.example
 config.json
 # Specifies intentionally untracked files to ignore when using Git
 # http://git-scm.com/docs/gitignore
@@ -75,3 +79,6 @@ www/
 # System files
 .DS_Store
 Thumbs.db
+Back End/.env
+Back End/.env
+Back End/.pinponClaveCuenta.json

@@ -5,6 +5,7 @@ import { CameraScannerModalComponent } from '../modales/camera-scanner-modal/cam
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { OutputsEmergentesService } from '../services/outputs-emergentes/outputs-emergentes.service';
+import { ConexionBackendService } from '../services/conexion-backend.service';
 
 @Component({
   selector: 'app-tab3',
@@ -17,59 +18,56 @@ import { OutputsEmergentesService } from '../services/outputs-emergentes/outputs
 export class Tab3Page {
   ultimosEscaneos: { [codigo: string]: number } = {};
   productosEscaneados: any[] = [];
-  apiUrl = 'http://localhost:8080/';
 
   constructor(
     private modalController: ModalController,
     private http: HttpClient,
-    private outputs: OutputsEmergentesService
+    private outputs: OutputsEmergentesService,
+    private apiService: ConexionBackendService
   ) {}
 
-  async abrirScanner() {
-    const modal = await this.modalController.create({
-      component: CameraScannerModalComponent,
-      cssClass: 'barcode-scanning-modal',
-      showBackdrop: false,
-    });
-    await modal.present();
+async abrirScanner() {
+  const modal = await this.modalController.create({
+    component: CameraScannerModalComponent,
+    cssClass: 'barcode-scanning-modal',
+    showBackdrop: false,
+  });
+  await modal.present();
 
-    const { data } = await modal.onWillDismiss();
-    const barcode = data?.barcode?.rawValue;
-    const ahora = Date.now();
+  const { data } = await modal.onWillDismiss();
+  const barcode = data?.barcode?.rawValue;
+  const ahora = Date.now();
 
-    console.log('Código de producto escaneado:', barcode);
+  console.log('Código de producto escaneado:', barcode);
 
-    if (barcode) {
-      const ultimo = this.ultimosEscaneos[barcode] || 0;
-      this.http.get<any>(`${this.apiUrl}api/get/producto_por_codigo/${barcode}`).subscribe({
-          next: res => {
-            const producto = res.producto;
-            const existente = this.productosEscaneados.find(p => p.id_formato === producto.id_formato);
-            if (existente) {
-              existente.cantidad++;
-            } else {
-              this.productosEscaneados.push({
-                id_formato: producto.id_formato,
-                nombre: producto.nombre_producto,
-                marca: producto.marca,
-                formato: producto.formato,
-                cantidad: 1,
-                precio: producto.precio,
-                codigo: producto.codigo_barra
-              });
-            }
-            this.ultimosEscaneos[barcode] = ahora;
-          },
-          error: async err => {
-            await this.outputs.showErrorAlert({
-              header: 'Producto no encontrado',
-              message: 'El producto escaneado no existe en el inventario.',
-              buttons: ['OK']
-            });
-          }
-        });
+  if (barcode) {
+    const ultimo = this.ultimosEscaneos[barcode] || 0;
+
+    this.apiService.registrarProductoPorcodigo('get/producto_por_codigo/', barcode).subscribe({
+      next: res => {
+        const producto = res.producto;
+        const existente = this.productosEscaneados.find(p => p.id_formato === producto.id_formato);
+        if (existente) {
+          existente.cantidad++;
+        } else {
+          this.productosEscaneados.push({
+            id_formato: producto.id_formato,
+            nombre: producto.nombre_producto,
+            marca: producto.marca,
+            formato: producto.formato,
+            cantidad: 1,
+            precio: producto.precio,
+            codigo: producto.codigo_barra
+          });
+        }
+        this.ultimosEscaneos[barcode] = ahora;
+      },
+      error: err => {
+        throw err;
       }
-    }
+    });
+  }
+}
 
     sumarCantidad(producto: any) {
       producto.cantidad++;
@@ -84,27 +82,27 @@ export class Tab3Page {
     getTotal(): number {
     return this.productosEscaneados.reduce((acc, p) => acc + (p.precio * p.cantidad), 0);
   }
-
-  realizarCompra() {
+realizarCompra() {
   const productos = this.productosEscaneados.map(p => ({
     id_formato: p.id_formato,
-    cantidad: p.cantidad
+    cantidad: p.cantidad,
+    precio: p.precio // Asegúrate de incluir el precio porque el backend lo necesita
   }));
 
-  this.http.post<any>(`${this.apiUrl}api/post/realizar_compra`, { productos }).subscribe({
-      next: async res => {
-        await this.outputs.showAlert({
-          header: '¡Compra realizada!',
-          message: 'La compra se realizó correctamente.',
-          buttons: ['OK']
-        });
-        this.productosEscaneados = [];
-      },
-      error: async err => {
-        await this.outputs.showErrorAlert({
-          message: 'Error al realizar la compra: ' + (err.error?.error || ''),
-        });
-      }
-    });
-  }
+  this.apiService.realizarCompra('post/realizar_compra', { productos }).subscribe({
+    next: async res => {
+      await this.outputs.showAlert({
+        header: '¡Compra realizada!',
+        message: 'La compra se realizó correctamente.',
+        buttons: ['OK']
+      });
+      this.productosEscaneados = [];
+    },
+    error: async err => {
+      await this.outputs.showErrorAlert({
+        message: 'Error al realizar la compra: ' + (err.error?.error || ''),
+      });
+    }
+  });
+}
 }

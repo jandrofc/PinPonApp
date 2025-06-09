@@ -1,0 +1,273 @@
+
+<ion-content>
+  <div class="container">
+  <header class="header">
+      <h1>Panel de Ventas</h1>
+      <div class="close-button-container">
+        <button class="close-button" (click)="closeModal()">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </div>
+  </header>
+
+  <!-- Filtros -->
+  <div class="filter-card">
+    <div class="filter-header">
+      <h3>Filtros de Búsqueda</h3>
+      <button 
+        *ngIf="hasActiveFilters()" 
+        class="btn btn-outline btn-sm"
+        (click)="clearFilters()">
+        <ion-icon name="close-outline"></ion-icon>
+        Limpiar filtros
+      </button>
+    </div>
+    
+    <div class="filter-content">
+      <div class="filter-grid">
+        <!-- Filtro por fecha -->
+        <div class="filter-group">
+          <label class="filter-label">
+            <ion-icon name="calendario"></ion-icon>
+            <span>Filtrar por fecha</span>
+          </label>
+          <button (click)="showDateModal = true" class="filter-input">
+            <ion-icon name="calendario"></ion-icon>
+            <span>{{ selectedDate ? selectedDate : 'Selecciona una fecha' }}</span>
+          </button>
+
+          <!-- Modal con ion-datetime -->
+          <ion-modal [isOpen]="showDateModal"
+            (didDismiss)="showDateModal = false">
+            <ng-template>
+              <ion-header>
+                <ion-toolbar>
+                  <ion-title>Fecha</ion-title>
+                  <div class="close-button-container" slot="end">
+                    <button class="close-button" (click)="showDateModal = false">
+                      <ion-icon name="close-outline"></ion-icon>
+                    </button>
+                  </div>
+                </ion-toolbar>
+              </ion-header>
+              <ion-content class="ion-padding">
+                <ion-datetime
+                  presentation="date"
+                  [(ngModel)]="selectedDate"
+                  (ionChange)="onDateChange(); showDateModal = false"
+                  [max]="maxDate">
+                </ion-datetime>
+                </ion-content>
+            </ng-template>
+          </ion-modal>
+        </div>
+
+        <!-- Filtro por producto -->
+        <div class="filter-group">
+          <label class="filter-label">
+            <ion-icon name="lupa"></ion-icon>
+            <span>Buscar producto</span>
+          </label>
+          <input 
+            type="text"
+            [(ngModel)]="searchProduct"
+            (input)="onProductSearch()"
+            placeholder="Escribe el nombre del producto..."
+            class="filter-input">
+        </div>
+      </div>
+
+      <!-- Indicadores de filtros activos -->
+      <div *ngIf="hasActiveFilters()" class="active-filters">
+        <div *ngIf="selectedDate" class="filter-badge">
+          <ion-icon name="calendario"></ion-icon>
+          <span>Fecha: {{ selectedDate }}</span>
+          <button (click)="clearDateFilter()" class="filter-badge-close">
+            <ion-icon name="close-outline"></ion-icon>
+          </button>
+        </div>
+        <div *ngIf="searchProduct" class="filter-badge">
+          <ion-icon name="lupa"></ion-icon>
+          <span>Producto: {{ searchProduct }}</span>
+          <button (click)="clearProductFilter()" class="filter-badge-close">
+            <ion-icon name="close-outline"></ion-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Estadísticas -->
+  <div class="stats-grid">
+      <div class="stat-card">
+          <div class="stat-header">
+              <ion-icon name="cash-outline" class="stat-icon stat-icon-success"></ion-icon>
+              <span class="stat-label">Ventas</span>
+          </div>
+          <div class="stat-value" id="total-sales">
+            ${{ resumen?.total_ventas | number:'1.0-0' }}
+          </div>
+      </div>
+
+      <div class="stat-card">
+          <div class="stat-header">
+              <ion-icon name="receipt" class="stat-icon stat-icon-primary"></ion-icon>
+              <span class="stat-label">Boletas</span>
+          </div>
+          <div class="stat-value" id="total-products">
+            {{ resumen?.total_productos }}
+          </div>
+      </div>
+
+      <div class="stat-card">
+          <div class="stat-header">
+              <ion-icon name="package" class="stat-icon stat-icon-secondary"></ion-icon>
+              <span class="stat-label">Productos</span>
+          </div>
+          <div class="stat-value" id="total-products">0</div>
+      </div>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="main-card">
+      <div class="card-header">
+          <h2>Ventas Recientes</h2>
+      </div>
+      
+      <div class="card-content">
+          <!-- Pestañas -->
+          <div class="tabs">
+              <button 
+                  class="tab-button" 
+                  [class.active]="activeTab === 'receipts'"
+                  (click)="switchTab('receipts')">
+                  Por Boletas
+              </button>
+              <button 
+                  class="tab-button" 
+                  [class.active]="activeTab === 'products'"
+                  (click)="switchTab('products')">
+                  Por Productos
+              </button>
+          </div>
+
+
+
+
+
+          <!-- Vista por boletas -->
+          <div id="receipts-view" class="tab-content" [class.active]="activeTab === 'receipts'">
+              <div id="receipts-container" class="receipts-container">
+                  <div *ngIf="loading" class="loading-container">
+                      <ion-spinner name="crescent"></ion-spinner>
+                      <p>Cargando boletas...</p>
+                  </div>
+              
+                  <!-- Lista de boletas -->
+                  <div *ngIf="!loading && salesData">
+                      <div class="receipts-view">
+                        <div *ngFor="let receipt of salesData" class="receipt-container">
+                          <ion-item 
+                            button 
+                            class="receipt-item"
+                            [class.receipt-expanded]="selectedReceipt === receipt.id_venta"
+                            (click)="toggleReceiptDetail(receipt.id_venta); $event.stopPropagation()">
+                            
+                            <ion-icon name="receipt" class="boleta-icon stat-icon-primary"></ion-icon>
+
+                            <ion-label>
+                              <h2 class="receipt-title">{{ generateReceiptTitle(receipt) }}</h2>
+                              <div class="receipt-info">
+                                <span class="info-item">
+                                  <ion-icon name="time-outline"></ion-icon>
+                                  {{ formatFecha(receipt.fecha) }}
+                                </span>
+                              </div>
+                            </ion-label>
+
+                            <div slot="end" class="receipt-summary">
+                              <div class="receipt-total">${{ receipt.total | number:'1.0-0' }}</div>
+                              <div class="receipt-count">{{ receipt.detalle.length }} productos</div>
+                            </div>
+                          </ion-item>
+
+                          <!-- Detalle expandible -->
+                          <div *ngIf="selectedReceipt === receipt.id_venta" class="receipt-detail">
+                            <div class="detail-header">
+                              <h4>Detalle de productos:</h4>
+                            </div>
+                            <div class="detail-items">
+                              <div *ngFor="let item of receipt.detalle" class="detail-item">
+                                <div class="item-info">
+                                  <ion-icon name="cube-outline"></ion-icon>
+                                  <span>{{ item.nombre_producto }}</span>
+                                  <span *ngIf="item.cantidad_vendida > 1" class="quantity">x{{ item.cantidad_vendida }}</span>
+                                </div>
+                                <span class="item-price">${{ item.precio_unitario| number:'1.0-0' }}</span>
+                              </div>
+                              <div class="detail-total">
+                                <div class="total-row">
+                                  <span class="total-label">Total</span>
+                                  <span class="total-amount">${{ receipt.total | number:'1.0-0' }}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+
+                  <!-- Mensaje cuando no hay datos -->
+                  <div *ngIf="!loading && !salesData" class="empty-state">
+                      <i class="icon-package empty-icon"></i>
+                      <h4>No se encontraron ventas</h4>
+                      <p>No hay ventas que coincidan con los filtros aplicados.</p>
+                      <button class="btn btn-outline" (click)="clearFilters()">
+                        Limpiar filtros
+                      </button>
+                  </div>
+              </div>
+          </div>
+          <!-- Vista por productos -->
+          <div id="products-view" class="tab-content" [class.active]="activeTab === 'products'">
+            <div id="products-container" class="products-container">
+              <div *ngIf="loading" class="loading-container">
+                <ion-spinner name="crescent"></ion-spinner>
+                <p>Cargando productos...</p>
+              </div>
+              <div *ngIf="!loading">
+                <div class="products-view">
+                  <div *ngFor="let product of products" class="product-container">
+                    <ion-item class="product-item">
+                      <div class="icon-container">
+                        <ion-icon name="cube-outline" class="product-icon stat-icon-secondary"></ion-icon>
+                      </div>
+                      <ion-label>
+                        <h2 class="product-title">{{ product.name }}</h2>
+                        <div class="product-info">
+                          <span class="info-item">
+                            <ion-icon name="pricetag-outline"></ion-icon>
+                            Unidades vendidas: {{ product.sold }}
+                          </span>
+                        </div>
+                      </ion-label>
+                      <div slot="end" class="product-summary">
+                        <div class="product-total">Total: ${{ product.revenue }}</div>
+                      </div>
+                    </ion-item>
+                  </div>
+              </div>
+              <div *ngIf="products.length === 0" class="empty-state">
+                <i class="icon-package empty-icon"></i>
+                <h4>No se encontraron ventas</h4>
+                <p>No hay ventas que coincidan con los filtros aplicados.</p>
+                <button class="btn btn-outline" (click)="clearFilters()">
+                  Limpiar filtros
+                </button>
+              </div>
+              </div>
+            </div>
+          </div>
+      </div>
+  </div>
+  </div>
+</ion-content>

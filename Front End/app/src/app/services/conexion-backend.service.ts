@@ -4,11 +4,16 @@ import { Observable , catchError, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { ConfigService } from './config.service';
 
+// Update the path below if the file is located elsewhere or has a different extension (e.g., .ts)
+import { RespuestaAPI } from '../modelos/ventas.interfaces';
+
+
+
 @Injectable({
   providedIn: 'root'
 })
 export class ConexionBackendService {
-
+  
 
 
   constructor(
@@ -31,6 +36,20 @@ export class ConexionBackendService {
       catchError(this.handleError)
     );
   }
+
+  getBoletas(filtro_producto: string, filtro_fecha: string){
+    const api = `${this.configService.apiUrl}get/ventas_con_detalles`;
+    const params = { filtro_producto, filtro_fecha}; // Convert Date to stringa}
+
+    return this.http.get<RespuestaAPI>(api,{params}).pipe(
+      catchError(this.handleError)
+    )
+
+
+  }
+
+
+
 
   // Método POST de ejemplo
   postData(endpoint: string, data: any): Observable<any> {
@@ -61,13 +80,32 @@ export class ConexionBackendService {
     .pipe(catchError(this.handleError));
 }
 
+  registrarProductoPorcodigo(endPoint: string, codigo: string): Observable<any> {
+    return this.http.get(`${this.configService.apiUrl}${endPoint}${ codigo }`)
+      .pipe(catchError(this.handleError));
+  }
 
+  realizarCompra(endPoint: string, compra: any): Observable<any> {
+    return this.http.post(`${this.configService.apiUrl}${endPoint}`, compra)
+      .pipe(catchError(this.handleError));
+  }
+
+  enviarLog(log: any) {
+    return this.http.post(`${this.configService.apiUrl}log`, { log });
+  }
+
+
+// Metodo para registrar un token FCM (para notificaciones push)
+  registrarFcmToken(token: string): Observable<any> {
+    return this.http.post(`${this.configService.apiUrl}post/fcm_token`, { token })
+      .pipe(catchError(this.handleError));
+}
 
   // Manejo de errores
   private handleError = (error: any) => {
     let errorMessage = 'Error desconocido';
     let errorType = 'UNKNOWN_ERROR';
-    
+
     console.error('Error completo:', error);
 
     // ✅ Error de timeout
@@ -150,7 +188,7 @@ export class ConexionBackendService {
     (structuredError as any).timestamp = new Date().toISOString();
 
     console.error(`[${errorType}] ${errorMessage}`);
-    
+
     return throwError(() => structuredError);
   }
 }
