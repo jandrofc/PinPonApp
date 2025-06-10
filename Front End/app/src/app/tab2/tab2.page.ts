@@ -8,7 +8,6 @@ import { ModalController } from '@ionic/angular'; // Importa ModalController par
 import { OutputsEmergentesService } from '../services/outputs-emergentes/outputs-emergentes.service';
 import { ConexionBackendService } from '../services/conexion-backend.service';
 import { GraficosComponent } from '../modales/graficos/graficos.component';
-
 export interface today_sales{
   valor_ventas : number
   porcentaje: number
@@ -103,6 +102,8 @@ export class Tab2Page implements OnInit{
     });
     await modal.present();
   }
+
+
 
   async obtenerUltimasBoletas() {
     this.conexionBackend.getUltimas3boletas('ultimas_boletas').subscribe({

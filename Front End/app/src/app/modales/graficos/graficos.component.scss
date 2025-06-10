@@ -1,0 +1,97 @@
+/* graficos.component.scss */
+
+/* Full-height modal with padding */
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--ion-color-light);
+}
+
+/* Header styling */
+ion-header {
+  --background: var(--ion-color-primary);
+  ion-title {
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+  ion-button {
+    color: #fff;
+  }
+}
+
+/* Content area */
+ion-content {
+  flex: 1;
+  padding: 1rem;
+  background: var(--ion-color-light);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* cambia de center a flex-start si no quieres que flote */
+  overflow-y: auto; /* por si hay mucho contenido en pantallas pequeñas */
+}
+
+/* Card container */
+ion-card {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto; /* centra horizontalmente */
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --background: #ffffff;
+}
+
+/* Card header */
+/* Card header */
+ion-card-header {
+  background: var(--ion-color-primary);
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+  padding: 0.5rem 1rem;
+
+  ion-card-title {
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin: 0;
+  }
+}
+/* Card content & chart */
+ion-card-content {
+  padding: 1.5rem;
+  canvas {
+    width: 100% !important;
+    height: auto !important;
+  }
+}
+
+
+
+/* Contenedor del botón "X" */
+.close-btn {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0.5rem 1rem 0 0; // separa de la izquierda y arriba
+}
+
+/* Estilo del botón "X" */
+.close-btn ion-button {
+  --background: transparent;
+  --color: #ffffff;
+  font-size: 1.5rem;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  font-weight: bold;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.chart-toggle-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
