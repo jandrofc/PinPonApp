@@ -1,3 +1,5 @@
+
+// Interfaces para las boletas del modal lista-ventas-modal
 export interface VentaDetalleItem {
   id_detalle: number;
   id_formato_producto: number;
@@ -35,8 +37,28 @@ export interface IndividualProduct {
   boletaId: string
 }
 
-export interface RespuestaAPI{
+export interface VentasConDetalle{
   success: true
   resumen: Resumen
   ventas: boleta[]
 }
+// Interfaces para los productos del modal lista-ventas-modal
+
+export interface ProductosMasVendidos{
+  success: true
+  productos: productosResumen[]
+  resumen: Resumen
+}
+
+export interface productosResumen{
+  nombre_producto: string,
+  marca: string,
+  formato: string,
+  codigo_barra: string, 
+  cantidad_total_vendida: string, 
+  precio_unitario: string,    
+  total_ventas: string 
+}
+
+
+

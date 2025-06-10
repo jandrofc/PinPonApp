@@ -5,7 +5,7 @@ import { environment } from 'src/environments/environment';
 import { ConfigService } from './config.service';
 
 // Update the path below if the file is located elsewhere or has a different extension (e.g., .ts)
-import { RespuestaAPI } from '../modelos/ventas.interfaces';
+import { ProductosMasVendidos, VentasConDetalle } from '../modelos/ventas.interfaces';
 
 
 
@@ -42,7 +42,7 @@ export class ConexionBackendService {
     const api = `${this.configService.apiUrl}get/ventas_con_detalles`;
     const params = { filtro_producto, filtro_fecha}; // Convert Date to stringa}
 
-    return this.http.get<RespuestaAPI>(api,{params}).pipe(
+    return this.http.get<VentasConDetalle>(api,{params}).pipe(
       catchError(this.handleError)
     )
   }
@@ -50,7 +50,7 @@ export class ConexionBackendService {
     const api = `${this.configService.apiUrl}get/productos_mas_vendidos`;
     const params = { filtro_producto, filtro_fecha}; // Convert Date to stringa}
 
-    return this.http.get<RespuestaAPI>(api,{params}).pipe(
+    return this.http.get<ProductosMasVendidos>(api,{params}).pipe(
       catchError(this.handleError)
     )
 
