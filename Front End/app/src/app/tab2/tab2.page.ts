@@ -8,6 +8,9 @@ import { ModalController } from '@ionic/angular'; // Importa ModalController par
 import { OutputsEmergentesService } from '../services/outputs-emergentes/outputs-emergentes.service';
 import { ConexionBackendService } from '../services/conexion-backend.service';
 import { GraficosComponent } from '../modales/graficos/graficos.component';
+import { Ipv4Component } from '../modales/ipv4/ipv4.component';
+import { addIcons  } from 'ionicons';
+import { settings} from 'ionicons/icons'
 export interface today_sales{
   valor_ventas : number
   porcentaje: number
@@ -53,7 +56,10 @@ export class Tab2Page implements OnInit{
     private readonly outputsEmergentesService: OutputsEmergentesService,
     private modalController: ModalController,
     private conexionBackend: ConexionBackendService
-  ) {}
+  ) {addIcons({
+        'settings': settings,
+      });
+    }
 
 
   today_sales: today_sales | null= null
@@ -83,7 +89,12 @@ export class Tab2Page implements OnInit{
 
   }
 
-
+async ipv4_modal(){
+  const modal = await this.modalController.create({
+        component: Ipv4Component
+      });
+      await modal.present();
+    }
 
 
 

@@ -4,13 +4,15 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router'; //navegacion entre paginas
 
-
+import { ModalController } from '@ionic/angular';
+import { Ipv4Component } from '../modales/ipv4/ipv4.component';
+import { addIcons  } from 'ionicons';
+import { settings} from 'ionicons/icons'
 import { ConexionBackendService} from 'src/app/services/conexion-backend.service';
 import { IonicModule } from '@ionic/angular';
 
 import { OutputsEmergentesService } from '../services/outputs-emergentes/outputs-emergentes.service';
 import { HTMLIonOverlayElement } from '@ionic/core';
-
 
 export interface Producto {
   id_formato:  number;
@@ -40,8 +42,10 @@ export class Tab1Page implements OnInit, OnDestroy{
     private router: Router,
     private params: ActivatedRoute,
     private readonly outputsEmergentesService: OutputsEmergentesService,
-    
-  ){}
+    private modalController: ModalController,
+  ){addIcons({
+        'settings': settings,
+      });}
     
   async ngOnDestroy() {
     if (this.autoRefreshInterval) {
@@ -60,7 +64,12 @@ export class Tab1Page implements OnInit, OnDestroy{
   private intentos_error = 0; // Contador de intentos de error
 
 
-
+async ipv4_modal(){
+  const modal = await this.modalController.create({
+        component: Ipv4Component
+      });
+      await modal.present();
+    }
 
 
   iniciarAutoRefresh(): void {
