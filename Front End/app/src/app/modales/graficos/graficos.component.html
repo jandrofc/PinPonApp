@@ -1,3 +1,56 @@
-<p>
-  graficos works!
-</p>
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Gráfico de ventas</ion-title>
+    <ion-buttons slot="end">
+      <div class="close-btn">
+        <ion-button (click)="close()">X</ion-button>
+      </div>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<div class="chart-toggle-buttons" style="text-align: center; margin-bottom: 1rem;">
+  <ion-button fill="outline" (click)="mostrarTop = true; mostrarMenos = false">
+    Ver más vendidos
+  </ion-button>
+  <ion-button fill="outline" (click)="mostrarTop = false; mostrarMenos = true">
+    Ver menos vendidos
+  </ion-button>
+</div>
+
+
+<ion-card *ngIf="mostrarTop">
+  <ion-card-header>
+    <ion-card-title>Top 7 días</ion-card-title>
+  </ion-card-header>
+  <ion-card-content *ngIf="chartOptions?.series?.length">
+    <apx-chart
+      [series]="chartOptions.series"
+      [chart]="chartOptions.chart"
+      [xaxis]="chartOptions.xaxis"
+      [plotOptions]="chartOptions.plotOptions"
+      [dataLabels]="chartOptions.dataLabels"
+      [stroke]="chartOptions.stroke"
+      [title]="chartOptions.title"
+      [legend]="chartOptions.legend">
+    </apx-chart>
+  </ion-card-content>
+</ion-card>
+
+<ion-card *ngIf="mostrarMenos">
+  <ion-card-header>
+    <ion-card-title>Los menos vendidos</ion-card-title>
+  </ion-card-header>
+  <ion-card-content *ngIf="MenosOptions?.series?.length">
+    <apx-chart
+      [series]="MenosOptions.series"
+      [chart]="MenosOptions.chart"
+      [xaxis]="MenosOptions.xaxis"
+      [plotOptions]="MenosOptions.plotOptions"
+      [dataLabels]="MenosOptions.dataLabels"
+      [stroke]="MenosOptions.stroke"
+      [title]="MenosOptions.title"
+      [legend]="MenosOptions.legend">
+    </apx-chart>
+  </ion-card-content>
+</ion-card>

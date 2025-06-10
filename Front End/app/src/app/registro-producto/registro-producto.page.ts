@@ -114,7 +114,7 @@ export class RegistroProductoPage implements OnInit {
           // Si el producto existe, buscar su cantidad
           if (res.mensaje === 'Producto ya existente') {
             // Traer datos del producto existente
-            this.conexionBackendService.registrarProductoPorcodigo('/get/producto_por_codigo/', codigo).subscribe({
+            this.conexionBackendService.registrarProductoPorcodigo('get/producto_por_codigo/', codigo).subscribe({
               next: (prodRes) => {
                 this.productosEscaneados.push({
                   codigo,

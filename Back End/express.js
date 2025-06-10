@@ -978,6 +978,64 @@ app.get('/api/cantidad_productos_vendidos_hoy', (req, res) => {
 });
 
 
+//endpoint para mostrar los productos mas vendido en los ultimo 7 dias 
+app.get('/api/productos_mas_vendidos_7dias', (req, res) => {
+  const query = `
+    SELECT 
+      p.producto AS nombre,
+      SUM(dv.cantidad) AS total_vendido
+    FROM detalle_venta dv
+    INNER JOIN venta v ON dv.id_venta = v.id
+    INNER JOIN formato_producto fp ON dv.id_formato_producto = fp.id
+    INNER JOIN producto p ON fp.producto_id = p.id
+    WHERE DATE(v.fecha) >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+    GROUP BY p.id, p.producto
+    ORDER BY total_vendido DESC
+    LIMIT 5
+  `;
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error al obtener productos más vendidos en 7 días:', err);
+      return res.status(500).json({ error: 'Error al consultar productos más vendidos', details: err });
+    }
+    const productos = results.map(row => ({
+      nombre: row.nombre,
+      total_vendido: row.total_vendido
+    }));
+    res.json({ productos });
+  });
+});
+
+
+//endpoint para mostrar los productos menos vendido en los ultimo 7 dias 
+app.get('/api/productos_menos_vendidos_7dias', (req, res) => {
+  const query = `
+    SELECT 
+      p.producto AS nombre,
+      SUM(dv.cantidad) AS total_vendido
+    FROM detalle_venta dv
+    INNER JOIN venta v ON dv.id_venta = v.id
+    INNER JOIN formato_producto fp ON dv.id_formato_producto = fp.id
+    INNER JOIN producto p ON fp.producto_id = p.id
+    WHERE DATE(v.fecha) >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+    GROUP BY p.id, p.producto
+    ORDER BY total_vendido ASC
+    LIMIT 5
+  `;
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error al obtener productos más vendidos en 7 días:', err);
+      return res.status(500).json({ error: 'Error al consultar productos más vendidos', details: err });
+    }
+    const productos = results.map(row => ({
+      nombre: row.nombre,
+      total_vendido: row.total_vendido
+    }));
+    res.json({ productos });
+  });
+});
+
+
 
 // Middleware para manejar rutas no definidas
 app.use((req, res) => {

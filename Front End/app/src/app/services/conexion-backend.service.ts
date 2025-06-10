@@ -71,6 +71,20 @@ export class ConexionBackendService {
   return this.http.get(`${this.configService.apiUrl}cantidad_productos_vendidos_hoy`);
   }
 
+  //obtener productos mas vendidos en los ultimos 7 dias
+  getProductosMasVendidos7Dias(): Observable<{ productos: { nombre: string; total_vendido: number }[] }> {
+  return this.http.get<{ productos: { nombre: string; total_vendido: number }[] }>(
+    `${this.configService.apiUrl}productos_mas_vendidos_7dias`
+  );
+}
+
+  //obtener productos mas vendidos en los ultimos 7 dias
+  getProductosMenosVendidos7Dias(): Observable<{ productos: { nombre: string; total_vendido: number }[] }> {
+  return this.http.get<{ productos: { nombre: string; total_vendido: number }[] }>(
+    `${this.configService.apiUrl}productos_menos_vendidos_7dias`
+  );
+}
+
 
 
 
@@ -89,7 +103,7 @@ export class ConexionBackendService {
   }
 
   validarCodigoBarra(codigo: string): Observable<any> {
-    return this.http.get(`${this.configService.apiUrl}/validar-codigo/${codigo}`);
+    return this.http.get(`${this.configService.apiUrl}get/validar_codigo/${codigo}`);
   }
 
   deshabilitarFormato(endpoint: string, idFormato: number): Observable<any> {
