@@ -6,7 +6,9 @@ import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { OutputsEmergentesService } from '../services/outputs-emergentes/outputs-emergentes.service';
 import { ConexionBackendService } from '../services/conexion-backend.service';
-
+import { Ipv4Component } from '../modales/ipv4/ipv4.component';
+import { addIcons  } from 'ionicons';
+import { settings} from 'ionicons/icons'
 @Component({
   selector: 'app-tab3',
   templateUrl: 'tab3.page.html',
@@ -24,7 +26,18 @@ export class Tab3Page {
     private http: HttpClient,
     private outputs: OutputsEmergentesService,
     private apiService: ConexionBackendService
-  ) {}
+  ) {addIcons({
+        'settings': settings,
+      });}
+
+async ipv4_modal(){
+  const modal = await this.modalController.create({
+        component: Ipv4Component
+      });
+      await modal.present();
+    }
+
+
 
 async abrirScanner() {
   const modal = await this.modalController.create({

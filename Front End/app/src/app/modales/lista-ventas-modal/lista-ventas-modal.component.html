@@ -236,7 +236,7 @@
                 <ion-spinner name="crescent"></ion-spinner>
                 <p>Cargando productos...</p>
               </div>
-              <div *ngIf="!loading">
+              <div *ngIf="!loading && products" >
                 <div class="products-view">
                   <div *ngFor="let product of products" class="product-container">
                     <ion-item class="product-item">
@@ -244,21 +244,21 @@
                         <ion-icon name="cube-outline" class="product-icon stat-icon-secondary"></ion-icon>
                       </div>
                       <ion-label>
-                        <h2 class="product-title">{{ product.name }}</h2>
+                        <h2 class="product-title">{{ product.nombre_producto+' '+ product.formato+' '+product.marca}}</h2>
                         <div class="product-info">
                           <span class="info-item">
                             <ion-icon name="pricetag-outline"></ion-icon>
-                            Unidades vendidas: {{ product.sold }}
+                            Unidades vendidas: {{ product.cantidad_total_vendida | number:'1.0-0' }}
                           </span>
                         </div>
                       </ion-label>
                       <div slot="end" class="product-summary">
-                        <div class="product-total">Total: ${{ product.revenue }}</div>
+                        <div class="product-total">Total: ${{ product.total_ventas | number:'1.0-0'}}</div>
                       </div>
                     </ion-item>
                   </div>
               </div>
-              <div *ngIf="products.length === 0" class="empty-state">
+              <div *ngIf="!loading && (!products || products.length <= 1) " class="empty-state">
                 <i class="icon-package empty-icon"></i>
                 <h4>No se encontraron ventas</h4>
                 <p>No hay ventas que coincidan con los filtros aplicados.</p>

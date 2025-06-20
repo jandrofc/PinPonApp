@@ -814,7 +814,7 @@ app.get('/api/get/ventas_con_detalles', (req, res) => {
 
 // Endpoint para obtener todos los productos con la cantidad de 
 app.get('/api/get/productos_mas_vendidos', (req, res) => {
-  const {filtro_fecha, filtro_producto}= req.query
+  const { filtro_fecha, filtro_producto } = req.query;
 
   let query = `
     SELECT
@@ -829,40 +829,63 @@ app.get('/api/get/productos_mas_vendidos', (req, res) => {
     LEFT JOIN detalle_venta dv ON v.id = dv.id_venta
     LEFT JOIN formato_producto fp ON dv.id_formato_producto = fp.id
     LEFT JOIN producto p ON fp.producto_id = p.id
-    `;
+  `;
 
-const where = [];
-const params = [];
+  const where = [];
+  const params = [];
 
-if (filtro_fecha && filtro_fecha !== '') {
-  where.push('DATE(v.fecha) = ?');
-  params.push(filtro_fecha);
-}
+  if (filtro_fecha && filtro_fecha !== '') {
+    where.push('DATE(v.fecha) = ?');
+    params.push(filtro_fecha);
+  }
 
-if (filtro_producto && filtro_producto !== '') {
-  where.push('LOWER(p.producto) LIKE ?');
-  params.push(`%${filtro_producto.toLowerCase()}%`);
-}
+  if (filtro_producto && filtro_producto !== '') {
+    where.push('LOWER(p.producto) LIKE ?');
+    params.push(`%${filtro_producto.toLowerCase()}%`);
+  }
 
-if (where.length) {
-  query += ' WHERE ' + where.join(' AND ');
-}
+  if (where.length) {
+    query += ' WHERE ' + where.join(' AND ');
+  }
 
-query += `
-GROUP BY p.id, fp.id, dv.precio_unitario
-ORDER BY total_ventas DESC
-`;
+  query += `
+    GROUP BY p.id, fp.id, dv.precio_unitario
+    ORDER BY total_ventas DESC
+  `;
 
-db.query(query, params, (err, results) => {
-  if (err) {
-      console.error('Error al obtener ventas y detalles:', err);
-      return res.status(500).json({ error: 'Error al obtener ventas y detalles', details: err });
+  // Consulta de resumen
+  let resumenQuery = `
+    SELECT 
+      COUNT(DISTINCT v.id) AS total_boletas,
+      SUM(dv.cantidad) AS total_productos,
+      SUM(v.total) AS total_ventas
+    FROM venta v
+    LEFT JOIN detalle_venta dv ON v.id = dv.id_venta
+    LEFT JOIN formato_producto fp ON dv.id_formato_producto = fp.id
+    LEFT JOIN producto p ON fp.producto_id = p.id
+  `;
+  if (where.length) {
+    resumenQuery += ' WHERE ' + where.join(' AND ');
+  }
+
+  db.query(query, params, (err, productos) => {
+    if (err) {
+      console.error('Error al obtener productos más vendidos:', err);
+      return res.status(500).json({ error: 'Error al obtener productos más vendidos', details: err });
     }
-  res.json({ 
-        success: true, 
-        results
+    db.query(resumenQuery, params, (err, resumenResults) => {
+      if (err) {
+        console.error('Error al obtener resumen:', err);
+        return res.status(500).json({ error: 'Error al obtener resumen', details: err });
+      }
+      const resumen = resumenResults[0] || { total_productos: 0, total_ventas: 0 };
+      res.json({
+        success: true,
+        productos,
+        resumen
       });
-});
+    });
+  });
 });
 
 //endpoint para mostrar las ultimas 3 boletas

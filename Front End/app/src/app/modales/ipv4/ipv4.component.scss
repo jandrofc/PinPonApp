@@ -1,0 +1,123 @@
+.header-section {
+  text-align: center;
+  margin-bottom: 20px;
+  
+  .wifi-icon {
+    font-size: 48px;
+    color: var(--ion-color-primary);
+    margin-bottom: 10px;
+  }
+  
+  h2 {
+    margin: 10px 0 5px 0;
+    color: var(--ion-color-dark);
+  }
+  
+  p {
+    color: var(--ion-color-medium);
+    margin: 0;
+  }
+}
+
+.common-ips-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  
+  ion-button {
+    --border-radius: 8px;
+    font-size: 20px;
+  }
+}
+
+.error-message {
+  margin-top: 8px;
+  padding: 0 16px;
+}
+
+.valid-input {
+  --border-color: var(--ion-color-success);
+  --color: var(--ion-color-success);
+}
+
+.invalid-input {
+  --border-color: var(--ion-color-danger);
+  --color: var(--ion-color-danger);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  
+  ion-button {
+    flex: 1;
+  }
+}
+
+
+ion-card {
+  margin-bottom: 16px;
+  background-color: white;
+
+  ion-card-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    
+    ion-icon {
+      font-size: 20px;
+    }
+  }
+}
+
+ion-item {
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  border-radius: 10px;
+}
+
+ion-list {
+  padding: 0;
+  background: white;
+  
+  ion-item {
+    --padding-start: 0;
+    margin-bottom: 10px;
+    
+    ion-label p {
+      font-size: 14px;
+      color: var(--ion-color-dark);
+    }
+  }
+}
+.button-row {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  width: 100%;
+  flex-wrap: wrap; // opcional: permite que se ajusten en pantallas pequeñas
+  margin-top: 20px;
+}
+
+.button-row ion-button {
+  flex: 1 1 48%; // 48% del ancho y con espacio entre ellos
+}
+
+ion-card-title.title-black {
+  color: #111 !important; // Negro o el tono que prefieras
+}
+
+ion-card-subtitle.subtitle-grey {
+  color: rgb(185, 185, 185) !important;
+}
+
+.close-icon {
+  font-size: 42px;
+  margin-right: 10px;
+}
+
+ion-card-header {
+  display: flex;
+  flex-direction: column; // Orden normal
+}

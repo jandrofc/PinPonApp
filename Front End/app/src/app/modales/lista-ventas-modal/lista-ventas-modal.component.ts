@@ -11,7 +11,7 @@ import { BehaviorSubject, type Observable } from 'rxjs';
 import { ConexionBackendService } from 'src/app/services/conexion-backend.service';
 import { error } from 'console';
 
-import { VentaDetalleItem, boleta, Resumen, IndividualProduct, RespuestaAPI } from "src/app/modelos/ventas.interfaces"
+import {  boleta, Resumen, productosResumen } from "src/app/modelos/ventas.interfaces"
 
 
 
@@ -57,7 +57,6 @@ export class ListaVentasModalComponent  implements OnInit {
 
   public switchTab(tabName: string): void {
     this.activeTab = tabName;
-    console.log(`Cambiando a la pestaña: ${tabName}`);
 
     // Cargar datos según la pestaña activa
     if (tabName === 'receipts') {
@@ -79,7 +78,7 @@ export class ListaVentasModalComponent  implements OnInit {
   salesData: boleta[] | null = null
   resumen: Resumen | null = null
 
-  products: any[] = []; // Array para almacenar los productos
+  products: productosResumen[] | null = null; // Array para almacenar los productos
   
   
   
@@ -146,10 +145,9 @@ export class ListaVentasModalComponent  implements OnInit {
     
     this.conexionBackend.getBoletas(this.searchProduct,this.selectedDate)
     .subscribe({
-      next: (data: RespuestaAPI) =>{
+      next: (data) =>{
         this.resumen= data.resumen;
         this.salesData = data.ventas
-        console.log(this.salesData)
         this.loading = false;
       },
       error: (err) => {
@@ -163,10 +161,9 @@ export class ListaVentasModalComponent  implements OnInit {
 
     this.conexionBackend.getProductos(this.searchProduct,this.selectedDate)
     .subscribe({
-      next: (data: RespuestaAPI) =>{
+      next: (data) =>{
         this.resumen= data.resumen;
-        this.salesData = data.ventas
-        
+        this.products= data.productos
         this.loading = false;
       },
       error: (err) => {
@@ -206,35 +203,6 @@ export class ListaVentasModalComponent  implements OnInit {
   }
 
 
-
-  // Cargar datos de productos
-  // private loadProductsData(): void {
-  //   console.log('Cargando datos de productos...');
-  //   this.loading = true;
-    
-  //   // Simulación de datos - reemplazar con servicio real
-  //   setTimeout(() => {
-  //     this.products = [
-  //       {
-  //         id: 1,
-  //         name: 'Producto A',
-  //         category: 'Electrónicos',
-  //         sold: 25,
-  //         revenue: 750.00,
-  //         stock: 15
-  //       },
-  //       {
-  //         id: 2,
-  //         name: 'Producto B',
-  //         category: 'Ropa',
-  //         sold: 40,
-  //         revenue: 1200.00,
-  //         stock: 8
-  //       }
-  //     ];
-  //     this.loading = false;
-  //   }, 1000);
-  // }
 
 
 

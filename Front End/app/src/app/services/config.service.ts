@@ -7,10 +7,13 @@ import { firstValueFrom } from 'rxjs';
 })
 export class ConfigService {
   private config: any = null;
-
+  public apiUrl = '';
   constructor(private http: HttpClient) {}
 
-  async loadConfig(): Promise<void> {
+  async loadConfig() {
+    // Cargar desde localStorage o archivo
+
+    const savedUrl = localStorage.getItem('apiUrl');
     try {
       this.config = await firstValueFrom(this.http.get('/assets/config.json'));
     } catch (error) {
@@ -18,9 +21,20 @@ export class ConfigService {
       // Fallback a la URL por defecto
       this.config = { apiUrl: 'http://localhost:3000/api/' };
     }
+    this.apiUrl= savedUrl || this.config?.apiUrl || 'http://localhost:3000/api/';
   }
+  setApiUrl(newUrl: string) {
+    this.apiUrl = newUrl;
+    localStorage.setItem('apiUrl', newUrl);
+  }
+  
 
-  get apiUrl(): string {
-    return this.config?.apiUrl || 'http://localhost:3000/api/';
-  }
+
+
+
+
+
+
+
+
 }
