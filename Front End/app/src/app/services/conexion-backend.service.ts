@@ -53,8 +53,14 @@ export class ConexionBackendService {
     return this.http.get<ProductosMasVendidos>(api,{params}).pipe(
       catchError(this.handleError)
     )
+  }
 
-}
+  getProductoPorCodigo(codigo: string): Observable<any> {
+    return this.http.get(`${this.configService.apiUrl}get/producto_por_codigo/${codigo}`)
+      .pipe(catchError(this.handleError));
+  }
+
+
   getUltimas3boletas(endpoint: string): Observable<any> {
     // Construir la URL completa
     const url = `${this.configService.apiUrl}${endpoint}`; // URL del endpoint

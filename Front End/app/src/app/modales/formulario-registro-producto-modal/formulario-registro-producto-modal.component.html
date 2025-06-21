@@ -24,12 +24,14 @@
           <ion-label position="stacked" color="dark">
             <strong>Código del Producto</strong>
           </ion-label>
-          <ion-input 
-            formControlName="code" 
-            readonly
-            class="readonly-input">
+          <!-- CAMBIO: El input ahora es editable y llama a onCodigoEscaneado al cambiar -->
+          <ion-input
+            formControlName="code"
+            [readonly]="true"
+            placeholder="Escanea o ingresa el código"
+            class="custom-input">
           </ion-input>
-        </ion-item>
+        </ion-item>W
       </div>
 
       <!-- Información Básica Section -->
@@ -44,8 +46,8 @@
           <ion-label position="stacked" color="dark">
             <strong>Nombre del Producto</strong> <ion-text class="danger-red"> *</ion-text>
           </ion-label>
-          <ion-input 
-            formControlName="name" 
+          <ion-input
+            formControlName="name"
             placeholder="Ej: Leche entera"
             class="custom-input">
           </ion-input>
@@ -60,8 +62,8 @@
           <ion-label position="stacked" color="dark">
             <strong>Marca</strong> <ion-text class="danger-red"> *</ion-text>
           </ion-label>
-          <ion-input 
-            formControlName="brand" 
+          <ion-input
+            formControlName="brand"
             placeholder="Ej: Alpura"
             class="custom-input">
           </ion-input>
@@ -76,8 +78,8 @@
           <ion-label position="stacked" color="dark">
             <strong>Formato</strong> <ion-text class="danger-red"> *</ion-text>
           </ion-label>
-          <ion-input 
-            formControlName="format" 
+          <ion-input
+            formControlName="format"
             placeholder="Ej: Botella 1L"
             class="custom-input">
           </ion-input>
@@ -96,27 +98,28 @@
         </div>
 
         <div class="two-column">
-          <ion-item lines="full" class="form-item" [class.error]="productForm.get('quantity')?.touched && (productForm.get('quantity')?.errors?.['required'] || productForm.get('quantity')?.errors?.['min'])">
-            <ion-icon name="cube-outline" slot="start" color="medium"></ion-icon>
-            <ion-label position="stacked" color="dark">
-              <strong>Cantidad</strong> <ion-text class="danger-red"> *</ion-text>
-            </ion-label>
-            <ion-input 
-              formControlName="quantity" 
-              type="number" 
-              placeholder="Ej: 1"
-              class="custom-input">
-            </ion-input>
-          </ion-item>
+          <ion-item lines="full" class="form-item">
+          <ion-icon name="cube-outline" slot="start" color="medium"></ion-icon>
+          <ion-label position="stacked" color="dark">
+            <strong>Cantidad a agregar</strong> <ion-text class="danger-red">*</ion-text>
+          </ion-label>
+          <ion-input
+            formControlName="quantity"
+            type="number"
+            min="1"
+            placeholder="Ingresa la cantidad a agregar"
+            class="custom-input">
+          </ion-input>
+        </ion-item>
 
           <ion-item lines="full" class="form-item" [class.error]="productForm.get('stock_min')?.touched && (productForm.get('stock_min')?.errors?.['required'] || productForm.get('stock_min')?.errors?.['min'])">
             <ion-icon name="warning-outline" slot="start" color="medium"></ion-icon>
             <ion-label position="stacked" color="dark">
               <strong>Stock Mínimo</strong> <ion-text class="danger-red"> *</ion-text>
             </ion-label>
-            <ion-input 
-              formControlName="stock_min" 
-              type="number" 
+            <ion-input
+              formControlName="stock_min"
+              type="number"
               placeholder="Ej: 5"
               class="custom-input">
             </ion-input>
@@ -153,9 +156,9 @@
           <ion-label position="stacked" color="dark">
             <strong>Precio</strong> <ion-text class="danger-red"> *</ion-text>
           </ion-label>
-          <ion-input 
-            formControlName="price" 
-            type="number" 
+          <ion-input
+            formControlName="price"
+            type="number"
             placeholder="Ej: 1000"
             class="custom-input price-input">
             <div slot="start" class="currency-symbol">$</div>
@@ -173,18 +176,18 @@
 
       <!-- Action Buttons -->
       <div class="form-actions">
-        <ion-button 
-          expand="block" 
+        <ion-button
+          expand="block"
           size="large"
-          (click)="guardarCambios(producto.codigo)" 
+          (click)="guardarCambios()"
           [disabled]="productForm.invalid"
           class="save-button">
           <ion-icon name="save" slot="start"></ion-icon>
           Guardar Producto
         </ion-button>
-        
-        <ion-button 
-          expand="block" 
+
+        <ion-button
+          expand="block"
           size="large"
           (click)="cancelarEdicion()"
           class="cancel-button">
