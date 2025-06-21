@@ -101,7 +101,11 @@
           </div>
 
           <div class="sales-activity-content">
-            <ng-container *ngIf="boletas.length > 0; else loadingRecent">
+            <ng-container *ngIf="!cargandoDatos; else loadingRecent">
+              <div *ngIf="boletas?.length === 0" class="sales-activity-empty">
+                <ion-icon name="sad-outline" size="large"></ion-icon>
+                <p>No hay ventas registradas hoy.</p>
+              </div>
               <div class="sales-activity-item" *ngFor="let boleta of boletas">
                 <div class="sales-activity-info">
                   <!-- Nombres de productos concatenados -->

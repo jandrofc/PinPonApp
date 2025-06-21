@@ -44,6 +44,7 @@ async abrirScanner() {
     component: CameraScannerModalComponent,
     cssClass: 'barcode-scanning-modal',
     showBackdrop: false,
+    animated: false
   });
   await modal.present();
 

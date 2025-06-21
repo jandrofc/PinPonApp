@@ -449,6 +449,7 @@ export class CameraScannerModalComponent implements AfterViewInit, OnDestroy {
   private async startScan(): Promise<void> {
     // Hide everything behind the modal (see `src/theme/variables.scss`)
     document.querySelector('body')?.classList.add('barcode-scanning-active');
+    
 
     // Configura las opciones para el escaneo, formato que lee, camara a usar y si sera en web o telefono
     if (Capacitor.getPlatform() === 'web') {
