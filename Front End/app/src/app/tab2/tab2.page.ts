@@ -11,6 +11,8 @@ import { GraficosComponent } from '../modales/graficos/graficos.component';
 import { Ipv4Component } from '../modales/ipv4/ipv4.component';
 import { addIcons  } from 'ionicons';
 import { settings} from 'ionicons/icons'
+import { ReportesComponent } from '../modales/reportes/reportes.component';
+
 export interface today_sales{
   valor_ventas : number
   porcentaje: number
@@ -133,6 +135,11 @@ async ipv4_modal(){
 }
 
 
-
+async modal_reportes(){
+    const modal = await this.modalController.create({
+      component: ReportesComponent
+    });
+    await modal.present();
+  }
 
 }
