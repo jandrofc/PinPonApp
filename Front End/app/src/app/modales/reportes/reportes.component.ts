@@ -1,7 +1,9 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { IonicModule, ModalController } from '@ionic/angular';
-import * as ExcelJS from 'exceljs';
-import { saveAs } from 'file-saver';
+import * as XLSX from 'xlsx';
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { CUSTOM_ELEMENTS_SCHEMA, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ConexionBackendService } from 'src/app/services/conexion-backend.service';
@@ -55,102 +57,121 @@ export class ReportesComponent  implements OnInit {
       datosFiltrados = datosFiltrados.filter(d => this.producto.includes(d.nombre_producto));
     }
 
-    const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('Stock');
+    // Prepara los datos para la hoja de Excel
+    const headers = ['ID Formato', 'ID Producto', 'Producto', 'Formato', 'Marca', 'Cantidad', 'Precio', 'Stock Minimo', 'Codigo de Barra', 'Fecha de Creacion', 'Fecha de Actualizacion'];
+    const datosParaExcel = datosFiltrados.map(dato => ({
+      'ID Formato': dato.id_formato,
+      'ID Producto': dato.producto_id,
+      'Producto': dato.nombre_producto,
+      'Formato': dato.formato,
+      'Marca': dato.marca,
+      'Cantidad': dato.cantidad,
+      'Precio': dato.precio,
+      'Stock Minimo': dato.stock_min,
+      'Codigo de Barra': dato.codigo_barra,
+      'Fecha de Creacion': dato.fecha_creacion,
+      'Fecha de Actualizacion': dato.fecha_actualizado
+    }));
 
-    worksheet.addRow([]);
+    // Agrega título y subtítulo como filas extras
+    const wsData = [
+      [],
+      ['Reporte de Stock'],
+      ['Minimarket Pinpon'],
+      [],
+      headers,
+      ...datosParaExcel.map(obj => headers.map(h => (obj as Record<string, any>)[h]))
+    ];
 
-    // --- Título del reporte ---
-    const tituloRow = worksheet.addRow(['', 'Reporte de Stock']);
-    worksheet.mergeCells(`B${tituloRow.number}:L${tituloRow.number}`);
-    tituloRow.font = { bold: true, size: 18 };
-    tituloRow.alignment = { horizontal: 'center', vertical: 'middle' };
+    // Crea la hoja y el libro
+    const ws: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(wsData);
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Stock');
 
-    // --- Subtítulo ---
-    const subtituloRow = worksheet.addRow(['', 'Minimarket Pinpon']);
-    worksheet.mergeCells(`B${subtituloRow.number}:L${subtituloRow.number}`);
-    subtituloRow.font = { italic: true, size: 14 };
-    subtituloRow.alignment = { horizontal: 'center', vertical: 'middle' };
+    // Genera el archivo como base64
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
 
-    // --- Espacio antes de la tabla ---
-    worksheet.addRow([]);
-
-    const headers = ['id_formato', 'producto_id', 'nombre_producto', 'formato', 'marca', 'cantidad', 'precio', 'stock_min', 'codigo_barra', 'fecha_creacion', 'fecha_actualizado'];
-    const headerNames = ['ID Formato', 'ID Producto', 'Producto', 'Formato', 'Marca', 'Cantidad', 'Precio', 'Stock Minimo', 'Codigo de Barra', 'Fecha de Creacion', 'Fecha de Actualizacion'];
-
-    // --- Encabezados con estilos ---
-    const headerRow = worksheet.addRow(['', ...headerNames]);
-    headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
-    headerRow.alignment = { horizontal: 'center' };
-    headerRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-      if (colNumber > 1) { // Solo aplica bordes a las columnas de la tabla
-        cell.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: '2c3182' }
-        };
-        cell.border = {
-          top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'}
-        };
-      }
-      cell.alignment = { wrapText: true, horizontal: 'center', vertical: 'middle' };
-    });
-
-  // --- Datos ---
-  datosFiltrados.forEach((dato, idx) => {
-    const fila = headers.map(h => {
-      if (h === 'fecha_creacion' || h === 'fecha_actualizado') {
-        const fecha = dato[h];
-        if (fecha) {
-          const d = new Date(fecha);
-          const dia = String(d.getDate()).padStart(2, '0');
-          const mes = String(d.getMonth() + 1).padStart(2, '0');
-          const anio = d.getFullYear();
-          return `${dia}/${mes}/${anio}`;
-        }
-        return '';
-      }
-      return dato[h];
-    });
-    const row = worksheet.addRow(['', ...fila]);
-    row.height = 25;
-
-    // Intercala color de fondo
-    const isEven = idx % 2 === 0;
-    row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-      if (colNumber > 1) { // Solo aplica estilos a las columnas de la tabla
-        cell.border = {
-          top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'}
-        };
-        cell.fill = isEven
-          ? { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE6F0FF' } } // azul claro
-          : { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } }; // blanco
-      }
-      cell.alignment = { wrapText: true, vertical: 'middle' };
-    });
-  });
-
-    // --- Ajustar ancho de columnas ---
-    worksheet.columns.forEach((column, idx) => {
-      // Índices de columnas que quieres más pequeñas
-      const columnasPequeñas = [1, 2, 6, 7, 8];
-      if (columnasPequeñas.includes(idx)) {
-        column.width = 10; // ancho pequeño
-      } else {
-        column.width = 16; // ancho normal
-      }
-    });
-
-    // --- Guardar archivo ---
+    // Nombre del archivo
     const fecha = new Date();
     const dia = String(fecha.getDate()).padStart(2, '0');
     const mes = String(fecha.getMonth() + 1).padStart(2, '0');
     const anio = fecha.getFullYear();
-    const fechaStr = `${dia}-${mes}-${anio}`; // dd-mm-yyyy
+    const fechaStr = `${dia}-${mes}-${anio}`;
     const nombreArchivo = `reporte_stock_${fechaStr}.xlsx`;
-    const buffer = await workbook.xlsx.writeBuffer();
-    saveAs(new Blob([buffer]), nombreArchivo);
+
+    // Guarda el archivo en el dispositivo
+    await Filesystem.writeFile({
+      path: nombreArchivo,
+      data: wbout,
+      directory: Directory.Documents,
+    });
+
     this.dismiss();
+  }
+
+  async generarPDF() {
+    let datosFiltrados = this.stockData;
+    if (this.producto && this.producto.length > 0) {
+      datosFiltrados = datosFiltrados.filter(d => this.producto.includes(d.nombre_producto));
+    }
+
+    const headers = ['ID Formato', 'ID Producto', 'Producto', 'Formato', 'Marca', 'Cantidad', 'Precio', 'Stock Minimo', 'Codigo de Barra', 'Fecha de Creacion', 'Fecha de Actualizacion'];
+    const datosParaPDF = datosFiltrados.map(dato => [
+      dato.id_formato,
+      dato.producto_id,
+      dato.nombre_producto,
+      dato.formato,
+      dato.marca,
+      dato.cantidad,
+      dato.precio,
+      dato.stock_min,
+      dato.codigo_barra,
+      dato.fecha_creacion,
+      dato.fecha_actualizado
+    ]);
+
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text('Reporte de Stock', 105, 15, { align: 'center' });
+    doc.setFontSize(12);
+    doc.text('Minimarket Pinpon', 105, 23, { align: 'center' });
+
+    autoTable(doc, {
+      head: [headers],
+      body: datosParaPDF,
+      startY: 30,
+      styles: { fontSize: 8 }
+    });
+
+    const fecha = new Date();
+    const dia = String(fecha.getDate()).padStart(2, '0');
+    const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+    const anio = fecha.getFullYear();
+    const fechaStr = `${dia}-${mes}-${anio}`;
+    const nombreArchivo = `reporte_stock_${fechaStr}.pdf`;
+
+    // Guardar el PDF en el dispositivo usando Capacitor Filesystem
+    const pdfOutput = doc.output('arraybuffer');
+    const base64Pdf = this.arrayBufferToBase64(pdfOutput);
+
+    await Filesystem.writeFile({
+      path: nombreArchivo,
+      data: base64Pdf,
+      directory: Directory.Documents,
+    });
+
+    this.dismiss();
+  }
+
+  // Utilidad para convertir ArrayBuffer a base64
+  arrayBufferToBase64(buffer: ArrayBuffer): string {
+    let binary = '';
+    const bytes = new Uint8Array(buffer);
+    const len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return window.btoa(binary);
   }
 
   closeModal() {

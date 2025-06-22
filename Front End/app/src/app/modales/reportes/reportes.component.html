@@ -8,14 +8,25 @@
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
-<ion-content>
-  <ion-list>
-    <ion-item>
-      <ion-label>Producto</ion-label>
-      <ion-select [(ngModel)]="producto" multiple="true">
-        <ion-select-option *ngFor="let p of productos" [value]="p">{{p}}</ion-select-option>
-      </ion-select>
-    </ion-item>
-  </ion-list>
-  <ion-button expand="block" (click)="generarExcel()">Descargar Excel</ion-button>
+
+<ion-content class="filtro-content">
+  <div class="filtro-wrapper">
+    <ion-card class="filtro-card">
+      <ion-card-header>
+        <ion-card-title class="filtro-title">Filtro de búsqueda</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list>
+          <ion-item>
+            <ion-label>Seleccionar productos...</ion-label>
+            <ion-select [(ngModel)]="producto" multiple="true">
+              <ion-select-option *ngFor="let p of productos" [value]="p">{{p}}</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+    <ion-button expand="block" class="descargar-btn" (click)="generarExcel()">Descargar Excel</ion-button>
+    <ion-button expand="block" color="secondary" class="descargar-btn" (click)="generarPDF()">Descargar PDF</ion-button>
+  </div>
 </ion-content>

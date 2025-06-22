@@ -2,3 +2,39 @@
   font-size: 42px;
   margin-right: 10px;
 }
+
+.filtro-content {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.filtro-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.filtro-card {
+  background: #fff;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto 16px auto;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.filtro-title {
+  color: #222; // negro
+  text-align: left;
+  font-weight: bold;
+  margin-left: 0;
+}
+
+.descargar-btn {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
