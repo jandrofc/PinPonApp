@@ -17,6 +17,11 @@ import { ErrorHandler } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { importProvidersFrom } from '@angular/core';
 
+// Cambia el formato de la informacion a como se usa en chile
+import { registerLocaleData } from '@angular/common';
+import localeEsCL from '@angular/common/locales/es-CL';
+registerLocaleData(localeEsCL);
+import { LOCALE_ID } from '@angular/core';
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -35,6 +40,6 @@ bootstrapApplication(AppComponent, {
       provide: ErrorHandler,
       useClass: ManejadorErroresService,
     },
-
+    { provide: LOCALE_ID, useValue: 'es-CL' }
   ],
 });

@@ -3,32 +3,143 @@
     <ion-title>
       Reportes
     </ion-title>
-    
+    <ion-buttons slot="end" (click)="ipv4_modal()">
+      <ion-icon name="settings" color="light" class="settings-icon"></ion-icon>
+  </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <main class="main-content">
-    <div class="section-header">
-      <h2 class="section-title">Generar Reporte</h2>
-    </div>
-    <div class="menu-container">
-      <div class="report-options">
-        <button class="report-card">
-            <ion-icon class="card-icon" name="trending-up"></ion-icon>
-            <span>Productos más vendidos en el mes</span>
-        </button>
-        
-        <button class="report-card">
-            <ion-icon class="card-icon" name="trending-down"></ion-icon>
-            <span>Productos menos vendidos</span>
-        </button>
-        
-        <button class="report-card">
-            <ion-icon class="card-icon" name="logo-usd"></ion-icon>
-            <span>Ventas del mes</span>
-        </button>
+<ion-content>
+  <main class="sales-app" color="primary">
+    <!-- Main Content -->
+        <div class="sales-main-content">
+            <!-- Quick Stats -->
+            <div class="sales-quick-stats">
+                <!-- Tarjeta Ventas Hoy -->
+                <div class="sales-stat-card">
+                    <p class="sales-stat-label">Total de Ventas del dia</p>
+                    <p class="sales-stat-value">$ {{totalVentas | number:'1.0-0'}}</p>
+                    <ng-template #loadingSales>
+                        <ion-spinner name="crescent"></ion-spinner>
+                    </ng-template>
+                </div>
+
+                <!-- Tarjeta Productos Vendidos -->
+                <div class="sales-stat-card">
+                    <p class="sales-stat-label">Productos Vendidos</p>
+                    <p class="sales-stat-value">{{productosVendidos | number:'1.0-0'}} </p>
+                    <ng-template #loadingProducts>
+                        <ion-spinner name="crescent"></ion-spinner>
+                    </ng-template>
+                </div>
+            </div>
+
+            <!-- Main Menu -->
+            <div class="sales-section-header">
+                <span class="sales-icon-chart"></span>
+                <span>Opciones de Reportes</span>
+            </div>
+
+            <div class="sales-menu-items">
+                <div class="sales-menu-card" (click)="mostrar_lista_ventas()">
+                    <div class="sales-menu-card-content">
+                        <div class="sales-menu-icon blue">
+                            <span class="sales-icon-cart"></span>
+                        </div>
+                        <div class="sales-menu-info">
+                            <div class="sales-menu-title-row">
+                                <h3 class="sales-menu-title">Lista de Ventas</h3>
+                                <span class="sales-badge">Básico</span>
+                            </div>
+                            <p class="sales-menu-description">Ver ventas realizadas por fecha con productos y totales</p>
+                        </div>
+                        <span class="sales-menu-arrow sales-icon-arrow"></span>
+                    </div>
+                </div>
+
+                <div class="sales-menu-card" (click)='mostrar_dashboard_ventas()'>
+                    <div class="sales-menu-card-content">
+                        <div class="sales-menu-icon green">
+                            <span class="sales-icon-trend"></span>
+                        </div>
+                        <div class="sales-menu-info">
+                            <div class="sales-menu-title-row">
+                                <h3 class="sales-menu-title">Análisis de Ventas</h3>
+                                <span class="sales-badge">Agregados</span>
+                            </div>
+                            <p class="sales-menu-description">Totales por día, producto o categoría para identificar tendencias</p>
+                        </div>
+                        <span class="sales-menu-arrow sales-icon-arrow"></span>
+                    </div>
+                </div>
+
+                <div class="sales-menu-card" (click)="modal_reportes()">
+                    <div class="sales-menu-card-content">
+                        <div class="sales-menu-icon purple">
+                            <span class="sales-icon-report"></span>
+                        </div>
+                        <div class="sales-menu-info">
+                            <div class="sales-menu-title-row">
+                                <h3 class="sales-menu-title">Generar Reportes</h3>
+                            </div>
+                            <p class="sales-menu-description">Genera un reporte de stock en excel filtrando por productos</p>
+                        </div>
+                        <span class="sales-menu-arrow sales-icon-arrow"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="sales-quick-actions">
+                <div class="sales-section-header">
+                    <span class="sales-icon-calendar"></span>
+                    <span>Acciones Rápidas</span>
+                </div>
+
+                <div class="sales-action-buttons">
+                    <button class="sales-action-btn">
+                        <span class="sales-action-btn-icon sales-icon-calendar"></span>
+                        <span class="sales-action-btn-text">Ventas de Hoy</span>
+                    </button>
+                    <button class="sales-action-btn">
+                        <span class="sales-action-btn-icon sales-icon-package"></span>
+                        <span class="sales-action-btn-text">Top Productos</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+        <div class="sales-activity-card">
+          <div class="sales-activity-header">
+            <h3 class="sales-activity-title">Actividad Reciente</h3>
+            <p class="sales-activity-subtitle">Últimas ventas registradas</p>
+          </div>
+
+          <div class="sales-activity-content">
+            <ng-container *ngIf="!cargandoDatos; else loadingRecent">
+              <div *ngIf="boletas?.length === 0" class="sales-activity-empty">
+                <ion-icon name="sad-outline" size="large"></ion-icon>
+                <p>No hay ventas registradas hoy.</p>
+              </div>
+              <div class="sales-activity-item" *ngFor="let boleta of boletas">
+                <div class="sales-activity-info">
+                  <!-- Nombres de productos concatenados -->
+                  <h4>{{ getNombresProductosConcatenados(boleta) }}</h4>
+                </div>
+                <!-- Total de la boleta -->
+                <div class="sales-activity-amount">${{ boleta.total | number:'1.0-0' }}</div>
+              </div>
+            </ng-container>
+
+            <ng-template #loadingRecent>
+              <div class="sales-activity-spinner">
+                <ion-spinner name="crescent"></ion-spinner>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+            <!-- Bottom Spacer -->
+            <div class="sales-bottom-spacer"></div>
       </div>
-    </div>
   </main>
 </ion-content>

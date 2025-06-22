@@ -1,83 +1,141 @@
-<ion-header [translucent]="true" ion-no-border="true">
+<ion-header [translucent]="true" ion-no-border="true" color="primary">
   <ion-toolbar class="toolbar-color">
-    <ion-title>
+    <ion-title color="light">
       Inventario
     </ion-title>
-    <ion-buttons slot="end">
-    <ion-button class="notification-button">
-      <ion-icon class="noti-icon" name="notifications"></ion-icon>
-    </ion-button>
+    <ion-buttons slot="end" (click)="ipv4_modal()">
+      <ion-icon name="settings" color="light" class="settings-icon"></ion-icon>
   </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <main class="main-content">
-    <!-- Formulario de edición -->
+<ion-content [fullscreen]="true" class="custom-content">
+  <div class="content-wrapper">
     <div *ngIf="modoEdicion; else listaProductos" class="edit-form">
-      <h2 class="section-title">Editar Producto</h2>
-      <form (ngSubmit)="guardarCambios()">
-        <ion-list>
-          <!-- CAMPO OCULTO: id_formato -->
-          <ion-item lines="none" style="display: none;">
-            <ion-label position="stacked">ID Formato</ion-label>
-            <ion-input
-              [(ngModel)]="productoSeleccionado.id_formato"
-              name="id_formato"
-            ></ion-input>
-          </ion-item>
-          <!-- FIN CAMPO OCULTO -->
-
-          <!-- Nombre del producto -->
-          <ion-item>
-            <ion-label position="stacked">Nombre del Producto</ion-label>
-            <ion-input
-              [(ngModel)]="productoSeleccionado.nombre_producto"
-              name="nombre_producto"
-              required
-            ></ion-input>
-          </ion-item>
-
-          <!-- Categoría/Formato -->
-          <ion-item>
-            <ion-label position="stacked">Categoría</ion-label>
-            <ion-input
-              [(ngModel)]="productoSeleccionado.formato"
-              name="formato"
-              required
-            ></ion-input>
-          </ion-item>
-
-          <!-- Cantidad -->
-          <ion-item>
-            <ion-label position="stacked">Cantidad</ion-label>
-            <ion-input
-              type="number"
-              [(ngModel)]="productoSeleccionado.cantidad"
-              name="cantidad"
-              required
-            ></ion-input>
-          </ion-item>
-
-          <!-- Precio -->
-          <ion-item>
-            <ion-label position="stacked">Precio</ion-label>
-            <ion-input
-              type="number"
-              [(ngModel)]="productoSeleccionado.precio"
-              name="precio"
-              required
-            ></ion-input>
-          </ion-item>
-        </ion-list>
-
-        <!-- Botones de acción -->
-        <div class="botones">
-          <button class="btn-guardar" expand="block" type="submit">Guardar Cambios</button>
-          <button class="btn-cancelar" expand="block" (click)="cancelarEdicion()">Cancelar</button>
+      <ion-card class="main-card">
+        <div class="form-header">
+          <ion-icon name="create-outline" class="title-icon"></ion-icon>
+          <h2>Editar Producto</h2>
+          <p>Actualiza la información del producto</p>
         </div>
-      </form>
+
+        <ion-card-content class="card-content">
+          <form (ngSubmit)="guardarCambios()">
+            <!-- Nombre del Producto -->
+            <div class="input-group">
+              <ion-item lines="none" class="custom-item">
+                <ion-label position="stacked" class="custom-label">
+                  <ion-icon name="pricetag" class="label-icon"></ion-icon>
+                  Nombre del Producto
+                </ion-label>
+                <ion-input
+                  [(ngModel)]="productoSeleccionado.nombre_producto"
+                  name="nombre_producto"
+                  placeholder="Ingresa el nombre del producto"
+                  class="custom-input"
+                ></ion-input>
+              </ion-item>
+            </div>
+
+            <!-- Marca -->
+            <div class="input-group">
+              <ion-item lines="none" class="custom-item">
+                <ion-label position="stacked" class="custom-label">
+                  <ion-icon name="ribbon" class="label-icon"></ion-icon>
+                  Marca
+                </ion-label>
+                <ion-input
+                  [(ngModel)]="productoSeleccionado.marca"
+                  name="marca"
+                  placeholder="Marca"
+                  class="custom-input"
+                ></ion-input>
+              </ion-item>
+            </div>
+
+            <!-- Formato -->
+            <div class="input-group">
+              <ion-item lines="none" class="custom-item">
+                <ion-label position="stacked" class="custom-label">
+                  <ion-icon name="cube" class="label-icon"></ion-icon>
+                  Formato
+                </ion-label>
+                <ion-input
+                  [(ngModel)]="productoSeleccionado.formato"
+                  name="formato"
+                  placeholder="Ej: Botella 1L"
+                  class="custom-input"
+                ></ion-input>
+              </ion-item>
+            </div>
+
+            <!-- Cantidad y Stock Mínimo -->
+            <div class="input-row">
+              <div class="input-group half-width">
+                <ion-item lines="none" class="custom-item">
+                  <ion-label position="stacked" class="custom-label">
+                    <ion-icon name="layers" class="label-icon"></ion-icon>
+                    Cantidad
+                  </ion-label>
+                  <ion-input
+                    [(ngModel)]="productoSeleccionado.cantidad"
+                    name="cantidad"
+                    type="number"
+                    placeholder="0"
+                    class="custom-input"
+                  ></ion-input>
+                </ion-item>
+              </div>
+              <div class="input-group half-width">
+                <ion-item lines="none" class="custom-item">
+                  <ion-label position="stacked" class="custom-label">
+                    <ion-icon name="alert-circle" class="label-icon red stockmin-icon"></ion-icon>
+                    Stock Mínimo
+                  </ion-label>
+                  <ion-input
+                    [(ngModel)]="productoSeleccionado.stock_min"
+                    name="stock_min"
+                    type="number"
+                    placeholder="0"
+                    class="custom-input"
+                  ></ion-input>
+                </ion-item>
+              </div>
+            </div>
+
+            <!-- Precio -->
+            <div class="input-group">
+              <ion-item lines="none" class="custom-item">
+                <ion-label position="stacked" class="custom-label">
+                  <ion-icon name="cash" class="label-icon emerald"></ion-icon>
+                  Precio
+                </ion-label>
+                <ion-input
+                  [(ngModel)]="productoSeleccionado.precio"
+                  name="precio"
+                  type="number"
+                  placeholder="0.00"
+                  class="custom-input"
+                ></ion-input>
+              </ion-item>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="action-buttons" style="margin-top: 1.5em;">
+              <ion-button expand="block" type="submit" class="save-button">
+                <ion-icon name="save" slot="start"></ion-icon>
+                Guardar Cambios
+              </ion-button>
+              <ion-button expand="block" (click)="cancelarEdicion()" class="cancel-button">
+                <ion-icon name="close" slot="start"></ion-icon>
+                Cancelar
+              </ion-button>
+            </div>
+          </form>
+        </ion-card-content>
+      </ion-card>
     </div>
+  </div>
 
     <!-- Lista de productos -->
     <ng-template #listaProductos>
@@ -118,12 +176,24 @@
               />
             </div>
             <div class="product-text">
-              <p class="product-name">{{ producto.nombre_producto }}</p>
-              <p class="product-precio"> $:{{ producto.precio }}</p>
+              <p class="product-name">{{ producto.nombre_producto }} - {{ producto.marca }} - {{ producto.formato }}</p>
+              <p class="product-precio"> ${{ producto.precio }}</p>
             </div>
           </div>
           <div class="product-quantity">
-            <span class="badge">{{ producto.cantidad }}</span>
+            <span 
+              class="badge"
+              [ngClass]="{'badge-bajo-stock': producto.cantidad <= producto.stock_min}"
+            >
+              {{ producto.cantidad }}
+            </span>
+            <span 
+              *ngIf="producto.cantidad <= producto.stock_min" 
+              class="bajo-stock-label"
+            >
+            <ion-icon name="alert-circle-outline" class="bajo-stock-icon"></ion-icon>
+              Bajo stock
+            </span>
           </div>
           <div class="product-edit">
             <button
@@ -148,5 +218,4 @@
         <div class="no-productos">No se encontraron productos</div>
       </ng-template>
     </ng-template>
-  </main>
 </ion-content>

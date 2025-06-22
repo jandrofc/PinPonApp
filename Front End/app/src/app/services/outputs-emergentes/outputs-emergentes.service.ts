@@ -99,6 +99,8 @@ export class OutputsEmergentesService {
     const defaultOpts: AlertOptions = {
       header: 'Error',
       buttons: ['OK'],
+      cssClass: 'show-error-alert',
+      animated: true,
     };
     opts = { ...defaultOpts, ...opts };
     return this.showAlert(opts);

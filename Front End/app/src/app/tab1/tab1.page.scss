@@ -8,8 +8,6 @@
 
 /* Header */
 .header {
-  background-color: #4f46e5; /* bg-indigo-600 */
-  color: white;
   padding: 1rem;
   display: flex;
   align-items: center;
@@ -27,37 +25,23 @@
 
 .icon-button {
   background: none;
-  color: #4f46e5;
+  color: var(--cb-600);
   border: none;
-  padding: 0.5rem;
+  padding: 0.3rem;
   border-radius: 9999px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
-}
-
-.icon-button:hover {
-  background-color: #4338ca;
-}
-
-.notification-button {
-  position: relative;
-}
-
-.noti-icon {
-  color: white;
   font-size: 1.7rem;
 }
 
-.notification-dot {
-  position: absolute;
-  top: 0.25rem;
-  right: 0.25rem;
-  height: 0.5rem;
-  width: 0.5rem;
-  background-color: #ef4444; /* bg-red-500 */
-  border-radius: 9999px;
+.icon-button:hover {
+  background-color: var(--cb-600);
+}
+
+.settings-icon {
+  font-size: 32px;
+  margin-right: 15px;
 }
 
 /* Main content */
@@ -76,7 +60,7 @@
 
 .back-button {
   margin-right: 0.5rem;
-  color: #4f46e5;
+  color: var(--cb-600);
   background: none;
   font-size: 1.5rem;
 }
@@ -84,7 +68,7 @@
 .section-title {
   font-size: 1.875rem;
   font-weight: 700;
-  color: #4f46e5;
+  color: var(--cb-600);
   text-align: center;
 }
 
@@ -117,6 +101,10 @@
   color: #94a3b8;
 }
 
+ion-searchbar {
+  --background: #fff !important; /* Fondo del searchbar */
+}
+
 /* Product List */
 .product-list {
   background-color: white;
@@ -129,8 +117,8 @@
 .product-list-header {
   display: grid;
   grid-template-columns: 6fr 3fr 3fr;
-  background-color: #4361ee;
-  color: white;
+  background-color: var(--cb-600);
+  color: var(--cb-50);
   padding: 0.75rem;
   font-weight: 500;
   text-align: center;
@@ -188,43 +176,87 @@
 }
 
 .product-quantity {
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.bajo-stock-label {
+  background: #ff4d4f;
+  color: #fff;
+  padding: 2px 0px 2px 8px;
+  border-radius: 15px;
+  margin-left: 8px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 75px;
+}
+
+.bajo-stock-icon {
+  font-size: 22px; /* Aumenta el tamaño del icono */
+  width: 22px;
+  height: 22px;
+  color: #fff;
+  display: inline-block;
+}
+
+@media (max-width: 600px) {
+  .product-quantity {
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+  .bajo-stock-label {
+    margin-left: 0;
+    margin-top: 8px; // Espacio entre cantidad y el label
+  }
 }
 
 .badge {
   display: inline-block;
   padding: 0.25rem 0.75rem;
-  background-color: #e5ebff;
-  color: #3730a3;
+  background-color: var(--cb-200);
+  color: var(--cb-600);
   border-radius: 9999px;
   font-weight: 500;
   font-size: 1rem;
   border: 1px solid #a49fe5;
 }
 
+.badge-bajo-stock {
+  background: #f3caca !important;
+  border: 1px solid #e59f9f !important;
+  color: #c73d3d !important;
+}
+
 .product-edit {
   display: flex;
   align-items: center;
-  justify-content: center;
-  text-align: center;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .edit-button:hover {
   background-color: #eef2ff;
 }
 
-.no-products {
+.no-productos {
   padding: 2rem;
   text-align: center;
-  color: #64748b;
+  color: #000000 !important;
+
 }
 
 /* Add Product Button */
 .add-product-button {
   width: 100%;
   padding: 1rem;
-  background-color: #b3e1ff;
-  color: #4361ee;
+  background-color: #4361ee;
+  color: white;
   font-size: 1rem;
   font-weight: 600;
   border-radius: 1rem;
@@ -232,6 +264,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-top: 0.6rem;
 
 }
 
@@ -288,10 +321,31 @@ ion-item {
 /* Para los labels y los inputs */
 ion-label, ion-input {
   color: #000000 !important;
-  font-size: 18px;
 }
+
+ion-label {
+  font-size: 22px;
+}
+
+ion-label.custom-label {
+  display: block;
+  max-width: 100%;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  line-height: 1.1;
+  margin-bottom: 0.5rem;
+  word-break: break-word;
+}
+
 ion-button{
   font-size: 15px;
+}
+
+ion-button ion-icon[slot="start"] {
+  margin-right: 0 !important;
+  margin-left: -1em !important;
+  font-size: 1.3em;
 }
 
 /* Si quieres que el ion-list no tenga fondo gris */
@@ -299,6 +353,11 @@ ion-list {
   background: transparent;
 }
 }
+
+.edit-form .input-wrapper.sc-ion-input-md {
+  background: transparent !important;
+}
+
 /* Ícono de basura */
 .delete-button {
   color: #ef4444; /* rojo */
@@ -310,31 +369,263 @@ ion-list {
   padding: 1rem;
 }
 
-.btn-guardar {
-  width: 100%;
-  padding: 0.8rem;
-  background-color: #397cef;
-  color: white;
-  font-size: 1rem;
-  font-weight: 0;
-  border-radius: 0.7rem;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 0.8rem;
+// Variables de colores
+:root {
+  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --background-gradient: linear-gradient(135deg, #f8faff 0%, #e8f2ff 100%);
+  --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  --input-focus-color: #667eea;
 }
 
-.btn-cancelar {
-  width: 100%;
-  padding: 0.8rem;
-  background-color: #ef4444;
-  color: white;
-  font-size: 1rem;
-  font-weight: 0;
-  border-radius: 0.7rem;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+// Header personalizado
+.custom-header {
+  .gradient-toolbar {
+    --background: var(--primary-gradient);
+    --color: white;
+    
+    .header-title {
+      .title-content {
+        h1 {
+          font-size: 1.2rem;
+          font-weight: 700;
+          margin: 0;
+          color: white;
+        }
+        
+        p {
+          font-size: 0.85rem;
+          margin: 0;
+          color: rgba(255, 255, 255, 0.8);
+        }
+      }
+    }
+  }
+}
+
+// Contenido principal
+.custom-content {
+  --background: #f8fafc;
+  
+  .content-wrapper {
+    padding: 1rem;
+    margin-top: -1.5rem;
+  }
+}
+
+// Tarjeta principal
+.main-card {
+  --background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: var(--card-shadow);
+  border: none;
+  margin: 0;
+  
+  .form-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, var(--ion-color-primary-tint), var(--ion-color-primary));
+    border-radius: 12px;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+    ion-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    h2 {
+      margin: 0.5rem 0;
+      font-weight: 600;
+      font-size: 1.5rem;
+    }
+
+    p {
+      margin: 0.5rem 0 0 0;
+      opacity: 0.9;
+      font-size: 0.9rem;
+    }
+  }
+  
+  .card-content {
+    padding: 0 1.5rem 1.5rem;
+  }
+}
+
+// Grupos de inputs
+.input-group {
+  margin-bottom: 1.5rem;
+  
+  &.half-width {
+    flex: 1;
+  }
+  
+  .custom-item {
+    --background: transparent;
+    --border-radius: 12px;
+    --padding-start: 0;
+    --padding-end: 0;
+    --inner-padding-end: 0;
+    
+    .custom-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 1.1rem;
+      
+      .label-icon {
+        font-size: 1.7rem;
+        color: #667eea;
+        
+        &.red { color: #f50b0b; }
+        &.emerald { color: #059669; }
+      }
+    }
+    
+    .custom-input {
+      --background: white;
+      --border-radius: 12px;
+      --padding-start: 1rem;
+      --padding-end: 1rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      height: 48px;
+      transition: border-color 0.2s ease;
+      
+      &:focus-within {
+        border-color: var(--input-focus-color);
+      }
+    }
+  }
+}
+
+// Fila de inputs
+.input-row {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  gap: 1rem;
+  align-items: flex-end;
+}
+
+.input-row .input-group {
+  flex: 1 1 0;
+  min-width: 120px;
+  max-width: 220px;
+}
+
+// Separador
+.separator {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
+  margin: 1.5rem 0;
+}
+
+// Botones de acción
+.action-buttons {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .save-button {
+      --background: #4361ee;
+      --color: #fff;
+      --border-width: 0;
+      --border-radius: 8px;
+      height: 50px;
+      font-size: 18px;
+    }
+
+    .cancel-button {
+      --background: #b3e1ff;
+      --color: #4361ee;
+      --border-width: 0;
+      --border-radius: 8px;
+      height: 50px;
+      font-size: 18px;
+    }
+  }
+
+
+// Navegación inferior
+.custom-tab-bar {
+  --background: white;
+  border-top: 1px solid #e5e7eb;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  
+  ion-tab-button {
+    --color: #9ca3af;
+    --color-selected: #667eea;
+    
+    &.active-tab {
+      --color: #667eea;
+    }
+    
+    ion-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    
+    ion-icon {
+      font-size: 1.25rem;
+    }
+  }
+}
+
+// Responsive design
+@media (min-width: 768px) {
+  .content-wrapper {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  
+  .main-card {
+    margin-top: 2rem;
+  }
+}
+
+// Animaciones
+@keyframes slideInUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.main-card {
+  animation: slideInUp 0.3s ease-out;
+}
+
+// Estados de focus mejorados
+ion-input {
+  &.has-focus {
+    .custom-input {
+      border-color: var(--input-focus-color) !important;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+  }
+}
+
+// Mejoras de accesibilidad
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+:host ::ng-deep .edit-form .input-wrapper.sc-ion-input-md {
+  background: transparent !important;
+}
+
+.label-icon.stockmin-icon {
+  font-size: 2.4rem !important;
 }

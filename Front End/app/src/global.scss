@@ -37,21 +37,54 @@
 @import '@ionic/angular/css/palettes/dark.system.css';
 
   
+
+  :root {
+    --ion-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  }
+
+
+  ion-header {
+    --background: #3D59C7; /* Color de fondo del header */
+    --ion-background-color: #3D59C7; /* Asegura que el color de fondo sea el deseado */
+    --ion-text-color: #f2f5fc; /* Color del texto del header */
+    --ion-box-shadow: none; /* Elimina la sombra del header */
+    --border-width: 0px; /* Elimina cualquier borde */
+    --ion-border-color: transparent; /* Asegura que no haya color de borde */
+    
+  }
+  ion-title{
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
   /* Estilos globales para ion-toolbar */
   ion-toolbar {
     --background: #3D59C7; /* Asegura que el color de fondo sea el deseado */
     --ion-background-color: #3D59C7; /* Sobrescribe el color de fondo */
-    --ion-text-color: rgb(0, 0, 0); /* Asegura que el texto sea blanco */
+    --ion-text-color: #f2f5fc; /* Asegura que el texto sea blanco */
     --ion-box-shadow: none; /* Elimina la sombra */
     --border-width: 0px; /* Elimina cualquier borde */
     --ion-border-color: transparent; /* Asegura que no haya color de borde */
     --padding-top: 25px !important; /* Elimina el padding superior */
     --min-height: 80px !important; /* Altura mínima del toolbar */
+
   }
   
+  ion-tabs {
+  --background: #3D59C7;
+  --ion-background-color: #3D59C7;
+  --ion-text-color: #f2f5fc;
+  --ion-box-shadow: none;
+  --border-width: 0px;
+  --ion-border-color: transparent;
+  --padding-top: 25px !important;
+  --min-height: 80px !important;
+}
+
+
   /* Estilos globales para ion-content */
   ion-content {
-    --background: #EBF3F5; /* Color de fondo claro */
+    --background: #f2f5fc; /* Color de fondo claro */
   }
 
   .header-ios ion-toolbar:last-of-type {
@@ -63,61 +96,29 @@
     --box-shadow: none !important;
   }
 
+  ion-button:hover {
+    transform: translateY(-1px);
+  }
+  * {
+    transition: all 0.2s ease-in-out;
+  }
+
+
   ion-title {
-    color: #ffffff; /* Color del texto del título */
+    color: #f2f5fc; /* Color del texto del título */
   }
 
   ion-searchbar {
-    --background: #ffffff !important;
-    --color: #000000 !important;
-    --placeholder-color: #888888 !important;
-    --icon-color: #000000 !important;
+    --background: #f2f5fc !important;
+    --color: #21264a !important;
+    --placeholder-color: #7a9de0 !important;
+    --icon-color: #21264a !important;
   }
 
-
-/* Aplica ocultamiento general en modo escáner */
-ion-content.barcode-scanner-active {
-  visibility: hidden !important;
-  --background: transparent !important;
-  --ion-background-color: transparent !important;
-  background: transparent !important;
-}
-
-/* Asegura que el modal del escáner sea visible */
-.barcode-scanner-modal {
-  visibility: visible !important;
-  background: transparent !important;
-  --background: transparent !important;
-  --ion-background-color: transparent !important;
-  z-index: 10;
-  position: relative;
-}
-
-/* Asegura transparencia también en modo oscuro */
-@media (prefers-color-scheme: dark) {
-  .barcode-scanner-modal {
-    visibility: visible !important;
-    background: transparent !important;
-    --background: transparent !important;
-    --ion-background-color: transparent !important;
-    z-index: 10;
-    position: relative;
+  ion-item {
+    --background: #f2f5fc !important;
+    --color: #21264a !important;
+    --border-color: transparent !important;
+    --ion-item-background: #f2f5fc !important;
   }
 
-  ion-content.barcode-scanner-active {
-    visibility: hidden !important;
-    --background: transparent !important;
-    --ion-background-color: transparent !important;
-    background: transparent !important;
-  }
-}
-
-/* Posicionamiento de la vista de la cámara */
-capacitor-camera-preview {
-  position: absolute !important;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 1;
-}

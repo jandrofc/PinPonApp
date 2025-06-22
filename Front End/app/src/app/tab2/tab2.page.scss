@@ -1,65 +1,297 @@
-.main-content {
-  flex: 1;
-  padding: 1.5rem 1rem;
-  max-width: 768px;
-  margin: 0 auto;
+.settings-icon {
+  font-size: 32px;
+  margin-right: 15px;
 }
 
-.section-header {
-  align-items: center;
-  margin-bottom: 1.5rem;
+.sales-app {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #f9fafb;
+    min-height: 100vh;
+    color: var(--cb-950);
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-.section-title {
-  font-size: 1.875rem;
-  font-weight: 700;
-  color: #4f46e5;
+.sales-app *,
+.sales-app *::before,
+.sales-app *::after {
+    box-sizing: border-box;
+}
+
+/* Main Content */
+.sales-main-content {
+    padding: 16px;
+}
+
+/* Quick Stats */
+.sales-quick-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+
+
+
+.sales-stat-card {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center; // Centra horizontalmente el contenido
+  justify-content: center; // Centra verticalmente si la altura lo permite
+  background: white;
+  border-radius: 8px;
+  padding: 4px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  min-height: 115px;
 }
 
-.menu-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center; /* Centra verticalmente */
-    height: 100%; /* Ocupa toda la altura de la pantalla */
-    padding: 20px;
-    background-color: #EBF3F5; /* Color de fondo claro */
-  }
+ion-spinner{
+    
+    color: #374151;
+}
 
-.report-options {
+.sales-stat-label {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 4px;
+}
+
+.sales-stat-value {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 2px;
+    color: var(--cb-950);
+}
+
+.sales-stat-change {
+    font-size: 12px;
+    
+}
+
+.sales-stat-change.positive {
+    color: #059669;
+}
+
+.sales-stat-change.negative {
+    color: #dc2626;
+}
+
+/* Section Headers */
+.sales-section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #374151;
+}
+
+/* Menu Items */
+.sales-menu-items {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    margin-bottom: 24px;
 }
 
-.report-card {
-    background-color: #b3e1ff;
-    border: none;
-    border-radius: 12px;
-    padding: 20px;
-    text-align: center;
-    font-size: 16px;
-    font-weight: 500;
-    color: #1e293b;
+.sales-menu-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.2s;
     cursor: pointer;
-    transition: all 0.2s ease;
+}
+
+.sales-menu-card:hover {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.sales-menu-card-content {
     display: flex;
     align-items: center;
-    position: relative;
-    overflow: hidden;
+    padding: 16px;
 }
 
-.report-card:hover {
-    background-color: #75b9e7;
-    transform: translateY(-2px);
-}
-
-.card-icon {
+.sales-menu-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin-right: 16px;
-    font-size: 30px;
-    color: #4361ee;
-    width: 24px;
+    color: white;
+    font-size: 24px;
+    flex-shrink: 0;
 }
+
+.sales-menu-icon.blue { background-color: #3b82f6; }
+.sales-menu-icon.green { background-color: #10b981; }
+.sales-menu-icon.purple { background-color: #8b5cf6; }
+
+.sales-menu-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.sales-menu-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.sales-menu-title {
+    font-weight: 600;
+    color: var(--cb-950);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sales-badge {
+    background-color: #f3f4f6;
+    color: #374151;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.sales-menu-description {
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.4;
+}
+
+.sales-menu-arrow {
+    color: #9ca3af;
+    font-size: 20px;
+    margin-left: 8px;
+    flex-shrink: 0;
+}
+
+/* Quick Actions */
+.sales-quick-actions {
+    margin-bottom: 24px;
+}
+
+.sales-action-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.sales-action-btn {
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.sales-action-btn:hover {
+    background-color: #f9fafb;
+}
+
+.sales-action-btn-icon {
+    font-size: 20px;
+    color: #374151;
+}
+
+.sales-action-btn-text {
+    font-size: 12px;
+    color: #374151;
+}
+
+/* Recent Activity */
+.sales-activity-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.sales-activity-header {
+    padding: 16px 16px 12px 16px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.sales-activity-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.sales-activity-subtitle {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.sales-activity-content {
+    padding: 16px;
+}
+
+.sales-activity-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.sales-activity-item:last-child {
+    border-bottom: none;
+}
+
+.sales-activity-info h4 {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 2px;
+    margin-top: 0;
+}
+
+.sales-activity-info p {
+    font-size: 12px;
+    color: #6b7280;
+    margin: 0;
+}
+
+.sales-activity-amount {
+    font-size: 14px;
+    font-weight: 600;
+    color: #059669;
+}
+
+.sales-activity-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60px;
+}
+
+/* Bottom Spacer */
+.sales-bottom-spacer {
+    height: 80px;
+}
+
+/* Icons using Unicode */
+.sales-icon-menu::before { content: "☰"; }
+.sales-icon-bell::before { content: "🔔"; }
+.sales-icon-user::before { content: "👤"; }
+.sales-icon-chart::before { content: "📊"; }
+.sales-icon-cart::before { content: "🛒"; }
+.sales-icon-trend::before { content: "📈"; }
+.sales-icon-report::before { content: "📑"; }
+.sales-icon-filter::before { content: "🔍"; }
+.sales-icon-calendar::before { content: "📅"; }
+.sales-icon-package::before { content: "📦"; }
+.sales-icon-arrow::before { content: "→"; }

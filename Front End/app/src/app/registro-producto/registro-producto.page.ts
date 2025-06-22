@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular'; // Importa IonicModule completo
 
 // lo imrpotamos para poder subir imagenes para los productos
-import { FilePicker } from '@capawesome/capacitor-file-picker'; 
+import { FilePicker } from '@capawesome/capacitor-file-picker';
 
 // lo importamos para conocer si un dispotivo tiene la camara y obtener los valores del escaneo
 import { BarcodeScanner, Barcode } from '@capacitor-mlkit/barcode-scanning';
@@ -18,7 +18,12 @@ import { createOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { ModalController } from '@ionic/angular';
 import { FormularioRegistroProductoModalComponent } from '../modales/formulario-registro-producto-modal/formulario-registro-producto-modal.component';
+
+import { ConexionBackendService } from '../services/conexion-backend.service';
+
+
 import { Router } from '@angular/router';
+
 
 export interface ProductoEscaneado {
   codigo: string;
@@ -27,6 +32,9 @@ export interface ProductoEscaneado {
   formato: string;
   cantidad: number | null;
   precio: number | null;
+  stock_min: number | null;
+  nuevo: boolean;
+  existente: number;
 }
 
 @Component({
@@ -36,11 +44,11 @@ export interface ProductoEscaneado {
   standalone: true,
   imports: [
     IonicModule,
-    CommonModule, 
-    FormsModule, 
-    
+    CommonModule,
+    FormsModule,
+
   ]
-  
+
 })
 export class RegistroProductoPage implements OnInit {
 
@@ -49,7 +57,7 @@ export class RegistroProductoPage implements OnInit {
   public isSupported = false;
   // Tiene el estado si barcode scanner tiene permisos
   public isPermissionGranted = false;
-  
+
 
   // Almacena los codigos de barras escaneados
   public productosEscaneados: ProductoEscaneado[] = [];
@@ -57,16 +65,18 @@ export class RegistroProductoPage implements OnInit {
   // Almacena los codigos de barras escaneados para mostrar en la vista
   // debe borrarse, solo fue para pruebas
   public valoresEscaneados: string[] = [];
-  
+
   constructor(
     private outputsEmergentesService: OutputsEmergentesService,
     private modalController: ModalController,
+
+    private conexionBackendService: ConexionBackendService,
     private router: Router
 
 
   ) { addIcons({ createOutline }) }
 
-  
+
   async editarProducto(producto: any) {
     const modal = await this.modalController.create({
       component: FormularioRegistroProductoModalComponent,
@@ -95,17 +105,75 @@ export class RegistroProductoPage implements OnInit {
     await modal.present();
 
     const { data } = await modal.onWillDismiss();
-    // Si se escaneó un código y no está repetido, lo agregamos
-    if (data?.barcode && !this.productosEscaneados.some(p => p.codigo === data.barcode.rawValue)) {
-      this.productosEscaneados.push({
-        codigo: data.barcode.rawValue,
-        nombre: '',
-        marca: '',
-        formato: '',
-        cantidad: null,
-        precio: null
+    const codigo = data?.barcode?.rawValue;
+
+    if (codigo && !this.productosEscaneados.some(p => p.codigo === codigo)) {
+      // Consultar si el código existe en la base de datos
+      this.conexionBackendService.validarCodigoBarra(codigo).subscribe({
+        next: (res) => {
+          // Si el producto existe, buscar su cantidad
+          if (res.mensaje === 'Producto ya existente') {
+            // Traer datos del producto existente
+            this.conexionBackendService.registrarProductoPorcodigo('get/producto_por_codigo/', codigo).subscribe({
+              next: (prodRes) => {
+                this.productosEscaneados.push({
+                  codigo,
+                  nombre: prodRes.producto.nombre_producto,
+                  marca: prodRes.producto.marca,
+                  formato: prodRes.producto.formato,
+                  cantidad: null,
+                  precio: prodRes.producto.precio,
+                  stock_min: prodRes.producto.stock_min ?? 5,
+                  nuevo: false,
+                  existente: prodRes.producto.cantidad ?? 0
+                });
+              },
+              error: () => {
+                // Si hay error, igual lo agregas como nuevo
+                this.productosEscaneados.push({
+                  codigo,
+                  nombre: '',
+                  marca: '',
+                  formato: '',
+                  cantidad: null,
+                  precio: null,
+                  stock_min: null,
+                  nuevo: true,
+                  existente: 0
+                });
+              }
+            });
+          } else {
+            // Producto no existe, es nuevo
+            this.productosEscaneados.push({
+              codigo,
+              nombre: '',
+              marca: '',
+              formato: '',
+              cantidad: null,
+              precio: null,
+              stock_min: null,
+              nuevo: true,
+              existente: 0
+            });
+          }
+        },
+        error: () => {
+          // Si hay error en la consulta, lo agregas como nuevo
+          this.productosEscaneados.push({
+            codigo,
+            nombre: '',
+            marca: '',
+            formato: '',
+            cantidad: null,
+            precio: null,
+            stock_min: null,
+            nuevo: true,
+            existente: 0
+          });
+        }
       });
-    } else if (data?.barcode && this.productosEscaneados.some(p => p.codigo === data.barcode.rawValue)) {
+    } else if (codigo && this.productosEscaneados.some(p => p.codigo === codigo)) {
       this.outputsEmergentesService.showErrorAlert({
         header: 'AVISO',
         message: 'El código ya fue escaneado',
@@ -149,7 +217,10 @@ export class RegistroProductoPage implements OnInit {
           marca: '',
           formato: '',
           cantidad: null,
-          precio: null
+          precio: null,
+          stock_min: null,
+          nuevo: true,
+          existente: 0
         });
       } else if (barcode && this.productosEscaneados.some(p => p.codigo === barcode.rawValue)) {
         this.outputsEmergentesService.showErrorAlert({
@@ -163,6 +234,47 @@ export class RegistroProductoPage implements OnInit {
       }
     });
   }
+
+public guardarProductosEscaneados() {
+  // Validar que haya productos para guardar
+  if (this.productosEscaneados.length === 0) {
+    this.outputsEmergentesService.showErrorAlert({
+      header: 'AVISO',
+      message: 'No hay productos para registrar',
+      buttons: ['OK'],
+    });
+    return;
+  }
+
+  // Prepara los datos para enviar (ajusta los nombres de campos si es necesario)
+  const productos = this.productosEscaneados.map(p => ({
+    producto: p.nombre,
+    marca: p.marca,
+    formato: p.formato,
+    cantidad: p.cantidad,
+    codigo_barra: p.codigo,
+    precio: p.precio,
+    stock_min: p.stock_min
+  }));
+
+  this.conexionBackendService.registrarProductos(productos).subscribe({
+    next: (res) => {
+      this.outputsEmergentesService.showErrorAlert({
+        header: 'Éxito',
+        message: 'Productos registrados correctamente',
+        buttons: ['OK'],
+      });
+      this.productosEscaneados = [];
+    },
+    error: (err) => {
+      this.outputsEmergentesService.showErrorAlert({
+        header: 'Error',
+        message: 'No se pudieron registrar los productos',
+        buttons: ['OK'],
+      });
+    }
+  });
+}
 
   // public async scan(): Promise<void> {
   //   const formats = this.formGroup.get('formats')?.value || [];
