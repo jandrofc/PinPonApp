@@ -10,6 +10,7 @@ import { ConexionBackendService } from 'src/app/services/conexion-backend.servic
 import { FormsModule } from '@angular/forms';
 import { addIcons } from 'ionicons';
 import { closeCircle } from 'ionicons/icons';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-reportes',
@@ -29,7 +30,8 @@ export class ReportesComponent  implements OnInit {
 
   constructor(private modalCtrl: ModalController,
               private conexionBackend: ConexionBackendService,
-              private cdr: ChangeDetectorRef
+              private cdr: ChangeDetectorRef,
+              private toastController: ToastController
   ) {addIcons({
           "close-circle": closeCircle});}
 
@@ -51,6 +53,24 @@ export class ReportesComponent  implements OnInit {
     this.modalCtrl.dismiss();
   }
 
+    async mostrarToast(mensaje: string) {
+    const toast = await this.toastController.create({
+      message: mensaje,
+      duration: 5000,
+      position: 'bottom',
+      cssClass: 'mi-toast-personalizado'
+    });
+    await toast.present();
+  }
+    private formatearFecha(fechaStr: string): string {
+    if (!fechaStr) return '';
+    const fecha = new Date(fechaStr);
+    const dia = String(fecha.getDate()).padStart(2, '0');
+    const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+    const anio = fecha.getFullYear();
+    return `${dia}-${mes}-${anio}`;
+  }
+
   async generarExcel() {
     let datosFiltrados = this.stockData;
     if (this.producto && this.producto.length > 0) {
@@ -69,8 +89,8 @@ export class ReportesComponent  implements OnInit {
       'Precio': dato.precio,
       'Stock Minimo': dato.stock_min,
       'Codigo de Barra': dato.codigo_barra,
-      'Fecha de Creacion': dato.fecha_creacion,
-      'Fecha de Actualizacion': dato.fecha_actualizado
+      'Fecha de Creacion': this.formatearFecha(dato.fecha_creacion),
+      'Fecha de Actualizacion': this.formatearFecha(dato.fecha_actualizado)
     }));
 
     // Agrega título y subtítulo como filas extras
@@ -105,7 +125,7 @@ export class ReportesComponent  implements OnInit {
       data: wbout,
       directory: Directory.Documents,
     });
-
+    await this.mostrarToast('Archivo Excel descargado en la carpeta Documentos');
     this.dismiss();
   }
 
@@ -126,8 +146,8 @@ export class ReportesComponent  implements OnInit {
       dato.precio,
       dato.stock_min,
       dato.codigo_barra,
-      dato.fecha_creacion,
-      dato.fecha_actualizado
+      this.formatearFecha(dato.fecha_creacion),
+      this.formatearFecha(dato.fecha_actualizado)
     ]);
 
     const doc = new jsPDF();
@@ -159,7 +179,7 @@ export class ReportesComponent  implements OnInit {
       data: base64Pdf,
       directory: Directory.Documents,
     });
-
+    await this.mostrarToast('Archivo PDF descargado en la carpeta Documentos');
     this.dismiss();
   }
 
