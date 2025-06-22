@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Filtrar Reporte de Stock</ion-title>
+    <ion-title>Filtro Reporte de Stock</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="dismiss()">Cerrar</ion-button>
     </ion-buttons>
@@ -10,7 +10,7 @@
   <ion-list>
     <ion-item>
       <ion-label>Producto</ion-label>
-      <ion-select [(ngModel)]="producto">
+      <ion-select [(ngModel)]="producto" multiple="true">
         <ion-select-option *ngFor="let p of productos" [value]="p">{{p}}</ion-select-option>
       </ion-select>
     </ion-item>
