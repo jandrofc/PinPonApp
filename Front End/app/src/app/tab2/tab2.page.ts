@@ -10,7 +10,9 @@ import { ConexionBackendService } from '../services/conexion-backend.service';
 import { GraficosComponent } from '../modales/graficos/graficos.component';
 import { Ipv4Component } from '../modales/ipv4/ipv4.component';
 import { addIcons  } from 'ionicons';
-import { settings} from 'ionicons/icons'
+import { sadOutline, settings} from 'ionicons/icons'
+import { ReportesComponent } from '../modales/reportes/reportes.component';
+
 export interface today_sales{
   valor_ventas : number
   porcentaje: number
@@ -58,6 +60,7 @@ export class Tab2Page implements OnInit{
     private conexionBackend: ConexionBackendService
   ) {addIcons({
         'settings': settings,
+        "sad-outline": sadOutline
       });
     }
 
@@ -72,19 +75,25 @@ export class Tab2Page implements OnInit{
 
   // Contiene los ultimos 3 productos vendidos
   lastThreeProducts : ProductsHoy[] | null = null
-
+  cargandoDatos: boolean = true
+  
   async ngOnInit() {
+    // ngOnInit puede quedar vacío ya que la lógica de carga y auto-refresh se mueve a ionViewDidEnter
+  }
+
+  async ionViewDidEnter() {
     // obtener
+    this.cargandoDatos= true
     this.obtenerUltimasBoletas()
 
-        this.conexionBackend.getTotalVentasHoy().subscribe({
-        next: (res) => this.totalVentas = res.total,
-        error: (err) => console.error('Error obteniendo total del día', err)
+    this.conexionBackend.getTotalVentasHoy().subscribe({
+    next: (res) => this.totalVentas = res.total,
+    error: (err) => console.error('Error obteniendo total del día', err)
     });
 
-      this.conexionBackend.getCantidadProductosVendidosHoy().subscribe({
-      next: (res) => this.productosVendidos = res.total,
-      error: (err) => console.error('Error al obtener cantidad de productos vendidos', err)
+    this.conexionBackend.getCantidadProductosVendidosHoy().subscribe({
+    next: (res) => this.productosVendidos = res.total,
+    error: (err) => console.error('Error al obtener cantidad de productos vendidos', err)
     });
 
   }
@@ -122,6 +131,7 @@ async ipv4_modal(){
         console.log('Datos recibidos:', data);
         this.boletas = data.boletas;
         console.log('Boletas recibidas:', this.boletas);
+        this.cargandoDatos=false
       },
       error: (err) => {
         console.error('Error al obtener boletas:', err);
@@ -133,6 +143,11 @@ async ipv4_modal(){
 }
 
 
-
+async modal_reportes(){
+    const modal = await this.modalController.create({
+      component: ReportesComponent
+    });
+    await modal.present();
+  }
 
 }

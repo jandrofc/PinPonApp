@@ -68,24 +68,9 @@ ion-card-content {
 
 
 
-/* Contenedor del botón "X" */
-.close-btn {
-  display: flex;
-  justify-content: flex-end;
-  margin: 0.5rem 1rem 0 0; // separa de la izquierda y arriba
-}
-
-/* Estilo del botón "X" */
-.close-btn ion-button {
-  --background: transparent;
-  --color: #ffffff;
-  font-size: 1.5rem;
-  width: 3rem;
-  height: 3rem;
-  border-radius: 50%;
-  border: 2px solid #ffffff;
-  font-weight: bold;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+.close-icon {
+  font-size: 42px;
+  margin-right: 10px;
 }
 
 .chart-toggle-buttons {
