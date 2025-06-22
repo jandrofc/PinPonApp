@@ -6,6 +6,7 @@ import {
   NgZone,          // Para ejecutar código dentro de Angular
   OnDestroy,       // Hook para limpiar cuando se destruye
   ViewChild,       // Para obtener referencias de elementos del template
+  Renderer2,       // Para manipular el DOM de forma segura
 } from '@angular/core';
 
 import { addIcons } from 'ionicons';
@@ -92,7 +93,7 @@ import { InputCustomEvent } from '@ionic/angular'; // Eventos de input de Ionic
   styles: [
     ` 
       ion-content {
-        --background: transparent;
+        --background: black; /* Inicialmente negro */
       }
 
       /* ✅ BOTÓN DE CERRAR PERSONALIZADO */
@@ -141,7 +142,6 @@ import { InputCustomEvent } from '@ionic/angular'; // Eventos de input de Ionic
         transform: translate(-50%, -50%);
         width: 280px;
         height: 280px;
-        box-shadow: 0 0 0 4000px rgba(0, 0, 0, 0.6);
         border-radius: 20px;
       }
 
@@ -296,7 +296,7 @@ import { InputCustomEvent } from '@ionic/angular'; // Eventos de input de Ionic
       /* ✅ TOOLBAR LIMPIO */
       ion-header {
         ion-toolbar {
-          --background: rgba(0, 0, 0, 0.8);
+          --background: black; /* Inicialmente negro */
           --color: white;
           backdrop-filter: blur(10px);
           
@@ -386,9 +386,8 @@ export class CameraScannerModalComponent implements AfterViewInit, OnDestroy {
     // readonly hace que la propiedad no se pueda modificar
     private readonly OutPuts_Emergentes: OutputsEmergentesService,
     private readonly ngZone: NgZone,
-    
-    
-
+    private readonly renderer: Renderer2, // Inyectar Renderer2
+    private readonly elementRef: ElementRef, // Inyectar ElementRef
   ) {addIcons({
       'barcode-outline': barcodeOutline,
       'close': close,
@@ -401,17 +400,30 @@ export class CameraScannerModalComponent implements AfterViewInit, OnDestroy {
   // usar el flash si esta disponible
 
   ngAfterViewInit(): void {
+    // Hide everything behind the modal (see `src/theme/variables.scss`)
+    document.querySelector('body')?.classList.add('barcode-scanning-active');
+
+    // Delay setting transparency to allow the body class to take effect
     setTimeout(() => {
-      this.startScan().then(() => {
-        if (Capacitor.getPlatform() !== 'web') {
-          BarcodeScanner.isTorchAvailable().then((result) => {
-            this.isTorchAvailable = result.available;
-          });
-        } else {
-          this.isTorchAvailable = false;
-        }
-      });
-    }, 500);
+      const ionContent = this.elementRef.nativeElement.querySelector('ion-content');
+      if (ionContent) {
+        this.renderer.setAttribute(ionContent, 'style', '--background: transparent !important;');
+      }
+      const ionToolbar = this.elementRef.nativeElement.querySelector('ion-toolbar');
+      if (ionToolbar) {
+        this.renderer.setStyle(ionToolbar, 'box-shadow', '0 4px 24px 0 rgba(0,0,0,0.35)');
+      }
+    }, 300); // 100ms delay
+
+    this.startScan().then(() => {
+      if (Capacitor.getPlatform() !== 'web') {
+        BarcodeScanner.isTorchAvailable().then((result) => {
+          this.isTorchAvailable = result.available;
+        });
+      } else {
+        this.isTorchAvailable = false;
+      }
+    });
   }
 
   // Al cerrar el modal se detiene el escaneo
@@ -447,8 +459,7 @@ export class CameraScannerModalComponent implements AfterViewInit, OnDestroy {
   }
 
   private async startScan(): Promise<void> {
-    // Hide everything behind the modal (see `src/theme/variables.scss`)
-    document.querySelector('body')?.classList.add('barcode-scanning-active');
+    
 
     // Configura las opciones para el escaneo, formato que lee, camara a usar y si sera en web o telefono
     if (Capacitor.getPlatform() === 'web') {

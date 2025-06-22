@@ -15,6 +15,8 @@ import {
 } from 'ngx-apexcharts';
 
 import { ConexionBackendService } from '../../services/conexion-backend.service';
+import { addIcons } from 'ionicons';
+import { closeCircle } from 'ionicons/icons';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -47,7 +49,8 @@ export class GraficosComponent implements OnInit {
   constructor(
     private backend: ConexionBackendService,
     private modalController: ModalController
-  ) {}
+  ) {addIcons({
+        "close-circle": closeCircle});}
 
 
   ngOnInit() {
@@ -102,7 +105,7 @@ export class GraficosComponent implements OnInit {
     });
   }
 
-  close() {
+  closeModal() {
     this.modalController.dismiss();
   }
 }

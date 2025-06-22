@@ -14,8 +14,12 @@ npx cap add android // crea el proyecto para exportarlo android estudio basado e
 npx cap open android // abre el android estudio con el proyecto
 
 
+archivos no registrados
 
-
+config.json va en app/src/assets
+variables.gradle android/
+google_service va en android/app/
+android manifest en el android/app/src/main
 
 npx ionic cap sync
 npx cap open android
