@@ -99,7 +99,7 @@ realizarCompra() {
   const productos = this.productosEscaneados.map(p => ({
     id_formato: p.id_formato,
     cantidad: p.cantidad,
-    precio: p.precio // Asegúrate de incluir el precio porque el backend lo necesita
+    precio: p.precio
   }));
 
   this.apiService.realizarCompra('post/realizar_compra', { productos }).subscribe({
@@ -112,9 +112,26 @@ realizarCompra() {
       this.productosEscaneados = [];
     },
     error: async err => {
-      await this.outputs.showErrorAlert({
-        message: 'Error al realizar la compra: ' + (err.error?.error || ''),
-      });
+      const msg = err.message || err.error?.error || '';
+      // Buscar si el error es de stock insuficiente y extraer el id_formato
+      const match = msg.match(/Stock insuficiente para el producto (\d+)/);
+      if (match) {
+        const id_formato = Number(match[1]);
+        const prod = this.productosEscaneados.find(p => p.id_formato === id_formato);
+        // Obtener la cantidad actual en la BD si está en el carrito
+        let nombre = prod ? prod.nombre : `ID ${id_formato}`;
+        // Consultar la cantidad en la BD usando el producto escaneado (si existe)
+        let cantidadBD = prod ? prod.cantidad : '?';
+        // Si quieres mostrar la cantidad real de la BD, puedes hacer una consulta al backend aquí.
+        // Pero usando la info del carrito:
+        await this.outputs.showErrorAlert({
+          message: `No hay suficiente stock para el producto: ${nombre}. Cantidad disponible: ${cantidadBD}.`,
+        });
+      } else {
+        await this.outputs.showErrorAlert({
+          message: 'Error al realizar la compra: ' + msg,
+        });
+      }
     }
   });
 }
