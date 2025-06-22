@@ -6,6 +6,8 @@ import { CUSTOM_ELEMENTS_SCHEMA, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ConexionBackendService } from 'src/app/services/conexion-backend.service';
 import { FormsModule } from '@angular/forms';
+import { addIcons } from 'ionicons';
+import { closeCircle } from 'ionicons/icons';
 
 @Component({
   selector: 'app-reportes',
@@ -26,7 +28,8 @@ export class ReportesComponent  implements OnInit {
   constructor(private modalCtrl: ModalController,
               private conexionBackend: ConexionBackendService,
               private cdr: ChangeDetectorRef
-  ) { }
+  ) {addIcons({
+          "close-circle": closeCircle});}
 
   ngOnInit() {
     this.conexionBackend.getListaProducto('get/lista_productos').subscribe({
@@ -148,6 +151,10 @@ export class ReportesComponent  implements OnInit {
     const buffer = await workbook.xlsx.writeBuffer();
     saveAs(new Blob([buffer]), nombreArchivo);
     this.dismiss();
+  }
+
+  closeModal() {
+    this.modalCtrl.dismiss();
   }
 
 }

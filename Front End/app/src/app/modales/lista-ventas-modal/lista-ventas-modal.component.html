@@ -1,15 +1,17 @@
 
 <ion-content>
-  <div class="container">
-  <header class="header">
-      <h1>Panel de Ventas</h1>
-      <div class="close-button-container">
-        <button class="close-button" (click)="closeModal()">
-          <ion-icon name="close-outline"></ion-icon>
-        </button>
-      </div>
-  </header>
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>Panel de Ventas</ion-title>
+      <ion-buttons slot="end">
+        <ion-button (click)="closeModal()">
+          <ion-icon name="close-circle" color="light" class="close-icon"></ion-icon>
+        </ion-button>
+    </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
 
+  <div class="container">
   <!-- Filtros -->
   <div class="filter-card">
     <div class="filter-header">
