@@ -1,0 +1,21 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Filtro Reporte de Stock</ion-title>
+    <ion-buttons slot="end">
+        <ion-button (click)="closeModal()">
+          <ion-icon name="close-circle" color="light" class="close-icon"></ion-icon>
+        </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-list>
+    <ion-item>
+      <ion-label>Producto</ion-label>
+      <ion-select [(ngModel)]="producto" multiple="true">
+        <ion-select-option *ngFor="let p of productos" [value]="p">{{p}}</ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
+  <ion-button expand="block" (click)="generarExcel()">Descargar Excel</ion-button>
+</ion-content>
