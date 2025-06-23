@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Filtro Reporte de Stock</ion-title>
+    <div class="titulo">Filtro Reporte de Stock</div>
     <ion-buttons slot="end">
         <ion-button (click)="closeModal()">
           <ion-icon name="close-circle" color="light" class="close-icon"></ion-icon>
@@ -13,11 +13,14 @@
   <div class="filtro-wrapper">
     <ion-card class="filtro-card">
       <ion-card-header>
-        <ion-card-title class="filtro-title">Filtro de búsqueda</ion-card-title>
+        <div class="filtro-header">
+          <ion-icon name="funnel"></ion-icon>
+          <ion-card-title class="filtro-title">Filtro de búsqueda</ion-card-title>
+        </div>
       </ion-card-header>
       <ion-card-content>
         <ion-list>
-          <ion-item>
+          <ion-item class="filtro-item">
             <ion-label>Seleccionar productos...</ion-label>
             <ion-select [(ngModel)]="producto" multiple="true">
               <ion-select-option *ngFor="let p of productos" [value]="p">{{p}}</ion-select-option>
@@ -26,7 +29,15 @@
         </ion-list>
       </ion-card-content>
     </ion-card>
-    <ion-button expand="block" class="descargar-btn" (click)="generarExcel()">Descargar Excel</ion-button>
-    <ion-button expand="block" color="secondary" class="descargar-btn" (click)="generarPDF()">Descargar PDF</ion-button>
+    <div class="action-buttons">
+        <button class="excel-button" (click)="generarExcel()">
+            <ion-icon name="download-outline"></ion-icon>
+            Descargar Excel
+        </button>
+        <button class="pdf-button" (click)="generarPDF()">
+            <ion-icon name="download-outline"></ion-icon>
+            Descargar PDF
+        </button>
+    </div>
   </div>
 </ion-content>
