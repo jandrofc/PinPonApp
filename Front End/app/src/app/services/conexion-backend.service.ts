@@ -124,8 +124,8 @@ export class ConexionBackendService {
     .pipe(catchError(this.handleError));
 }
 
-  registrarProductoPorcodigo(endPoint: string, codigo: string): Observable<any> {
-    return this.http.get(`${this.configService.apiUrl}${endPoint}${ codigo }`)
+  obtenerProductoPorCodigo(codigo: string): Observable<any> {
+    return this.http.get(`${this.configService.apiUrl}${`get/producto_por_codigo/`}${ codigo }`)
       .pipe(catchError(this.handleError));
   }
 
