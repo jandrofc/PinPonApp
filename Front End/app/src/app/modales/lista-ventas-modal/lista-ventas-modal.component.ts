@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular'; // Import IonicModule for Ionic components
-import { closeOutline, receipt, cube, logoUsd, timeOutline, pricetagOutline,
+import { closeCircle, receipt, cube, logoUsd, timeOutline, pricetagOutline,
 calendarOutline, searchOutline  } from 'ionicons/icons'; // Import the close icon
 import { OutputsEmergentesService } from '../../services/outputs-emergentes/outputs-emergentes.service';
 import { addIcons,  } from 'ionicons';
@@ -29,7 +29,7 @@ export class ListaVentasModalComponent  implements OnInit {
     private readonly conexionBackend: ConexionBackendService
   ) {
     addIcons({
-      'close-circle': closeOutline,
+      'close-circle': closeCircle,
       'cash-outline': logoUsd,
       'receipt': receipt,
       'package': cube,
