@@ -231,7 +231,8 @@ import { InputCustomEvent } from '@ionic/angular'; // Eventos de input de Ionic
         position: absolute;
         left: 0;
         top: 0;
-        width: 80%;
+        width: 100%;
+        height: 100%;
         object-fit: cover;
       }
 

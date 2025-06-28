@@ -30,20 +30,31 @@
         <hr class="product-divider" />
         <!-- Tercera fila: Existente, cantidad y total -->
         <div class="product-details-row">
-          <span>Existente: {{ producto.existente }}</span>
-          <span>Cantidad: {{ producto.cantidad }}</span>
-          <span>Precio: ${{ producto.precio }}</span>
+          <span>Existente: {{ producto.existente ?? 0 }}</span>
+          <span>Cantidad: {{ producto.cantidad ?? 1 }}</span>
+          <span>Precio: ${{ producto.precio ?? 0 }}</span>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="confirm-container">
-    <ion-button expand="block" color="secondary" class="scan-button" (click)="escanear_Productos()">
+  <div class="form-actions">
+    <ion-button
+      expand="block"
+      size="large"
+      (click)="escanear_Productos()"
+      class="scan-button">
+      <ion-icon name="camera" slot="start"></ion-icon>
       Seguir escaneando
     </ion-button>
-    <ion-button expand="block" color="primary" class="confirm-button" (click)="guardarProductosEscaneados()">
-      Confirme los productos escaneados
+
+    <ion-button
+      expand="block"
+      size="large"
+      (click)="guardarProductosEscaneados()"
+      class="confirm-button">
+      <ion-icon name="checkmark-sharp"></ion-icon>
+      Confirmar productos escaneados
     </ion-button>
   </div>
 </ion-content>

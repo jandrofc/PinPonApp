@@ -109,42 +109,24 @@ export class RegistroProductoPage implements OnInit {
 
     if (codigo && !this.productosEscaneados.some(p => p.codigo === codigo)) {
       // Consultar si el código existe en la base de datos
-      this.conexionBackendService.validarCodigoBarra(codigo).subscribe({
-        next: (res) => {
-          // Si el producto existe, buscar su cantidad
-          if (res.mensaje === 'Producto ya existente') {
-            // Traer datos del producto existente
-            this.conexionBackendService.registrarProductoPorcodigo('get/producto_por_codigo/', codigo).subscribe({
-              next: (prodRes) => {
-                this.productosEscaneados.push({
-                  codigo,
-                  nombre: prodRes.producto.nombre_producto,
-                  marca: prodRes.producto.marca,
-                  formato: prodRes.producto.formato,
-                  cantidad: null,
-                  precio: prodRes.producto.precio,
-                  stock_min: prodRes.producto.stock_min ?? 5,
-                  nuevo: false,
-                  existente: prodRes.producto.cantidad ?? 0
-                });
-              },
-              error: () => {
-                // Si hay error, igual lo agregas como nuevo
-                this.productosEscaneados.push({
-                  codigo,
-                  nombre: '',
-                  marca: '',
-                  formato: '',
-                  cantidad: null,
-                  precio: null,
-                  stock_min: null,
-                  nuevo: true,
-                  existente: 0
-                });
-              }
+      this.conexionBackendService.getProductoPorCodigo(codigo).subscribe({
+        next: (resp) => {
+          if (resp && resp.producto) {
+            // Producto existente - usar los mismos nombres de campos que en el modal
+            const producto = resp.producto;
+            this.productosEscaneados.push({
+              codigo,
+              nombre: producto.nombre_producto,
+              marca: producto.marca,
+              formato: producto.formato,
+              cantidad: null, // Se llenará al editar
+              precio: producto.precio,
+              stock_min: producto.stock_min ?? 5,
+              nuevo: false,
+              existente: producto.cantidad ?? 0
             });
           } else {
-            // Producto no existe, es nuevo
+            // Producto no existe - es nuevo
             this.productosEscaneados.push({
               codigo,
               nombre: '',
@@ -158,8 +140,8 @@ export class RegistroProductoPage implements OnInit {
             });
           }
         },
-        error: () => {
-          // Si hay error en la consulta, lo agregas como nuevo
+        error: (err) => {
+          // Si hay error, agregarlo como nuevo
           this.productosEscaneados.push({
             codigo,
             nombre: '',
@@ -211,25 +193,56 @@ export class RegistroProductoPage implements OnInit {
     element.onDidDismiss().then((result) => {
       const barcode: Barcode | undefined = result.data?.barcode;
       if (barcode && !this.productosEscaneados.some(p => p.codigo === barcode.rawValue)) {
-        this.productosEscaneados.push({
-          codigo: barcode.rawValue,
-          nombre: '',
-          marca: '',
-          formato: '',
-          cantidad: null,
-          precio: null,
-          stock_min: null,
-          nuevo: true,
-          existente: 0
+        this.conexionBackendService.getProductoPorCodigo(barcode.rawValue).subscribe({
+          next: (resp) => {
+            if (resp && resp.producto) {
+              const producto = resp.producto;
+              this.productosEscaneados.push({
+                codigo: barcode.rawValue,
+                nombre: producto.nombre_producto,
+                marca: producto.marca,
+                formato: producto.formato,
+                cantidad: null,
+                precio: producto.precio,
+                stock_min: producto.stock_min ?? 5,
+                nuevo: false,
+                existente: producto.cantidad ?? 0
+              });
+            } else {
+              this.productosEscaneados.push({
+                codigo: barcode.rawValue,
+                nombre: '',
+                marca: '',
+                formato: '',
+                cantidad: null,
+                precio: null,
+                stock_min: null,
+                nuevo: true,
+                existente: 0
+              });
+            }
+          },
+          error: () => {
+            this.productosEscaneados.push({
+              codigo: barcode.rawValue,
+              nombre: '',
+              marca: '',
+              formato: '',
+              cantidad: null,
+              precio: null,
+              stock_min: null,
+              nuevo: true,
+              existente: 0
+            });
+          }
         });
       } else if (barcode && this.productosEscaneados.some(p => p.codigo === barcode.rawValue)) {
         this.outputsEmergentesService.showErrorAlert({
           header: 'AVISO',
           message: 'El código ya fue escaneado',
           buttons: ['OK'],
-         });
+        });
       } else if (!barcode && this.productosEscaneados.length === 0) {
-        // Si NO se escaneó nada y la lista está vacía, volver al inventario
         this.router.navigate(['/tabs/tab1']);
       }
     });

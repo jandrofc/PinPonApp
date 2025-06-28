@@ -189,21 +189,28 @@
     color: rgb(49, 39, 156); // color del icono al pasar el mouse
   }
 
-  .confirm-container {
+  .form-actions {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
     position: fixed;
-    bottom: 60px;
+    bottom: 0;
     left: 0;
     right: 0;
-    padding: 16px;
-    background: white;
-    border-top: 1px solid #e5e7eb;
-    z-index: 10;
-    
-    .confirm-button {
-      --background: #2563eb;
-      --background-hover: #1d4ed8;
+    padding: 1rem;
+
+    .scan-button {
+      --background: #b3e1ff;
+      --color: #4361ee;
+      --border-width: 0;
       --border-radius: 8px;
-      font-weight: 500;
-      height: 48px;
+    }
+
+    .confirm-button {
+      --background: #4361ee;
+      --color: #fff;
+      --border-width: 0;
+      --border-radius: 8px;
     }
   }

@@ -178,7 +178,9 @@ async ipv4_modal(){
   get filteredProducts() {
     return this.productos
       .filter(producto =>
-        producto.nombre_producto.toLowerCase().includes(this.searchQuery.toLowerCase())
+        producto.nombre_producto.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+        producto.marca.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+        producto.formato.toLowerCase().includes(this.searchQuery.toLowerCase())
       )
       .sort((a, b) => a.nombre_producto.localeCompare(b.nombre_producto));
   }

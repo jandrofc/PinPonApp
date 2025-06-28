@@ -66,9 +66,17 @@ export class FormularioRegistroProductoModalComponent  implements OnInit {
       stock_min: [0, [Validators.required, Validators.min(1)]],
     });
 
-    if (this.producto && this.producto.codigo) {
-      // Llama a onCodigoEscaneado automáticamente para llenar los datos si hay producto
-      this.onCodigoEscaneado(this.producto.codigo);
+    // Si hay producto, llenar el formulario con los datos actuales (no consultar backend)
+    if (this.producto) {
+      this.productForm.patchValue({
+        code: this.producto.codigo,
+        name: this.producto.nombre,
+        brand: this.producto.marca,
+        format: this.producto.formato,
+        quantity: this.producto.cantidad ?? 1,
+        price: this.producto.precio ?? 0,
+        stock_min: this.producto.stock_min ?? 1
+      });
     }
   }
 
@@ -109,7 +117,9 @@ export class FormularioRegistroProductoModalComponent  implements OnInit {
       formato: valores.format,
       cantidad: valores.quantity, // cantidad a agregar
       precio: valores.price,
-      stock_min: valores.stock_min
+      stock_min: valores.stock_min,
+      nuevo: this.producto?.nuevo ?? false,
+      existente: this.producto?.existente ?? 0 // Preserva el valor original
     };
     await this.modalController.dismiss(productoActualizado);
     console.log('Producto actualizado:', productoActualizado);

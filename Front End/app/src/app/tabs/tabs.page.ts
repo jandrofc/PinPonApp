@@ -3,7 +3,7 @@ import { RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import {  arrowBack, search, notifications, camera, bag, cubeOutline, cartOutline, barChartOutline, createOutline, trashOutline, trendingUp, trendingDown, logoUsd, alertCircleOutline, informationCircle, barcodeOutline, documentTextOutline, pricetagOutline, alertCircle, businessOutline, resizeOutline, layersOutline, warningOutline, cashOutline, cardOutline, saveOutline, closeOutline, pricetag, ribbon, layers, cube, alert, cash, downloadOutline, funnel } from 'ionicons/icons';
+import {  arrowBack, search, notifications, camera, bag, cubeOutline, cartOutline, barChartOutline, createOutline, trashOutline, trendingUp, trendingDown, logoUsd, alertCircleOutline, informationCircle, barcodeOutline, documentTextOutline, pricetagOutline, alertCircle, businessOutline, resizeOutline, layersOutline, warningOutline, cashOutline, cardOutline, saveOutline, closeOutline, pricetag, ribbon, layers, cube, alert, cash, downloadOutline, funnel, checkmarkSharp } from 'ionicons/icons';
 
 @Component({
   selector: 'app-tabs',
@@ -52,7 +52,8 @@ export class TabsPage {
       "download-outline":downloadOutline,
       "funnel":funnel,
       "trending-up":trendingUp,
-      "trending-down":trendingDown
+      "trending-down":trendingDown,
+      "checkmark-sharp":checkmarkSharp
     });
   }
 }
