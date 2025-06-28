@@ -29,7 +29,7 @@ export class ListaVentasModalComponent  implements OnInit {
     private readonly conexionBackend: ConexionBackendService
   ) {
     addIcons({
-      'close-outline': closeOutline,
+      'close-circle': closeOutline,
       'cash-outline': logoUsd,
       'receipt': receipt,
       'package': cube,
@@ -83,6 +83,7 @@ export class ListaVentasModalComponent  implements OnInit {
   
   
   loading: boolean = true; // Indicador de carga
+  errorMessage: string | null = null; // Propiedad para almacenar mensajes de error
 
   
 
@@ -149,9 +150,11 @@ export class ListaVentasModalComponent  implements OnInit {
         this.resumen= data.resumen;
         this.salesData = data.ventas
         this.loading = false;
+        this.errorMessage = null; // Clear any previous error
       },
       error: (err) => {
-        throw new Error(err);
+        this.loading = false;
+        this.errorMessage = 'Error al cargar las ventas: ' + (err.message || 'Error desconocido');
       }
     })
   }
@@ -165,9 +168,11 @@ export class ListaVentasModalComponent  implements OnInit {
         this.resumen= data.resumen;
         this.products= data.productos
         this.loading = false;
+        this.errorMessage = null; // Clear any previous error
       },
       error: (err) => {
-        throw new Error(err);
+        this.loading = false;
+        this.errorMessage = 'Error al cargar los productos: ' + (err.message || 'Error desconocido');
       }
     })
   }

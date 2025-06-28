@@ -53,6 +53,7 @@ export class Tab2Page implements OnInit{
   boletas: Boleta[] = []; // Almacena las últimas 3 boletas
   totalVentas: number = 0;
   productosVendidos: number = 0;
+  conexionExitosa: boolean = true; // Nueva propiedad para el estado de la conexión
 
   constructor(
     private readonly outputsEmergentesService: OutputsEmergentesService,
@@ -132,9 +133,12 @@ async ipv4_modal(){
         this.boletas = data.boletas;
         console.log('Boletas recibidas:', this.boletas);
         this.cargandoDatos=false
+        this.conexionExitosa = true; // Conexión exitosa
       },
       error: (err) => {
         console.error('Error al obtener boletas:', err);
+        this.conexionExitosa = false; // Error de conexión
+        this.cargandoDatos = false; // Detener el spinner aunque haya error
       }
     });
   }

@@ -117,7 +117,11 @@
 
           <div class="sales-activity-content">
             <ng-container *ngIf="!cargandoDatos; else loadingRecent">
-              <div *ngIf="boletas?.length === 0" class="sales-activity-empty">
+              <div *ngIf="!conexionExitosa" class="sales-activity-empty">
+                <ion-icon name="sad-outline" size="large"></ion-icon>
+                <p>No se pudo conectar al servidor para obtener las últimas boletas.</p>
+              </div>
+              <div *ngIf="boletas?.length === 0 && conexionExitosa" class="sales-activity-empty">
                 <ion-icon name="sad-outline" size="large"></ion-icon>
                 <p>No hay ventas registradas hoy.</p>
               </div>
