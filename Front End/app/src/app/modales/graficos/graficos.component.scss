@@ -22,7 +22,7 @@ ion-header {
 ion-card {
   width: 100%;
   max-width: 370px;
-  margin: 0 20px 0 20px;
+  margin: 0;
   border-radius: 1rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   --background: #ffffff;
@@ -51,7 +51,11 @@ ion-card-content {
     height: auto !important;
   }
 }
-
+.graficos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 
 .close-icon {

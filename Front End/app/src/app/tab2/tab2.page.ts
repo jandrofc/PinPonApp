@@ -83,27 +83,33 @@ export class Tab2Page implements OnInit{
   }
 
   async ionViewDidEnter() {
-    // obtener
-    this.cargandoDatos= true
-    this.obtenerUltimasBoletas()
-
-    this.conexionBackend.getTotalVentasHoy().subscribe({
-    next: (res) => this.totalVentas = res.total,
-    error: (err) => console.error('Error obteniendo total del día', err)
-    });
-
-    this.conexionBackend.getCantidadProductosVendidosHoy().subscribe({
-    next: (res) => this.productosVendidos = res.total,
-    error: (err) => console.error('Error al obtener cantidad de productos vendidos', err)
-    });
-
+    this.cargarDatos()
   }
 
-async ipv4_modal(){
-  const modal = await this.modalController.create({
-        component: Ipv4Component
+
+  async cargarDatos(){
+    this.cargandoDatos= true
+      this.obtenerUltimasBoletas()
+
+      this.conexionBackend.getTotalVentasHoy().subscribe({
+      next: (res) => this.totalVentas = res.total,
+      error: (err) => console.error('Error obteniendo total del día', err)
       });
-      await modal.present();
+
+      this.conexionBackend.getCantidadProductosVendidosHoy().subscribe({
+      next: (res) => this.productosVendidos = res.total,
+      error: (err) => console.error('Error al obtener cantidad de productos vendidos', err)
+      });
+  }
+
+  async ipv4_modal(){
+    const modal = await this.modalController.create({
+          component: Ipv4Component
+      });
+    modal.onDidDismiss().then(() => {
+      this.cargarDatos()
+    });
+    await modal.present();
     }
 
 
@@ -114,12 +120,18 @@ async ipv4_modal(){
     const modal = await this.modalController.create({
       component: ListaVentasModalComponent
     });
+    modal.onDidDismiss().then(() => {
+      this.cargarDatos()
+    });
     await modal.present();
   }
 
   async mostrar_dashboard_ventas(){
     const modal = await this.modalController.create({
       component: GraficosComponent
+    });
+    modal.onDidDismiss().then(() => {
+      this.cargarDatos()
     });
     await modal.present();
   }
@@ -150,6 +162,9 @@ async ipv4_modal(){
 async modal_reportes(){
     const modal = await this.modalController.create({
       component: ReportesComponent
+    });
+    modal.onDidDismiss().then(() => {
+      this.cargarDatos()
     });
     await modal.present();
   }

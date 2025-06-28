@@ -109,7 +109,7 @@ export class RegistroProductoPage implements OnInit {
 
     if (codigo && !this.productosEscaneados.some(p => p.codigo === codigo)) {
       // Consultar si el código existe en la base de datos
-      this.conexionBackendService.getProductoPorCodigo(codigo).subscribe({
+      this.conexionBackendService.obtenerProductoPorCodigo( codigo).subscribe({
         next: (resp) => {
           if (resp && resp.producto) {
             // Producto existente - usar los mismos nombres de campos que en el modal

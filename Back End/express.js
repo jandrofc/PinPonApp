@@ -704,7 +704,7 @@ app.post('/api/log', express.json(), (req, res) => {
 
 // Endpoint para obtener todas las ventas con sus detalles
 app.get('/api/get/ventas_con_detalles', (req, res) => {
-  const {filtro_fecha, filtro_producto}= req.query
+  const { fecha_inicio, fecha_fin, filtro_producto } = req.query;
 
   let query = `
     SELECT 
@@ -729,11 +729,15 @@ app.get('/api/get/ventas_con_detalles', (req, res) => {
   const where = [];
   const params = [];
 
-  if (filtro_fecha !== '' && filtro_fecha) {
-    where.push('DATE(v.fecha) = ?');
-    params.push(filtro_fecha);
+  if (fecha_inicio && fecha_inicio !== '') {
+    where.push('DATE(v.fecha) >= ?');
+    params.push(fecha_inicio);
   }
-  if (filtro_producto !=='' && filtro_producto) {
+  if (fecha_fin && fecha_fin !== '') {
+    where.push('DATE(v.fecha) <= ?');
+    params.push(fecha_fin);
+  }
+  if (filtro_producto && filtro_producto !== '') {
     where.push('LOWER(p.producto) LIKE ?');
     params.push(`%${filtro_producto.toLowerCase()}%`);
   } 
@@ -814,7 +818,7 @@ app.get('/api/get/ventas_con_detalles', (req, res) => {
 
 // Endpoint para obtener todos los productos con la cantidad de 
 app.get('/api/get/productos_mas_vendidos', (req, res) => {
-  const { filtro_fecha, filtro_producto } = req.query;
+  const { fecha_inicio, fecha_fin, filtro_producto } = req.query;
 
   let query = `
     SELECT
@@ -834,9 +838,13 @@ app.get('/api/get/productos_mas_vendidos', (req, res) => {
   const where = [];
   const params = [];
 
-  if (filtro_fecha && filtro_fecha !== '') {
-    where.push('DATE(v.fecha) = ?');
-    params.push(filtro_fecha);
+  if (fecha_inicio && fecha_inicio !== '') {
+    where.push('DATE(v.fecha) >= ?');
+    params.push(fecha_inicio);
+  }
+  if (fecha_fin && fecha_fin !== '') {
+    where.push('DATE(v.fecha) <= ?');
+    params.push(fecha_fin);
   }
 
   if (filtro_producto && filtro_producto !== '') {

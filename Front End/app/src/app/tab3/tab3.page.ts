@@ -57,7 +57,7 @@ async abrirScanner() {
   if (barcode) {
     const ultimo = this.ultimosEscaneos[barcode] || 0;
 
-    this.apiService.registrarProductoPorcodigo('get/producto_por_codigo/', barcode).subscribe({
+    this.apiService.obtenerProductoPorCodigo( barcode).subscribe({
       next: res => {
         const producto = res.producto;
         const existente = this.productosEscaneados.find(p => p.id_formato === producto.id_formato);

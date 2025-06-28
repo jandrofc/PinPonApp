@@ -8,19 +8,6 @@
 
 // header
 
-.close-icon {
-  font-size: 42px;
-  margin-right: 10px;
-}
-
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 24px;
-  margin-top: 5px;
-}
 
 .header h1 {
   font-size: 2rem;
@@ -171,8 +158,23 @@ ion-modal{
 }
 
 
+// MODAL FECHAS
+.predefined-ranges{
+  h4{
+    color: #1a1a1a;
+  }
+}
 
+.divider{
+  color: #1a1a1a;
+  font-weight: 700;
+}
 
+.custom-range{
+  label{
+    color: #1a1a1a;
+  }
+}
 
 
 /* Estadísticas */
