@@ -3,7 +3,9 @@
     <ion-title>
       Reportes
     </ion-title>
-
+    <ion-buttons slot="end" (click)="ipv4_modal()">
+      <ion-icon name="settings" color="light" class="settings-icon"></ion-icon>
+  </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -70,6 +72,21 @@
                         <span class="sales-menu-arrow sales-icon-arrow"></span>
                     </div>
                 </div>
+
+                <div class="sales-menu-card" (click)="modal_reportes()">
+                    <div class="sales-menu-card-content">
+                        <div class="sales-menu-icon purple">
+                            <span class="sales-icon-report"></span>
+                        </div>
+                        <div class="sales-menu-info">
+                            <div class="sales-menu-title-row">
+                                <h3 class="sales-menu-title">Generar Reportes</h3>
+                            </div>
+                            <p class="sales-menu-description">Genera un reporte de stock en excel filtrando por productos</p>
+                        </div>
+                        <span class="sales-menu-arrow sales-icon-arrow"></span>
+                    </div>
+                </div>
             </div>
 
             <!-- Quick Actions -->
@@ -99,7 +116,11 @@
           </div>
 
           <div class="sales-activity-content">
-            <ng-container *ngIf="boletas.length > 0; else loadingRecent">
+            <ng-container *ngIf="!cargandoDatos; else loadingRecent">
+              <div *ngIf="boletas?.length === 0" class="sales-activity-empty">
+                <ion-icon name="sad-outline" size="large"></ion-icon>
+                <p>No hay ventas registradas hoy.</p>
+              </div>
               <div class="sales-activity-item" *ngFor="let boleta of boletas">
                 <div class="sales-activity-info">
                   <!-- Nombres de productos concatenados -->

@@ -1,3 +1,8 @@
+.settings-icon {
+  font-size: 32px;
+  margin-right: 15px;
+}
+
 .sales-app {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background-color: #f9fafb;
@@ -285,6 +290,7 @@ ion-spinner{
 .sales-icon-chart::before { content: "📊"; }
 .sales-icon-cart::before { content: "🛒"; }
 .sales-icon-trend::before { content: "📈"; }
+.sales-icon-report::before { content: "📑"; }
 .sales-icon-filter::before { content: "🔍"; }
 .sales-icon-calendar::before { content: "📅"; }
 .sales-icon-package::before { content: "📦"; }

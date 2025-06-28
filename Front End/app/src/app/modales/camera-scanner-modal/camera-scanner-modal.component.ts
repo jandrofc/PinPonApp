@@ -6,6 +6,7 @@ import {
   NgZone,          // Para ejecutar código dentro de Angular
   OnDestroy,       // Hook para limpiar cuando se destruye
   ViewChild,       // Para obtener referencias de elementos del template
+  Renderer2,       // Para manipular el DOM de forma segura
 } from '@angular/core';
 
 import { addIcons } from 'ionicons';
@@ -20,6 +21,7 @@ import {
   BarcodeScanner,   // Servicio principal del scanner
   LensFacing,       // Cámara frontal o trasera
   StartScanOptions, // Opciones para iniciar el escaneo
+  Resolution
 } from '@capacitor-mlkit/barcode-scanning';
 
 import { BrowserMultiFormatReader } from '@zxing/browser'; // ZXing para escaneo en web
@@ -92,7 +94,7 @@ import { InputCustomEvent } from '@ionic/angular'; // Eventos de input de Ionic
   styles: [
     ` 
       ion-content {
-        --background: transparent;
+        --background: black; /* Inicialmente negro */
       }
 
       /* ✅ BOTÓN DE CERRAR PERSONALIZADO */
@@ -139,9 +141,8 @@ import { InputCustomEvent } from '@ionic/angular'; // Eventos de input de Ionic
         left: 50%;
         top: 50%;
         transform: translate(-50%, -50%);
-        width: 280px;
-        height: 280px;
-        box-shadow: 0 0 0 4000px rgba(0, 0, 0, 0.6);
+        width: 90%;
+        height: 260px;
         border-radius: 20px;
       }
 
@@ -230,15 +231,14 @@ import { InputCustomEvent } from '@ionic/angular'; // Eventos de input de Ionic
         position: absolute;
         left: 0;
         top: 0;
-        width: 100%;
-        height: 100%;
+        width: 80%;
         object-fit: cover;
       }
 
       /* ✅ INSTRUCCIONES MEJORADAS */
       .instructions {
         position: absolute;
-        top: 15%;
+        top: 10%;
         left: 50%;
         transform: translateX(-50%);
         text-align: center;
@@ -296,7 +296,7 @@ import { InputCustomEvent } from '@ionic/angular'; // Eventos de input de Ionic
       /* ✅ TOOLBAR LIMPIO */
       ion-header {
         ion-toolbar {
-          --background: rgba(0, 0, 0, 0.8);
+          --background: black; /* Inicialmente negro */
           --color: white;
           backdrop-filter: blur(10px);
           
@@ -329,10 +329,6 @@ import { InputCustomEvent } from '@ionic/angular'; // Eventos de input de Ionic
           }
         }
         
-        .square {
-          width: 250px;
-          height: 250px;
-        }
         
         .instructions {
           top: 10%;
@@ -366,17 +362,18 @@ export class CameraScannerModalComponent implements AfterViewInit, OnDestroy {
   public maxZoomRatio: number | undefined;
 
   private formatos: BarcodeFormat[] = [
-      BarcodeFormat.Codabar,
-      BarcodeFormat.Code128,
-      BarcodeFormat.Code39,
-      BarcodeFormat.Code93,
-      BarcodeFormat.Ean13,
-      BarcodeFormat.Ean8, 
-      BarcodeFormat.Itf,
-      BarcodeFormat.UpcA,
-      BarcodeFormat.UpcE
+      //BarcodeFormat.Codabar,
+      //BarcodeFormat.Code128,
+      // BarcodeFormat.Code39, // porciacaso
+      //BarcodeFormat.Code93,
+      BarcodeFormat.Ean13, // porductos de retail
+      // BarcodeFormat.Ean8,  // Productos pequenios
+      //BarcodeFormat.Itf, 
+      BarcodeFormat.UpcA, // productos de minoristas
+      BarcodeFormat.UpcE // Productos pequenios EEUU
     ];
   private readonly lensFacing: LensFacing = LensFacing.Back;
+  private isScanningActive = true;
   
   // ZXing para escaneo en web
   private zxingReader = new BrowserMultiFormatReader();
@@ -386,9 +383,8 @@ export class CameraScannerModalComponent implements AfterViewInit, OnDestroy {
     // readonly hace que la propiedad no se pueda modificar
     private readonly OutPuts_Emergentes: OutputsEmergentesService,
     private readonly ngZone: NgZone,
-    
-    
-
+    private readonly renderer: Renderer2, // Inyectar Renderer2
+    private readonly elementRef: ElementRef, // Inyectar ElementRef
   ) {addIcons({
       'barcode-outline': barcodeOutline,
       'close': close,
@@ -401,17 +397,30 @@ export class CameraScannerModalComponent implements AfterViewInit, OnDestroy {
   // usar el flash si esta disponible
 
   ngAfterViewInit(): void {
+    // Hide everything behind the modal (see `src/theme/variables.scss`)
+    document.querySelector('body')?.classList.add('barcode-scanning-active');
+
+    // Delay setting transparency to allow the body class to take effect
     setTimeout(() => {
-      this.startScan().then(() => {
-        if (Capacitor.getPlatform() !== 'web') {
-          BarcodeScanner.isTorchAvailable().then((result) => {
-            this.isTorchAvailable = result.available;
-          });
-        } else {
-          this.isTorchAvailable = false;
-        }
-      });
-    }, 500);
+      const ionContent = this.elementRef.nativeElement.querySelector('ion-content');
+      if (ionContent) {
+        this.renderer.setAttribute(ionContent, 'style', '--background: transparent !important;');
+      }
+      const ionToolbar = this.elementRef.nativeElement.querySelector('ion-toolbar');
+      if (ionToolbar) {
+        this.renderer.setStyle(ionToolbar, 'box-shadow', '0 4px 24px 0 rgba(0,0,0,0.35)');
+      }
+    }, 300); // 100ms delay
+
+    this.startScan().then(() => {
+      if (Capacitor.getPlatform() !== 'web') {
+        BarcodeScanner.isTorchAvailable().then((result) => {
+          this.isTorchAvailable = result.available;
+        });
+      } else {
+        this.isTorchAvailable = false;
+      }
+    });
   }
 
   // Al cerrar el modal se detiene el escaneo
@@ -447,8 +456,7 @@ export class CameraScannerModalComponent implements AfterViewInit, OnDestroy {
   }
 
   private async startScan(): Promise<void> {
-    // Hide everything behind the modal (see `src/theme/variables.scss`)
-    document.querySelector('body')?.classList.add('barcode-scanning-active');
+    
 
     // Configura las opciones para el escaneo, formato que lee, camara a usar y si sera en web o telefono
     if (Capacitor.getPlatform() === 'web') {
@@ -476,112 +484,163 @@ export class CameraScannerModalComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
-    // --- MÓVIL: BarcodeScanner ---
-    const options: StartScanOptions = {
-      formats: this.formatos,
-      lensFacing: this.lensFacing,
-      videoElement: undefined, // solo para móvil
-    };
+    if (Capacitor.getPlatform() !== 'web') {  
+      const avail = await BarcodeScanner.isGoogleBarcodeScannerModuleAvailable();
+        if (!avail.available) {
+          const loading = await this.OutPuts_Emergentes.showLoading({
+            message: 'Descargando módulo de escaneo...',
+            spinner: 'circular'
+          });
+          try {
+              BarcodeScanner.installGoogleBarcodeScannerModule();
+              
+              await new Promise(async(res, rej)  => {
+                const listener = await BarcodeScanner.addListener(
+                  'googleBarcodeScannerModuleInstallProgress',
+                  ev => {
+                    if (ev.progress !== undefined) {
+                      // Actualizar mensaje con progreso
+                      loading.message = `Descargando... ${Math.round(ev.progress)}%`;
+                      
+                      if (ev.progress >= 90) {
+                        listener.remove();
+                        res(undefined);
+                      }
+                    }
+                  }
+                );
 
+                // Timeout de seguridad (opcional)
+                setTimeout(() => {
+                  listener.remove();
+                  rej(new Error('Tiempo de descarga agotado'));
+                }, 60000); // 60 segundos
+              });
 
-
-
-    // Obtiene el perimetro rectangulo de la vista de escaneo declara en el modal arriba
-    const squareElementBoundingClientRect =
-      this.squareElement?.nativeElement.getBoundingClientRect();
-
-    // Escala el rectangulo para que tengan la misma resolucion ent todos los dispositivos
-    const scaledRect = squareElementBoundingClientRect
-      ? {
-          left: squareElementBoundingClientRect.left * window.devicePixelRatio,
-          right:
-            squareElementBoundingClientRect.right * window.devicePixelRatio,
-          top: squareElementBoundingClientRect.top * window.devicePixelRatio,
-          bottom:
-            squareElementBoundingClientRect.bottom * window.devicePixelRatio,
-          width:
-            squareElementBoundingClientRect.width * window.devicePixelRatio,
-          height:
-            squareElementBoundingClientRect.height * window.devicePixelRatio,
+            } catch (error) {
+              console.error('Error descargando módulo:', error);
+              // Mostrar error al usuario si es necesario
+            } finally {
+              // Cerrar loading cuando termine
+              await loading.dismiss();
+            }
         }
-      : undefined;
+      
+      
+      
+        // --- MÓVIL: BarcodeScanner ---
+      const options: StartScanOptions = {
+        formats: this.formatos,
+        lensFacing: this.lensFacing,
+        videoElement: undefined, // solo para móvil
+        // resolution: { width: 1280, height: 720 } as unknown as Resolution,
+        resolution: { width: 640, height: 480 } as unknown as Resolution, // Resolución reducida
+      };
+      
 
-    const detectionCornerPoints = scaledRect
-      ? [
-          [scaledRect.left, scaledRect.top],
-          [scaledRect.left + scaledRect.width, scaledRect.top],
-          [
-            scaledRect.left + scaledRect.width,
-            scaledRect.top + scaledRect.height,
-          ],
-          [scaledRect.left, scaledRect.top + scaledRect.height],
-        ]
-      : undefined;
 
 
-    
-    const listener = await BarcodeScanner.addListener(
-      'barcodesScanned',
-      async (event) => {
-        this.ngZone.run(() => {
-          const firstBarcode = event.barcodes[0];
-          if (!firstBarcode) {
-            return;
-          }
-          const cornerPoints = firstBarcode.cornerPoints;
-          if (
-            detectionCornerPoints &&
-            cornerPoints &&
-            Capacitor.getPlatform() !== 'web'
-          ) {
 
-            if (
-              detectionCornerPoints[0][0] > cornerPoints[0][0] ||
-              detectionCornerPoints[0][1] > cornerPoints[0][1] ||
-              detectionCornerPoints[1][0] < cornerPoints[1][0] ||
-              detectionCornerPoints[1][1] > cornerPoints[1][1] ||
-              detectionCornerPoints[2][0] < cornerPoints[2][0] ||
-              detectionCornerPoints[2][1] < cornerPoints[2][1] ||
-              detectionCornerPoints[3][0] > cornerPoints[3][0] ||
-              detectionCornerPoints[3][1] < cornerPoints[3][1]
-            ) {
+      // Obtiene el perimetro rectangulo de la vista de escaneo declara en el modal arriba
+      const squareElementBoundingClientRect =
+        this.squareElement?.nativeElement.getBoundingClientRect();
+
+      // Escala el rectangulo para que tengan la misma resolucion ent todos los dispositivos
+      // const scaledRect = squareElementBoundingClientRect
+      //   ? {
+      //       left: 
+      //         squareElementBoundingClientRect.left * window.devicePixelRatio,
+      //       top: 
+      //         squareElementBoundingClientRect.top * window.devicePixelRatio,
+      //       width:
+      //         squareElementBoundingClientRect.width * window.devicePixelRatio,
+      //       height:
+      //         squareElementBoundingClientRect.height * window.devicePixelRatio,
+      //     }
+      //   : undefined;
+
+      // const detectionCornerPoints = scaledRect
+      //   ? [
+      //       [scaledRect.left, scaledRect.top],
+      //       [scaledRect.left + scaledRect.width, scaledRect.top],
+      //       [
+      //         scaledRect.left + scaledRect.width,
+      //         scaledRect.top + scaledRect.height,
+      //       ],
+      //       [scaledRect.left, scaledRect.top + scaledRect.height],
+      //     ]
+      //   : undefined;
+
+
+      
+      await BarcodeScanner.addListener(
+        'barcodesScanned',
+        async (event) => {
+          if (!this.isScanningActive) return;
+          this.ngZone.run(() => {
+            const firstBarcode = event.barcodes[0];
+            if (!firstBarcode) {
               return;
             }
-          }
-          this.playBeepSound(); // Reproducir sonido de beep
-          listener.remove();
-          this.closeModal(firstBarcode);
-        });
-      },
-    );
+            const cornerPoints = firstBarcode.cornerPoints;
+            // if (
+            //   detectionCornerPoints &&
+            //   cornerPoints
+            // ) {
+            //   if (
+            //     detectionCornerPoints[0][0] > cornerPoints[0][0] ||
+            //     detectionCornerPoints[0][1] > cornerPoints[0][1] ||
+            //     detectionCornerPoints[1][0] < cornerPoints[1][0] ||
+            //     detectionCornerPoints[1][1] > cornerPoints[1][1] ||
+            //     detectionCornerPoints[2][0] < cornerPoints[2][0] ||
+            //     detectionCornerPoints[2][1] < cornerPoints[2][1] ||
+            //     detectionCornerPoints[3][0] > cornerPoints[3][0] ||
+            //     detectionCornerPoints[3][1] < cornerPoints[3][1]
+            //   ) {
+            //     console.log("codigo fuera del cuadrado")
+            //     return;
+            //   }
+            // }
+            console.timeEnd('Tiempo detección');
+            console.log('Código detectado (móvil):', firstBarcode.rawValue);
+            this.isScanningActive = false;
+            this.playBeepSound(); // Reproducir sonido de beep
+            //listener.remove();
+            this.closeModal(firstBarcode);
+          });
+        },
+      );
 
 
-    // ESCANEA EL CODIGO
-    await BarcodeScanner.startScan(options);
-    
-    
-    
-    // OPCIONES DE ZOOM
-    
-    if (Capacitor.getPlatform() !== 'web') {
+      // ESCANEA EL CODIGO
+      console.time('Tiempo detección');
+      await BarcodeScanner.startScan(options);
+      
+      
+      
+      // OPCIONES DE ZOOM
+      
       void BarcodeScanner.getMinZoomRatio().then((result) => {
         this.minZoomRatio = result.zoomRatio;
       });
       void BarcodeScanner.getMaxZoomRatio().then((result) => {
         this.maxZoomRatio = result.zoomRatio;
       });
-    }
-  }
 
+    
+    }
+  };
 
   // Detiene el escaneo
   private async stopScan(): Promise<void> {
+    this.isScanningActive = false;
     document.querySelector('body')?.classList.remove('barcode-scanning-active');
     if (Capacitor.getPlatform() === 'web') {
       if (this.zxingControls && typeof this.zxingControls.stop === 'function') {
         this.zxingControls.stop();}
     } else {
       await BarcodeScanner.stopScan();
+      await BarcodeScanner.removeAllListeners();
     }
   }
 }

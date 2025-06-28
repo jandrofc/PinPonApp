@@ -1,0 +1,43 @@
+<ion-header>
+  <ion-toolbar>
+    <div class="titulo">Filtro Reporte de Stock</div>
+    <ion-buttons slot="end">
+        <ion-button (click)="closeModal()">
+          <ion-icon name="close-circle" color="light" class="close-icon"></ion-icon>
+        </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="filtro-content">
+  <div class="filtro-wrapper">
+    <ion-card class="filtro-card">
+      <ion-card-header>
+        <div class="filtro-header">
+          <ion-icon name="funnel"></ion-icon>
+          <ion-card-title class="filtro-title">Filtro de búsqueda</ion-card-title>
+        </div>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list>
+          <ion-item class="filtro-item">
+            <ion-label>Seleccionar productos...</ion-label>
+            <ion-select [(ngModel)]="producto" multiple="true">
+              <ion-select-option *ngFor="let p of productos" [value]="p">{{p}}</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+    <div class="action-buttons">
+        <button class="excel-button" (click)="generarExcel()">
+            <ion-icon name="download-outline"></ion-icon>
+            Descargar Excel
+        </button>
+        <button class="pdf-button" (click)="generarPDF()">
+            <ion-icon name="download-outline"></ion-icon>
+            Descargar PDF
+        </button>
+    </div>
+  </div>
+</ion-content>

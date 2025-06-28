@@ -4,13 +4,15 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router'; //navegacion entre paginas
 
-
+import { ModalController } from '@ionic/angular';
+import { Ipv4Component } from '../modales/ipv4/ipv4.component';
+import { addIcons  } from 'ionicons';
+import { settings} from 'ionicons/icons'
 import { ConexionBackendService} from 'src/app/services/conexion-backend.service';
 import { IonicModule } from '@ionic/angular';
 
 import { OutputsEmergentesService } from '../services/outputs-emergentes/outputs-emergentes.service';
 import { HTMLIonOverlayElement } from '@ionic/core';
-
 
 export interface Producto {
   id_formato:  number;
@@ -40,8 +42,10 @@ export class Tab1Page implements OnInit, OnDestroy{
     private router: Router,
     private params: ActivatedRoute,
     private readonly outputsEmergentesService: OutputsEmergentesService,
-    
-  ){}
+    private modalController: ModalController,
+  ){addIcons({
+        'settings': settings,
+      });}
     
   async ngOnDestroy() {
     if (this.autoRefreshInterval) {
@@ -51,16 +55,38 @@ export class Tab1Page implements OnInit, OnDestroy{
   }
 
 
-  async ngOnInit() {
+  async ionViewDidEnter(){
     this.CargarDatos();
     this.iniciarAutoRefresh(); // Inicia el auto-refresh al cargar la página
+  }
+
+  async ionViewWillLeave() {
+    if (this.autoRefreshInterval) {
+      clearInterval(this.autoRefreshInterval);
+      console.log('Auto-refresh detenido al salir de la página');
+    }
+  }
+
+  async ngOnInit() {
+    // ngOnInit puede quedar vacío ya que la lógica de carga y auto-refresh se mueve a ionViewDidEnter
   }
   private autoRefreshInterval: any;
   private REFRESH_INTERVAL = 30000 // 1 minuto
   private intentos_error = 0; // Contador de intentos de error
 
 
-
+async ipv4_modal(){
+  if (this.autoRefreshInterval) {
+    clearInterval(this.autoRefreshInterval);
+    console.log('Auto-refresh detenido por apertura de modal');
+  }
+  const modal = await this.modalController.create({
+        component: Ipv4Component
+      });
+  await modal.present();
+  await modal.onDidDismiss(); // Espera a que el modal se cierre
+  this.iniciarAutoRefresh(); // Reinicia el auto-refresh al cerrar el modal
+}
 
 
   iniciarAutoRefresh(): void {
@@ -156,13 +182,24 @@ export class Tab1Page implements OnInit, OnDestroy{
       )
       .sort((a, b) => a.nombre_producto.localeCompare(b.nombre_producto));
   }
+
+  private limpiarRecursos() {
+    if (this.autoRefreshInterval) {
+      clearInterval(this.autoRefreshInterval);
+      console.log('Auto-refresh detenido manualmente');
+    }
+  }
   escanear_Productos_Nuevos(){
+    this.limpiarRecursos()
     this.router.navigate(['/registro-producto']);
   }
 
   activarEdicion(producto: Producto) {
     this.productoSeleccionado = { ...producto }; // Clonar el producto para evitar modificarlo directamente
     this.modoEdicion = true; // Activa el modo de edición
+    if (this.autoRefreshInterval) {
+      clearInterval(this.autoRefreshInterval);
+    }
   }
 
 guardarCambios() {
@@ -246,6 +283,6 @@ guardarCambios() {
 
   cancelarEdicion() {
     this.modoEdicion = false; // Cancela la edición y vuelve a la lista
+    this.iniciarAutoRefresh(); // Reinicia el auto-refresh al cerrar el modal
   }
 }
-

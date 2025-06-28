@@ -1,0 +1,115 @@
+/* graficos.component.scss */
+
+/* Full-height modal with padding */
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--ion-color-light);
+}
+
+/* Header styling */
+ion-header {
+  --background: var(--ion-color-primary);
+  ion-button {
+    color: #fff;
+  }
+}
+
+
+
+/* Card container */
+ion-card {
+  width: 100%;
+  max-width: 370px;
+  margin: 0 20px 0 20px;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --background: #ffffff;
+}
+
+/* Card header */
+/* Card header */
+ion-card-header {
+  background: var(--ion-color-primary);
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+  padding: 0.5rem 1rem;
+
+  ion-card-title {
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin: 0;
+  }
+}
+/* Card content & chart */
+ion-card-content {
+  padding: 1.5rem;
+  canvas {
+    width: 100% !important;
+    height: auto !important;
+  }
+}
+
+
+
+.close-icon {
+  font-size: 42px;
+}
+
+.chart-toggle-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 18px;
+    margin: 0 20px 0 20px;
+    align-items: center;
+    justify-content: center;
+    height: 30%;
+}
+
+.mas-button, .menos-button {
+    padding: 18px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 1.2rem;
+    width: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.mas-button {
+    background-color: #b3e1ff;
+    color: #4361ee;
+}
+
+.menos-button {
+    background-color: #4361ee;
+    color: white;
+}
+
+.mas-button:hover, .menos-button:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.mas-button:active, .menos-button:active {
+    transform: translateY(0);
+}
+
+.mas-button ion-icon,
+.menos-button ion-icon {
+  font-size: 2.5rem;
+}
