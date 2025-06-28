@@ -11,32 +11,18 @@
 /* Header styling */
 ion-header {
   --background: var(--ion-color-primary);
-  ion-title {
-    color: #fff;
-    font-weight: bold;
-    font-size: 1.2rem;
-  }
   ion-button {
     color: #fff;
   }
 }
 
-/* Content area */
-ion-content {
-  flex: 1;
-  padding: 1rem;
-  background: var(--ion-color-light);
-  display: flex;
-  justify-content: center;
-  align-items: flex-start; /* cambia de center a flex-start si no quieres que flote */
-  overflow-y: auto; /* por si hay mucho contenido en pantallas pequeñas */
-}
+
 
 /* Card container */
 ion-card {
   width: 100%;
-  max-width: 500px;
-  margin: 0 auto; /* centra horizontalmente */
+  max-width: 370px;
+  margin: 0 20px 0 20px;
   border-radius: 1rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   --background: #ffffff;
@@ -70,7 +56,6 @@ ion-card-content {
 
 .close-icon {
   font-size: 42px;
-  margin-right: 10px;
 }
 
 .chart-toggle-buttons {
@@ -80,3 +65,51 @@ ion-card-content {
   margin-top: 1rem;
 }
 
+.action-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 18px;
+    margin: 0 20px 0 20px;
+    align-items: center;
+    justify-content: center;
+    height: 30%;
+}
+
+.mas-button, .menos-button {
+    padding: 18px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 1.2rem;
+    width: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.mas-button {
+    background-color: #b3e1ff;
+    color: #4361ee;
+}
+
+.menos-button {
+    background-color: #4361ee;
+    color: white;
+}
+
+.mas-button:hover, .menos-button:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.mas-button:active, .menos-button:active {
+    transform: translateY(0);
+}
+
+.mas-button ion-icon,
+.menos-button ion-icon {
+  font-size: 2.5rem;
+}

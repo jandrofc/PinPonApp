@@ -165,7 +165,11 @@
                       <ion-spinner name="crescent"></ion-spinner>
                       <p>Cargando boletas...</p>
                   </div>
-              
+                  
+                  <div *ngIf="errorMessage" class="error-message">
+                    <p>{{ errorMessage }}</p>
+                  </div>
+
                   <!-- Lista de boletas -->
                   <div *ngIf="!loading && salesData">
                       <div class="receipts-view">
@@ -221,7 +225,7 @@
                   </div>
 
                   <!-- Mensaje cuando no hay datos -->
-                  <div *ngIf="!loading && (!salesData || salesData.length <= 1)" class="empty-state">
+                  <div *ngIf="!loading && (!salesData || salesData.length <= 1) && !errorMessage" class="empty-state">
                       <i class="icon-package empty-icon"></i>
                       <h4>No se encontraron ventas</h4>
                       <p>No hay ventas que coincidan con los filtros aplicados.</p>
@@ -237,6 +241,9 @@
               <div *ngIf="loading" class="loading-container">
                 <ion-spinner name="crescent"></ion-spinner>
                 <p>Cargando productos...</p>
+              </div>
+              <div *ngIf="errorMessage" class="error-message">
+                <p>{{ errorMessage }}</p>
               </div>
               <div *ngIf="!loading && products" >
                 <div class="products-view">
@@ -260,7 +267,7 @@
                     </ion-item>
                   </div>
               </div>
-              <div *ngIf="!loading && (!products || products.length <= 1) " class="empty-state">
+              <div *ngIf="!loading && (!products || products.length <= 1) && !errorMessage" class="empty-state">
                 <i class="icon-package empty-icon"></i>
                 <h4>No se encontraron ventas</h4>
                 <p>No hay ventas que coincidan con los filtros aplicados.</p>

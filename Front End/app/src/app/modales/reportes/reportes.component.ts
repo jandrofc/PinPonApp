@@ -49,10 +49,6 @@ export class ReportesComponent  implements OnInit {
     });
   }
 
-  dismiss() {
-    this.modalCtrl.dismiss();
-  }
-
     async mostrarToast(mensaje: string) {
     const toast = await this.toastController.create({
       message: mensaje,
@@ -126,7 +122,6 @@ export class ReportesComponent  implements OnInit {
       directory: Directory.Documents,
     });
     await this.mostrarToast('Archivo Excel descargado en la carpeta Documentos');
-    this.dismiss();
   }
 
   async generarPDF() {
@@ -180,7 +175,6 @@ export class ReportesComponent  implements OnInit {
       directory: Directory.Documents,
     });
     await this.mostrarToast('Archivo PDF descargado en la carpeta Documentos');
-    this.dismiss();
   }
 
   // Utilidad para convertir ArrayBuffer a base64

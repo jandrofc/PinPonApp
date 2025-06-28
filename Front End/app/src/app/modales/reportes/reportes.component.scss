@@ -1,10 +1,18 @@
+.titulo {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ffffff;
+  text-align: center;
+  flex: 1;
+  align-self: center;
+}
+
 .close-icon {
   font-size: 42px;
-  margin-right: 10px;
 }
 
 .filtro-content {
-  height: 100%;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -16,27 +24,92 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  height: 100%; 
+  transform: translateY(-8%);
+  padding: 30px;
 }
 
 .filtro-card {
   background: #fff;
   width: 100%;
   max-width: 400px;
-  margin: 0 auto 16px auto;
+  margin: 0 auto 40px auto;
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
-.filtro-title {
-  color: #222; // negro
-  text-align: left;
-  font-weight: bold;
-  margin-left: 0;
+ion-list {
+  background: transparent !important;
+  padding: 0 !important;
 }
 
-.descargar-btn {
-  width: 100%;
-  max-width: 400px;
-  margin: 0 auto;
+.filtro-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filtro-header ion-icon {
+  font-size: 1.5rem;
+  color: #4361ee !important;
+}
+
+.filtro-title {
+  color: #000000;
+  text-align: left;
+  margin-left: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.filtro-item {
+  --border-radius: 8px;
+  overflow: hidden;
+  --background: #fff;
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.excel-button, .pdf-button {
+    padding: 18px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 1.2rem;
+    width: 100%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.excel-button {
+    background-color: #b3e1ff;
+    color: #4361ee;
+}
+
+.pdf-button {
+    background-color: #4361ee;
+    color: white;
+}
+
+.excel-button:hover, .pdf-button:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.excel-button:active, .pdf-button:active {
+    transform: translateY(0);
+}
+
+.excel-button ion-icon,
+.pdf-button ion-icon {
+  font-size: 1.7rem;
 }
 
 .mi-toast-personalizado {
