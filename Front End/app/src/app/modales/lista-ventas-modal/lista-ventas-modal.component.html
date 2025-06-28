@@ -184,7 +184,7 @@
   <!-- Contenido principal -->
   <div class="main-card">
       <div class="card-header">
-          <h2>Ventas Recientes</h2>
+          <h2>Ventas</h2>
       </div>
       
       <div class="card-content">
@@ -275,7 +275,7 @@
                   </div>
 
                   <!-- Mensaje cuando no hay datos -->
-                  <div *ngIf="!loading && (!salesData || salesData.length <= 1) && !errorMessage" class="empty-state">
+                  <div *ngIf="!loading && (!salesData || salesData.length < 1) && !errorMessage" class="empty-state">
                       <i class="icon-package empty-icon"></i>
                       <h4>No se encontraron ventas</h4>
                       <p>No hay ventas que coincidan con los filtros aplicados.</p>
@@ -317,7 +317,7 @@
                     </ion-item>
                   </div>
               </div>
-              <div *ngIf="!loading && (!products || products.length <= 1) && !errorMessage" class="empty-state">
+              <div *ngIf="!loading && (!products || products.length < 1) && !errorMessage" class="empty-state">
                 <i class="icon-package empty-icon"></i>
                 <h4>No se encontraron ventas</h4>
                 <p>No hay ventas que coincidan con los filtros aplicados.</p>

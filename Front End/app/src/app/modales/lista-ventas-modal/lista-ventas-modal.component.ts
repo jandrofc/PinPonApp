@@ -67,6 +67,8 @@ export class ListaVentasModalComponent  implements OnInit {
     } else if (tabName === 'products') {
       this.loadProductsData();
     }
+    console.log(this.products)
+    console.log(this.salesData)
   }
 
 
