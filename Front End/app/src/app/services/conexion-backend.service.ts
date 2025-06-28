@@ -38,17 +38,17 @@ export class ConexionBackendService {
   }
 
   //obtenciones de las boletas
-  getBoletas(filtro_producto: string, filtro_fecha: string){
+  getBoletas(filtro_producto: string, filtro_fecha_inicio: string, filtro_fecha_fin: string){
     const api = `${this.configService.apiUrl}get/ventas_con_detalles`;
-    const params = { filtro_producto, filtro_fecha}; // Convert Date to stringa}
+    const params = { filtro_producto, filtro_fecha_inicio, filtro_fecha_fin };
 
     return this.http.get<VentasConDetalle>(api,{params}).pipe(
       catchError(this.handleError)
     )
   }
-  getProductos(filtro_producto: string, filtro_fecha: string){
+  getProductos(filtro_producto: string, filtro_fecha_inicio: string, filtro_fecha_fin: string){
     const api = `${this.configService.apiUrl}get/productos_mas_vendidos`;
-    const params = { filtro_producto, filtro_fecha}; // Convert Date to stringa}
+    const params = { filtro_producto, filtro_fecha_inicio, filtro_fecha_fin };
 
     return this.http.get<ProductosMasVendidos>(api,{params}).pipe(
       catchError(this.handleError)

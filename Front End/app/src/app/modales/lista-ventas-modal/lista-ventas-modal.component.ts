@@ -46,8 +46,9 @@ export class ListaVentasModalComponent  implements OnInit {
 
   // FILTROS
   maxDate = new Date().toISOString().split('T')[0]; // formato 'YYYY-MM-DD'
-  selectedDate = ''
-  searchProduct = ''
+  startDate: string = '';
+  endDate: string = '';
+  searchProduct = '';
   showDateModal = false;
 
   // indica el estado de la vista de las ventas, receipts / products
@@ -57,7 +58,7 @@ export class ListaVentasModalComponent  implements OnInit {
 
   public switchTab(tabName: string): void {
     this.activeTab = tabName;
-
+    this.errorMessage = null;
     // Cargar datos según la pestaña activa
     if (tabName === 'receipts') {
       this.loadReceiptsData();
@@ -99,36 +100,50 @@ export class ListaVentasModalComponent  implements OnInit {
 
 
   applyFilters(): void {
-    if (this.activeTab === "receipts")
-      this.loadReceiptsData()
-    else if (this.activeTab === "products"){
-      this.loadProductsData()
+    if (this.activeTab === "receipts") {
+      this.loadReceiptsData();
+    } else if (this.activeTab === "products") {
+      this.loadProductsData();
     }
   }
 
   clearFilters(): void {
-    this.selectedDate = ""
-    this.searchProduct = ""
-    this.applyFilters()
+    this.startDate = '';
+    this.endDate = '';
+    this.searchProduct = '';
+    this.applyFilters();
   }
 
   clearDateFilter(): void {
-    this.selectedDate = ""
-    this.applyFilters()
+    this.startDate = '';
+    this.endDate = '';
+    this.applyFilters();
   }
 
   clearProductFilter(): void {
-    this.searchProduct = ""
-    this.applyFilters()
+    this.searchProduct = '';
+    this.applyFilters();
   }
 
   hasActiveFilters(): boolean {
-    return !!(this.selectedDate || this.searchProduct)
+    return !!(this.startDate || this.endDate || this.searchProduct);
   }
 
-  onDateChange(): void {
-    this.selectedDate = this.selectedDate.split("T")[0];
-    this.applyFilters()
+  onDateChange(event: any): void {
+    const selectedValue = event.detail.value;
+    if (selectedValue && typeof selectedValue === 'string') {
+      // Single date selected
+      this.startDate = selectedValue.split('T')[0];
+      this.endDate = selectedValue.split('T')[0]; // Set end date to the same day
+    } else if (selectedValue && typeof selectedValue === 'object' && selectedValue.hasOwnProperty('lower') && selectedValue.hasOwnProperty('upper')) {
+      // Date range selected
+      this.startDate = selectedValue.lower.split('T')[0];
+      this.endDate = selectedValue.upper.split('T')[0];
+    } else {
+      this.startDate = '';
+      this.endDate = '';
+    }
+    this.applyFilters();
   }
 
   onProductSearch(): void {
@@ -144,13 +159,13 @@ export class ListaVentasModalComponent  implements OnInit {
   private async loadReceiptsData(): Promise<void> {
     this.loading = true;
     
-    this.conexionBackend.getBoletas(this.searchProduct,this.selectedDate)
+    this.conexionBackend.getBoletas(this.searchProduct, this.startDate, this.endDate)
     .subscribe({
       next: (data) =>{
         this.resumen= data.resumen;
         this.salesData = data.ventas
         this.loading = false;
-        this.errorMessage = null; // Clear any previous error
+        this.errorMessage = null; 
       },
       error: (err) => {
         this.loading = false;
@@ -162,13 +177,13 @@ export class ListaVentasModalComponent  implements OnInit {
   private async loadProductsData(): Promise<void>{
     this.loading = true;
 
-    this.conexionBackend.getProductos(this.searchProduct,this.selectedDate)
+    this.conexionBackend.getProductos(this.searchProduct, this.startDate, this.endDate)
     .subscribe({
       next: (data) =>{
         this.resumen= data.resumen;
         this.products= data.productos
         this.loading = false;
-        this.errorMessage = null; // Clear any previous error
+        this.errorMessage = null; 
       },
       error: (err) => {
         this.loading = false;

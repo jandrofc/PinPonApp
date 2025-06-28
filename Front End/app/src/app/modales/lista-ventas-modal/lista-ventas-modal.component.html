@@ -35,7 +35,7 @@
           </label>
           <button (click)="showDateModal = true" class="filter-input">
             <ion-icon name="calendario"></ion-icon>
-            <span>{{ selectedDate ? selectedDate : 'Selecciona una fecha' }}</span>
+            <span>{{ (startDate && endDate) ? (startDate === endDate ? startDate : startDate + ' hasta ' + endDate) : 'Selecciona una fecha' }}</span>
           </button>
 
           <!-- Modal con ion-datetime -->
@@ -54,9 +54,8 @@
               </ion-header>
               <ion-content class="ion-padding">
                 <ion-datetime
-                  presentation="date"
-                  [(ngModel)]="selectedDate"
-                  (ionChange)="onDateChange(); showDateModal = false"
+                  presentation="date-range"
+                  (ionChange)="onDateChange($event); showDateModal = false"
                   [max]="maxDate">
                 </ion-datetime>
                 </ion-content>
@@ -81,9 +80,9 @@
 
       <!-- Indicadores de filtros activos -->
       <div *ngIf="hasActiveFilters()" class="active-filters">
-        <div *ngIf="selectedDate" class="filter-badge">
+        <div *ngIf="startDate && endDate" class="filter-badge">
           <ion-icon name="calendario"></ion-icon>
-          <span>Fecha: {{ selectedDate }}</span>
+          <span>Fecha: {{ startDate === endDate ? startDate : startDate + ' hasta ' + endDate }}</span>
           <button (click)="clearDateFilter()" class="filter-badge-close">
             <ion-icon name="close-outline"></ion-icon>
           </button>
