@@ -50,6 +50,8 @@ export class ListaVentasModalComponent  implements OnInit {
   endDate: string = '';
   searchProduct = '';
   showDateModal = false;
+  tempStartDate: string = '';
+  tempEndDate: string = '';
 
   // indica el estado de la vista de las ventas, receipts / products
   activeTab: string = 'receipts'; // Pestaña activa por defecto
@@ -98,6 +100,72 @@ export class ListaVentasModalComponent  implements OnInit {
       });
     }
 
+  // Método para inicializar tempStartDate y tempEndDate cuando se abre el modal
+  public openDateModal(): void {
+    this.tempStartDate = this.startDate;
+    this.tempEndDate = this.endDate;
+    this.showDateModal = true;
+  }
+
+  // Métodos para rangos predefinidos
+  setDateRange(range: string): void {
+    const today = new Date();
+    let start = new Date();
+    let end = new Date();
+
+    switch (range) {
+      case 'today':
+        // Hoy: desde el inicio del día hasta el final del día
+        start.setHours(0, 0, 0, 0);
+        end.setHours(23, 59, 59, 999);
+        break;
+      case 'yesterday':
+        // Ayer: desde el inicio del día de ayer hasta el final del día de ayer
+        start.setDate(today.getDate() - 1);
+        start.setHours(0, 0, 0, 0);
+        end.setDate(today.getDate() - 1);
+        end.setHours(23, 59, 59, 999);
+        break;
+      case 'week':
+        // Esta semana: desde el lunes de esta semana hasta hoy
+        start = new Date(today.setDate(today.getDate() - today.getDay() + (today.getDay() === 0 ? -6 : 1))); // Lunes de esta semana
+        start.setHours(0, 0, 0, 0);
+        end = new Date(); // Hoy
+        end.setHours(23, 59, 59, 999);
+        break;
+      case 'month':
+        // Este mes: desde el primer día de este mes hasta hoy
+        start = new Date(today.getFullYear(), today.getMonth(), 1);
+        start.setHours(0, 0, 0, 0);
+        end = new Date(); // Hoy
+        end.setHours(23, 59, 59, 999);
+        break;
+      case 'lastMonth':
+        // Mes pasado: desde el primer día del mes pasado hasta el último día del mes pasado
+        start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        start.setHours(0, 0, 0, 0);
+        end = new Date(today.getFullYear(), today.getMonth(), 0); // Último día del mes pasado
+        end.setHours(23, 59, 59, 999);
+        break;
+      default:
+        // Si no se reconoce el rango, no se aplica ningún filtro
+        this.tempStartDate = '';
+        this.tempEndDate = '';
+        return;
+    }
+
+    this.tempStartDate = start.toISOString().split('T')[0];
+    this.tempEndDate = end.toISOString().split('T')[0];
+  }
+
+  // Método para aplicar el rango de fechas seleccionado
+  applyDateRange(): void {
+    this.startDate = this.tempStartDate.split('T')[0];;
+    this.endDate = this.tempEndDate.split('T')[0];;
+    this.applyFilters();
+    this.showDateModal = false; // Cerrar el modal después de aplicar
+  }
+
 
   applyFilters(): void {
     if (this.activeTab === "receipts") {
@@ -129,22 +197,6 @@ export class ListaVentasModalComponent  implements OnInit {
     return !!(this.startDate || this.endDate || this.searchProduct);
   }
 
-  onDateChange(event: any): void {
-    const selectedValue = event.detail.value;
-    if (selectedValue && typeof selectedValue === 'string') {
-      // Single date selected
-      this.startDate = selectedValue.split('T')[0];
-      this.endDate = selectedValue.split('T')[0]; // Set end date to the same day
-    } else if (selectedValue && typeof selectedValue === 'object' && selectedValue.hasOwnProperty('lower') && selectedValue.hasOwnProperty('upper')) {
-      // Date range selected
-      this.startDate = selectedValue.lower.split('T')[0];
-      this.endDate = selectedValue.upper.split('T')[0];
-    } else {
-      this.startDate = '';
-      this.endDate = '';
-    }
-    this.applyFilters();
-  }
 
   onProductSearch(): void {
     this.applyFilters()

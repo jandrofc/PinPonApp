@@ -33,18 +33,17 @@
             <ion-icon name="calendario"></ion-icon>
             <span>Filtrar por fecha</span>
           </label>
-          <button (click)="showDateModal = true" class="filter-input">
+          <button (click)="openDateModal()" class="filter-input">
             <ion-icon name="calendario"></ion-icon>
             <span>{{ (startDate && endDate) ? (startDate === endDate ? startDate : startDate + ' hasta ' + endDate) : 'Selecciona una fecha' }}</span>
           </button>
 
           <!-- Modal con ion-datetime -->
-          <ion-modal [isOpen]="showDateModal"
-            (didDismiss)="showDateModal = false">
+          <ion-modal [isOpen]="showDateModal" (didDismiss)="showDateModal = false">
             <ng-template>
               <ion-header>
                 <ion-toolbar>
-                  <ion-title>Fecha</ion-title>
+                  <ion-title>Filtrar por Fecha</ion-title>
                   <div class="close-button-container" slot="end">
                     <button class="close-button" (click)="showDateModal = false">
                       <ion-icon name="close-outline"></ion-icon>
@@ -53,12 +52,66 @@
                 </ion-toolbar>
               </ion-header>
               <ion-content class="ion-padding">
-                <ion-datetime
-                  presentation="date-range"
-                  (ionChange)="onDateChange($event); showDateModal = false"
-                  [max]="maxDate">
-                </ion-datetime>
-                </ion-content>
+                <!-- Rangos predefinidos -->
+                <div class="predefined-ranges">
+                  <h4>Rangos rápidos:</h4>
+                  <div class="range-buttons">
+                    <ion-button fill="outline" size="small" (click)="setDateRange('today')">
+                      Hoy
+                    </ion-button>
+                    <ion-button fill="outline" size="small" (click)="setDateRange('yesterday')">
+                      Ayer
+                    </ion-button>
+                    <ion-button fill="outline" size="small" (click)="setDateRange('week')">
+                      Esta semana
+                    </ion-button>
+                    <ion-button fill="outline" size="small" (click)="setDateRange('month')">
+                      Este mes
+                    </ion-button>
+                    <ion-button fill="outline" size="small" (click)="setDateRange('lastMonth')">
+                      Mes pasado
+                    </ion-button>
+                  </div>
+                </div>
+
+                <ion-item class="divider">
+                  <ion-label>O selecciona un rango personalizado:</ion-label>
+                </ion-item>
+
+                <!-- Selector personalizado -->
+                <div class="custom-range">
+                  <div class="date-input-group">
+                    <label>Desde:</label>
+                    <ion-datetime
+                      presentation="date"
+                      [(ngModel)]="tempStartDate"
+                      [max]="tempEndDate || maxDate">
+                    </ion-datetime>
+                  </div>
+                  
+                  <div class="date-input-group">
+                    <label>Hasta:</label>
+                    <ion-datetime
+                      presentation="date"
+                      [(ngModel)]="tempEndDate"
+                      [min]="tempStartDate"
+                      [max]="maxDate">
+                    </ion-datetime>
+                  </div>
+                </div>
+
+                <div class="date-actions">
+                  <ion-button fill="clear" (click)="showDateModal = false">
+                    Cancelar
+                  </ion-button>
+                  <ion-button 
+                    fill="solid" 
+                    (click)="applyDateRange()"
+                    [disabled]="!tempStartDate">
+                    Aplicar Filtro
+                  </ion-button>
+                </div>
+              </ion-content>
             </ng-template>
           </ion-modal>
         </div>
