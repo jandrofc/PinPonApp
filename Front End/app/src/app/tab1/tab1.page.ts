@@ -13,6 +13,7 @@ import { IonicModule } from '@ionic/angular';
 
 import { OutputsEmergentesService } from '../services/outputs-emergentes/outputs-emergentes.service';
 import { HTMLIonOverlayElement } from '@ionic/core';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 
 export interface Producto {
   id_formato:  number;
@@ -38,6 +39,8 @@ export interface Producto {
 })
 export class Tab1Page implements OnInit, OnDestroy{
   configService: any;
+  imagePreview: string | null = null;
+  selectedImageUrl: string | null = null;
   constructor(
     private apiService: ConexionBackendService,
     private router: Router,
@@ -205,7 +208,7 @@ async ipv4_modal(){
     }
   }
 
-guardarCambios() {
+async guardarCambios() {
     if (!this.productoSeleccionado) return;
 
     // Validación de datos antes de enviar al backend
@@ -234,6 +237,25 @@ guardarCambios() {
       alert('Precio inválido');
       return;
     }
+    if (this.imagePreview) {
+      const loading = await this.outputsEmergentesService.showLoading({
+        message: 'Subiendo imagen...'
+      });
+
+      try {
+        await this.uploadImageToServer(this.imagePreview, p.codigo);
+        if (this.selectedImageUrl) {
+          this.productoSeleccionado.imagen_url = this.selectedImageUrl;
+        }
+        loading.dismiss();
+      } catch (error) {
+        loading.dismiss();
+        this.outputsEmergentesService.showErrorAlert({
+          message: 'Error subiendo la imagen'
+        });
+        return;
+      }
+    }
 
     // Llamamos al PUT
     this.apiService.putData('put/formato', this.productoSeleccionado)
@@ -244,6 +266,8 @@ guardarCambios() {
             const idx = this.productos.findIndex(p => p.id_formato === this.productoSeleccionado.id_formato);
             if (idx > -1) this.productos[idx] = { ...this.productoSeleccionado };
             this.modoEdicion = false;
+            this.imagePreview = null;
+            this.selectedImageUrl = null;
             alert('Cambios realizados con éxito'); // Mensaje de éxito
             console.log('Formato actualizado correctamente');
           }
@@ -281,11 +305,70 @@ guardarCambios() {
       });
   }
 
+async selectImage() {
+    try {
+      const image = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: true,
+        resultType: CameraResultType.DataUrl,
+        source: CameraSource.Prompt, // Permite elegir entre cámara y galería
+        width: 800,
+        height: 800
+      });
 
+      if (image.dataUrl) {
+        this.imagePreview = image.dataUrl;
+      }
+    } catch (error) {
+      this.outputsEmergentesService.showErrorAlert({
+        message: 'Error al seleccionar la imagen'
+      });
+    }
+  }
 
+  removeImage() {
+    this.imagePreview = null;
+    this.selectedImageUrl = null;
+    this.productoSeleccionado.imagen_url = '';
+  }
+
+  private async uploadImageToServer(base64Data: string, codigoProducto: string): Promise<void> {
+    try {
+      // Extraer solo la parte base64 (sin el prefijo data:image/...)
+      const base64Image = base64Data.split(',')[1];
+      const mimeType = base64Data.split(',')[0].split(':')[1].split(';')[0];
+      
+      // Convertir base64 a blob
+      const response = await fetch(`data:${mimeType};base64,${base64Image}`);
+      const blob = await response.blob();
+      
+      // Crear FormData
+      const formData = new FormData();
+      formData.append('imagen', blob, `${codigoProducto || Date.now()}.jpg`);
+      formData.append('codigo_barra', codigoProducto || '');
+
+      // Subir al servidor
+      const baseUrl = this.apiService.getIPFILE().replace('/api/', '');
+      const uploadResponse = await fetch(`${baseUrl}upload/imagen-producto`, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (uploadResponse.ok) {
+        const result = await uploadResponse.json();
+        this.selectedImageUrl = result.imageUrl;
+      } else {
+        throw new Error('Error en la respuesta del servidor');
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
 
   cancelarEdicion() {
     this.modoEdicion = false; // Cancela la edición y vuelve a la lista
+    this.imagePreview = null; // Limpia la vista previa de la imagen
+    this.selectedImageUrl = null; // Limpia la URL de la imagen seleccionada
     this.iniciarAutoRefresh(); // Reinicia el auto-refresh al cerrar el modal
   }
 

@@ -25,6 +25,50 @@
             <div class="input-group">
               <ion-item lines="none" class="custom-item">
                 <ion-label position="stacked" class="custom-label">
+                  <ion-icon name="image" class="label-icon"></ion-icon>
+                  Imagen del Producto
+                </ion-label>
+              </ion-item>
+              
+              <!-- Vista previa de imagen -->
+              <div class="image-section">
+                <div class="image-preview" *ngIf="imagePreview || productoSeleccionado.imagen_url">
+                  <img 
+                    [src]="imagePreview || getImageSrc(productoSeleccionado.imagen_url)" 
+                    alt="Vista previa" 
+                    (error)="onImageError($event)"
+                  />
+                  <ion-button 
+                    class="remove-image-btn" 
+                    fill="clear" 
+                    size="small"
+                    (click)="removeImage()"
+                  >
+                    <ion-icon name="close-circle" slot="icon-only"></ion-icon>
+                  </ion-button>
+                </div>
+                
+                <!-- Placeholder cuando no hay imagen -->
+                <div class="image-placeholder" *ngIf="!imagePreview && !productoSeleccionado.imagen_url">
+                  <ion-icon name="image-outline" size="large"></ion-icon>
+                  <p>Sin imagen</p>
+                </div>
+                
+                <!-- Botones para agregar/cambiar imagen -->
+                <div class="image-actions">
+                  <ion-button 
+                    expand="block" 
+                    fill="outline" 
+                    (click)="selectImage()"
+                    class="image-button"
+                  >
+                    <ion-icon name="camera" slot="start"></ion-icon>
+                    {{ (imagePreview || productoSeleccionado.imagen_url) ? 'Cambiar Imagen' : 'Agregar Imagen' }}
+                  </ion-button>
+                </div>
+              </div>
+              <ion-item lines="none" class="custom-item">
+                <ion-label position="stacked" class="custom-label">
                   <ion-icon name="pricetag" class="label-icon"></ion-icon>
                   Nombre del Producto
                 </ion-label>
