@@ -37,6 +37,7 @@ export interface Producto {
   imports: [    FormsModule, CommonModule,IonicModule],
 })
 export class Tab1Page implements OnInit, OnDestroy{
+  configService: any;
   constructor(
     private apiService: ConexionBackendService,
     private router: Router,
@@ -46,12 +47,12 @@ export class Tab1Page implements OnInit, OnDestroy{
   ){addIcons({
         'settings': settings,
       });}
-    
+
   async ngOnDestroy() {
     if (this.autoRefreshInterval) {
       clearInterval(this.autoRefreshInterval);
       console.log('Auto-refresh detenido');
-    }  
+    }
   }
 
 
@@ -106,7 +107,7 @@ async ipv4_modal(){
       this.obtenerProductos(); // Llama al método para obtener productos
     }, this.REFRESH_INTERVAL);
 
-    
+
   }
 
 
@@ -290,15 +291,16 @@ guardarCambios() {
 
   getImageSrc(imagenUrl: string): string {
     console.log('🖼️ [TAB1] Imagen URL:', imagenUrl); // Para debug
-    
+
     if (!imagenUrl) return '';
-    
+
     if (imagenUrl.startsWith('http')) return imagenUrl;
-    
+
     // Construir URL directamente
-    const fullUrl = `http://localhost:3000${imagenUrl}`;
+    const baseUrl = this.apiService.getIPFILE().replace('/api/', '');
+    const fullUrl = `${baseUrl}${imagenUrl}`;
     console.log('🖼️ [TAB1] URL final:', fullUrl); // Para debug
-    
+
     return fullUrl;
   }
 

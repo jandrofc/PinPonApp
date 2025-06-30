@@ -141,7 +141,7 @@
     <ng-template #listaProductos>
       <div class="section-header">
         <h2 class="section-title">Inventario de Productos</h2>
-        
+
       </div>
       <!-- Barra de búsqueda -->
       <ion-searchbar
@@ -189,14 +189,14 @@
             </div>
           </div>
           <div class="product-quantity">
-            <span 
+            <span
               class="badge"
               [ngClass]="{'badge-bajo-stock': producto.cantidad <= producto.stock_min}"
             >
               {{ producto.cantidad }}
             </span>
-            <span 
-              *ngIf="producto.cantidad <= producto.stock_min" 
+            <span
+              *ngIf="producto.cantidad <= producto.stock_min"
               class="bajo-stock-label"
             >
             <ion-icon name="alert-circle-outline" class="bajo-stock-icon"></ion-icon>

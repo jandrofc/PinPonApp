@@ -25,6 +25,7 @@ import { ConexionBackendService } from '../services/conexion-backend.service';
 import { Router } from '@angular/router';
 
 
+
 export interface ProductoEscaneado {
   codigo: string;
   nombre: string;
@@ -53,7 +54,6 @@ export interface ProductoEscaneado {
 })
 export class RegistroProductoPage implements OnInit {
 
-
   // Tiene el estado si barcode scanner es soportado
   public isSupported = false;
   // Tiene el estado si barcode scanner tiene permisos
@@ -66,6 +66,7 @@ export class RegistroProductoPage implements OnInit {
   // Almacena los codigos de barras escaneados para mostrar en la vista
   // debe borrarse, solo fue para pruebas
   public valoresEscaneados: string[] = [];
+  configService: any;
 
   constructor(
     private outputsEmergentesService: OutputsEmergentesService,
@@ -326,23 +327,24 @@ close() {
 
 getImageSrc(imagenUrl: string): string {
   console.log('🖼️ Imagen URL recibida:', imagenUrl); // Para debug
-  
+
   if (!imagenUrl) return '';
-  
+
   if (imagenUrl.startsWith('http')) return imagenUrl;
-  
+
   // Si imagen_url es "/uploads/productos/archivo.jpg"
   // La URL final debe ser "http://localhost:3000/uploads/productos/archivo.jpg"
-  const fullUrl = `http://localhost:3000${imagenUrl}`;
+  const baseUrl = this.conexionBackendService.getIPFILE().replace('/api/', '');
+  const fullUrl = `${baseUrl}${imagenUrl}`;
   console.log('🖼️ URL final construida:', fullUrl); // Para debug
-  
+
   return fullUrl;
 }
 
 onImageError(event: any) {
   // Ocultar la imagen y mostrar un placeholder
   event.target.style.display = 'none';
-  
+
   // Opcional: agregar una clase para mostrar un ícono de placeholder
   const parent = event.target.parentElement;
   if (parent) {
