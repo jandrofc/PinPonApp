@@ -299,7 +299,6 @@ guardarCambios() {
     // Construir URL directamente
     const baseUrl = this.apiService.getIPFILE().replace('/api/', '');
     const fullUrl = `${baseUrl}${imagenUrl}`;
-    console.log('🖼️ [TAB1] URL final:', fullUrl); // Para debug
 
     return fullUrl;
   }

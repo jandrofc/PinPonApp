@@ -20,6 +20,20 @@
           ¡Escanee los productos!
         </div>
         <div *ngFor="let producto of productosEscaneados" class="product-row">
+          <div class="product-image-container">
+            <div class="product-image-wrapper" *ngIf="producto.imagen_url && getImageSrc(producto.imagen_url); else imagePlaceholder">
+              <img [src]="getImageSrc(producto.imagen_url)" 
+                  alt="Producto" 
+                  class="product-image"
+                  (error)="onImageError($event)"
+                  (load)="onImageLoad($event)" />
+            </div>
+            <ng-template #imagePlaceholder>
+              <div class="product-image-placeholder">
+                <ion-icon name="image-outline" size="large" color="medium"></ion-icon>
+              </div>
+            </ng-template>
+          </div>
           <div class="product-info">
             <div class="product-name">{{ producto.nombre }} - {{ producto.marca }} - {{ producto.formato }}</div>
             <div class="product-price">$ {{ producto.precio }}</div>

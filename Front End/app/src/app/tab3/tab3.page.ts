@@ -8,7 +8,7 @@ import { OutputsEmergentesService } from '../services/outputs-emergentes/outputs
 import { ConexionBackendService } from '../services/conexion-backend.service';
 import { Ipv4Component } from '../modales/ipv4/ipv4.component';
 import { addIcons  } from 'ionicons';
-import { settings} from 'ionicons/icons'
+import { imageOutline, settings} from 'ionicons/icons'
 @Component({
   selector: 'app-tab3',
   templateUrl: 'tab3.page.html',
@@ -28,6 +28,7 @@ export class Tab3Page {
     private apiService: ConexionBackendService
   ) {addIcons({
         'settings': settings,
+        'image-outline': imageOutline
       });}
 
 async ipv4_modal(){
@@ -71,7 +72,8 @@ async abrirScanner() {
             formato: producto.formato,
             cantidad: 1,
             precio: producto.precio,
-            codigo: producto.codigo_barra
+            codigo: producto.codigo_barra,
+            imagen_url: producto.imagen_url
           });
         }
         this.ultimosEscaneos[barcode] = ahora;
@@ -136,4 +138,32 @@ realizarCompra() {
     }
   });
 }
+
+getImageSrc(imagenUrl: string): string {
+    
+    if (!imagenUrl) return '';
+    
+    if (imagenUrl.startsWith('http')) return imagenUrl;
+    
+    const baseUrl = this.apiService.getIPFILE().replace('/api/', '');
+    const fullUrl = `${baseUrl}${imagenUrl}`;
+    
+    return fullUrl;
+  }
+
+  onImageError(event: any) {
+    event.target.style.display = 'none';
+    
+    const parent = event.target.parentElement;
+    if (parent) {
+      parent.classList.add('image-error');
+    }
+  }
+
+  onImageLoad(event: any) {
+    const parent = event.target.parentElement;
+    if (parent) {
+      parent.classList.remove('image-error');
+    }
+  }
 }

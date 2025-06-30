@@ -194,14 +194,16 @@
 
   .remove-image-btn {
     position: absolute;
-    top: 8px;
-    right: 8px;
+    top: 0px;
+    left: 145px;
     --color: white;
     --background: rgba(244, 67, 54, 0.8);
     --border-radius: 50%;
-    width: 32px;
-    height: 32px;
     backdrop-filter: blur(4px);
+
+    ion-icon {
+    font-size: 28px;
+  }
   }
 }
 

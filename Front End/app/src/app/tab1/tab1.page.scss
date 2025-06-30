@@ -149,26 +149,27 @@ ion-searchbar {
 }
 
 .product-image-wrapper {
-  height: 50px;        // ← Hacer igual al width para que sea cuadrado
+  height: 50px;
   width: 50px;
-  border-radius: 8px;   // ← Más cuadrado que 0.5rem
+  border-radius: 8px;
   background-color: white;
   border: 1px solid #e5e7eb;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;     // ← IMPORTANTE: Ocultar el overflow
-  flex-shrink: 0;       // ← Evitar que se comprima
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
 .product-image {
-  width: 100%;          // ← Llenar todo el contenedor
-  height: 100%;         // ← Llenar todo el contenedor
-  object-fit: cover;    // ← CLAVE: Recortar manteniendo proporción
-  object-position: center; // ← Centrar el recorte
-  border-radius: 8px;   // ← Mantener consistencia con el wrapper
-  border: none;         // ← Remover borde duplicado
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 8px;
+  border: none;
 }
+
 .product-name {
   font-weight: 500;
   color: #1e293b;
@@ -311,7 +312,6 @@ ion-searchbar {
 
 /* Contenedor del formulario de edición */
 .edit-form {
-  background-color: #ffffff;  /* fondo blanco */
   color: #000000;             /* texto negro */
   padding: 16px;              /* opcional: separación interna */
   border-radius: 8px;         /* opcional: esquinas redondeadas */
@@ -418,7 +418,7 @@ ion-list {
 
 // Tarjeta principal
 .main-card {
-  --background: transparent;
+  --background: white;
   backdrop-filter: blur(10px);
   border-radius: 20px;
   box-shadow: var(--card-shadow);
@@ -494,9 +494,8 @@ ion-list {
       --border-radius: 12px;
       --padding-start: 1rem;
       --padding-end: 1rem;
-      border: 2px solid #e5e7eb;
+      border: 2px solid #bcc3d0;
       border-radius: 12px;
-      height: 48px;
       transition: border-color 0.2s ease;
 
       &:focus-within {
@@ -635,7 +634,7 @@ ion-input {
 }
 
 :host ::ng-deep .edit-form .input-wrapper.sc-ion-input-md {
-  background: transparent !important;
+  background: #f2f5fc !important;
 }
 
 .label-icon.stockmin-icon {
