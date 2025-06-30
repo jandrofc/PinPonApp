@@ -134,172 +134,153 @@ app.get('/api/get/lista_productos', (request, response) => {
 
 
 //curl -X POST http://localhost:3000/api/post/producto
-app.post('/api/post/producto', (req, res) => {
-    // Permitir recibir un solo objeto o un array de productos
+app.post('/api/post/producto', async (req, res) => {
     const productos = Array.isArray(req.body) ? req.body : [req.body];
-    const resultados = [];
-    let procesados = 0;
-
+    
     if (productos.length === 0) {
         return res.status(400).json({ error: 'No se enviaron productos para registrar' });
     }
 
-    productos.forEach((productoObj, idx) => {
-        const {
-            producto,
-            marca,
-            formato,
-            cantidad,
-            codigo_barra,
-            precio,
-            stock_min
-        } = productoObj;
+    const resultados = [];
 
-        // Validar campos obligatorios
-        if (!producto || !marca || !formato || cantidad == null || !codigo_barra || precio == null || stock_min == 5) {
-            resultados.push({ idx, error: 'Faltan datos obligatorios en el body', producto: productoObj });
-            procesados++;
-            if (procesados === productos.length) {
-                return res.json({ resultados });
-            }
-            return;
-        }
+    try {
+        for (let idx = 0; idx < productos.length; idx++) {
+            const productoObj = productos[idx];
+            const { producto, marca, formato, cantidad, codigo_barra, precio, stock_min } = productoObj;
 
-        // Comprobar unicidad de código de barras y estado habilitado
-        const codigoQuery = `SELECT * FROM formato_producto WHERE codigo_barra = ?`;
-        db.query(codigoQuery, [codigo_barra], (err, codigoRes) => {
-            if (err) {
-                resultados.push({ idx, error: 'Error en la validación de código de barras', details: err, producto: productoObj });
-                procesados++;
-                if (procesados === productos.length) {
-                    return res.json({ resultados });
-                }
-                return;
+            // Validar campos obligatorios
+            if (!producto || !marca || !formato || cantidad == null || !codigo_barra || precio == null || stock_min == null) {
+                resultados.push({ 
+                    idx, 
+                    error: 'Faltan datos obligatorios en el body', 
+                    producto: productoObj 
+                });
+                continue;
             }
-            if (codigoRes.length > 0) {
-                const formato = codigoRes[0];
-                if (formato.habilitado === 1) {
-                    // Ya existe y está habilitado: sumar cantidad
-                    const nuevaCantidad = Number(formato.cantidad) + Number(cantidad);
-                    const updateCantidadQuery = `
-                        UPDATE formato_producto
-                        SET cantidad = ?
-                        WHERE id = ?
-                    `;
-                    db.query(updateCantidadQuery, [nuevaCantidad, formato.id], (err, updateRes) => {
-                        if (err) {
-                            resultados.push({ idx, error: 'Error al actualizar cantidad', details: err, producto: productoObj });
-                        } else {
-                            resultados.push({
-                                idx,
-                                success: true,
-                                message: 'Cantidad sumada a formato existente',
-                                formato: { ...formato, cantidad: nuevaCantidad }
-                            });
-                        }
-                        procesados++;
-                        if (procesados === productos.length) {
-                            return res.json({ resultados });
-                        }
+
+            try {
+                // Verificar si el código ya existe
+                const codigoExistente = await new Promise((resolve, reject) => {
+                    const codigoQuery = `SELECT * FROM formato_producto WHERE codigo_barra = ?`;
+                    db.query(codigoQuery, [codigo_barra], (err, results) => {
+                        if (err) reject(err);
+                        else resolve(results);
                     });
-                    return;
-                } else {
-                    // Existe pero está deshabilitado, lo reactivamos
-                    const updateQuery = `
-                        UPDATE formato_producto
-                        SET habilitado = 1, cantidad = ?
-                        WHERE id = ?
-                    `;
-                    db.query(updateQuery, [cantidad, formato.id], (err, updateRes) => {
-                        if (err) {
-                            resultados.push({ idx, error: 'Error al reactivar formato', details: err, producto: productoObj });
-                        } else {
-                            resultados.push({
-                                idx,
-                                success: true,
-                                message: 'Formato reactivado correctamente',
-                                formato: { ...formato, habilitado: 1, cantidad }
+                });
+
+                if (codigoExistente.length > 0) {
+                    const formato = codigoExistente[0];
+                    if (formato.habilitado === 1) {
+                        // Sumar cantidad a formato existente
+                        const nuevaCantidad = Number(formato.cantidad) + Number(cantidad);
+                        await new Promise((resolve, reject) => {
+                            const updateQuery = `UPDATE formato_producto SET cantidad = ? WHERE id = ?`;
+                            db.query(updateQuery, [nuevaCantidad, formato.id], (err, result) => {
+                                if (err) reject(err);
+                                else resolve(result);
                             });
-                        }
-                        procesados++;
-                        if (procesados === productos.length) {
-                            return res.json({ resultados });
-                        }
-                    });
-                    return;
-                }
-            }
-
-                    // Comprobar si existe el producto genérico
-                    const checkQuery = `SELECT id FROM producto WHERE producto = ? AND marca = ?`;
-                    db.query(checkQuery, [producto, marca], (err, prodRes) => {
-                        if (err) {
-                            resultados.push({ idx, error: 'Error al comprobar producto', details: err, producto: productoObj });
-                            procesados++;
-                            if (procesados === productos.length) {
-                                return res.json({ resultados });
-                            }
-                            return;
-                        }
-
-                        const insertarFormato = (productId) => {
-            const insertFmtQ = `
-                INSERT INTO formato_producto
-                    (producto_id, formato, cantidad, codigo_barra, precio, stock_min)
-                VALUES (?, ?, ?, ?, ?, ?)
-            `;
-            db.query(
-                insertFmtQ,
-                [productId, formato, cantidad, codigo_barra, precio, stock_min],
-                (err, fmtRes) => {
-                    if (err) {
-                        console.log('Error al insertar formato:', err);
-                        resultados.push({ idx, error: 'Error al insertar formato', details: err, producto: productoObj });
-                    } else {
-                        console.log('Resultado INSERT formato_producto:', fmtRes);
+                        });
+                        
                         resultados.push({
                             idx,
                             success: true,
-                            message: prodRes.length > 0
-                                ? 'Formato agregado a producto existente'
-                                : 'Producto y formato creados correctamente',
-                            formatoId: fmtRes.insertId,
-                            productoId: productId
+                            message: 'Cantidad sumada a formato existente',
+                            formato: { ...formato, cantidad: nuevaCantidad }
                         });
-                    }
-                    procesados++;
-                    if (procesados === productos.length) {
-                        return res.json({ resultados });
+                        continue;
+                    } else {
+                        // Reactivar formato deshabilitado
+                        await new Promise((resolve, reject) => {
+                            const updateQuery = `UPDATE formato_producto SET habilitado = 1, cantidad = ? WHERE id = ?`;
+                            db.query(updateQuery, [cantidad, formato.id], (err, result) => {
+                                if (err) reject(err);
+                                else resolve(result);
+                            });
+                        });
+                        
+                        resultados.push({
+                            idx,
+                            success: true,
+                            message: 'Formato reactivado correctamente',
+                            formato: { ...formato, habilitado: 1, cantidad }
+                        });
+                        continue;
                     }
                 }
-            );
-        };
 
-        if (prodRes.length > 0) {
-            // Producto ya existe → sólo insertamos formato
-            const existingId = prodRes[0].id;
-            insertarFormato(existingId);
-        } else {
-            // Producto no existe → insertamos producto y luego formato
-            const insertProdQ = `INSERT INTO producto (producto, marca) VALUES (?, ?)`;
-            db.query(insertProdQ, [producto, marca], (err, prodInsertRes) => {
-                if (err) {
-                    console.log('Error al crear producto:', err);
-                    resultados.push({ idx, error: 'Error al crear producto', details: err, producto: productoObj });
-                    procesados++;
-                    if (procesados === productos.length) {
-                        return res.json({ resultados });
-                    }
-                    return;
+                // Verificar si el producto genérico existe
+                const productoExistente = await new Promise((resolve, reject) => {
+                    const checkQuery = `SELECT id FROM producto WHERE producto = ? AND marca = ?`;
+                    db.query(checkQuery, [producto, marca], (err, results) => {
+                        if (err) reject(err);
+                        else resolve(results);
+                    });
+                });
+
+                let productoId;
+
+                if (productoExistente.length > 0) {
+                    // Usar producto existente
+                    productoId = productoExistente[0].id;
+                } else {
+                    // Crear nuevo producto
+                    const nuevoProducto = await new Promise((resolve, reject) => {
+                        const insertProdQ = `INSERT INTO producto (producto, marca) VALUES (?, ?)`;
+                        db.query(insertProdQ, [producto, marca], (err, result) => {
+                            if (err) reject(err);
+                            else resolve(result);
+                        });
+                    });
+                    productoId = nuevoProducto.insertId;
                 }
-                console.log('Resultado INSERT producto:', prodInsertRes);
-                const newProductId = prodInsertRes.insertId;
-                insertarFormato(newProductId);
-            });
+
+                // Insertar formato
+                const nuevoFormato = await new Promise((resolve, reject) => {
+                    const insertFmtQ = `
+                        INSERT INTO formato_producto (producto_id, formato, cantidad, codigo_barra, precio, stock_min)
+                        VALUES (?, ?, ?, ?, ?, ?)
+                    `;
+                    db.query(insertFmtQ, [productoId, formato, cantidad, codigo_barra, precio, stock_min], (err, result) => {
+                        if (err) reject(err);
+                        else resolve(result);
+                    });
+                });
+
+                resultados.push({
+                    idx,
+                    success: true,
+                    message: productoExistente.length > 0 
+                        ? 'Formato agregado a producto existiente' 
+                        : 'Producto y formato creados correctamente',
+                    formatoId: nuevoFormato.insertId,
+                    productoId: productoId
+                });
+
+            } catch (error) {
+                console.error(`Error procesando producto ${idx}:`, error);
+                resultados.push({ 
+                    idx, 
+                    error: 'Error al procesar producto', 
+                    details: error.message, 
+                    producto: productoObj 
+                });
+            }
         }
-            });
+
+        // Enviar respuesta una sola vez al final
+        res.json({ 
+            success: true, 
+            message: `Procesados ${productos.length} productos`,
+            resultados 
         });
-    });
+
+    } catch (error) {
+        console.error('Error general:', error);
+        res.status(500).json({ 
+            error: 'Error interno del servidor', 
+            details: error.message 
+        });
+    }
 });
 
 //Valida que el codigo de barra exista en la DB

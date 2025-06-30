@@ -14,7 +14,7 @@ import { BarcodeScanner, Barcode } from '@capacitor-mlkit/barcode-scanning';
 import { OutputsEmergentesService } from '../services/outputs-emergentes/outputs-emergentes.service';
 
 import { CameraScannerModalComponent } from '../modales/camera-scanner-modal/camera-scanner-modal.component';
-import { createOutline } from 'ionicons/icons';
+import { camera, checkmarkSharp, closeCircle, createOutline,  } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { ModalController } from '@ionic/angular';
 import { FormularioRegistroProductoModalComponent } from '../modales/formulario-registro-producto-modal/formulario-registro-producto-modal.component';
@@ -74,7 +74,11 @@ export class RegistroProductoPage implements OnInit {
     private router: Router
 
 
-  ) { addIcons({ createOutline }) }
+  ) { addIcons({ createOutline,
+      closeCircle,
+      camera,
+      checkmarkSharp
+   }) }
 
 
   async editarProducto(producto: any) {
@@ -119,7 +123,7 @@ export class RegistroProductoPage implements OnInit {
               nombre: producto.nombre_producto,
               marca: producto.marca,
               formato: producto.formato,
-              cantidad: null, // Se llenará al editar
+              cantidad: 1,
               precio: producto.precio,
               stock_min: producto.stock_min ?? 5,
               nuevo: false,
@@ -132,7 +136,7 @@ export class RegistroProductoPage implements OnInit {
               nombre: '',
               marca: '',
               formato: '',
-              cantidad: null,
+              cantidad: 1,
               precio: null,
               stock_min: null,
               nuevo: true,
@@ -147,7 +151,7 @@ export class RegistroProductoPage implements OnInit {
             nombre: '',
             marca: '',
             formato: '',
-            cantidad: null,
+            cantidad: 1,
             precio: null,
             stock_min: null,
             nuevo: true,
@@ -202,7 +206,7 @@ export class RegistroProductoPage implements OnInit {
                 nombre: producto.nombre_producto,
                 marca: producto.marca,
                 formato: producto.formato,
-                cantidad: null,
+                cantidad: 1,
                 precio: producto.precio,
                 stock_min: producto.stock_min ?? 5,
                 nuevo: false,
@@ -214,7 +218,7 @@ export class RegistroProductoPage implements OnInit {
                 nombre: '',
                 marca: '',
                 formato: '',
-                cantidad: null,
+                cantidad: 1,
                 precio: null,
                 stock_min: null,
                 nuevo: true,
@@ -228,7 +232,7 @@ export class RegistroProductoPage implements OnInit {
               nombre: '',
               marca: '',
               formato: '',
-              cantidad: null,
+              cantidad: 1,
               precio: null,
               stock_min: null,
               nuevo: true,
@@ -287,6 +291,31 @@ public guardarProductosEscaneados() {
       });
     }
   });
+}
+
+close() {
+  if (this.productosEscaneados.length > 0) {
+    this.outputsEmergentesService.showErrorAlert({
+      header: 'Confirmar',
+      message: '¿Estás seguro de que quieres salir? Se perderán los productos escaneados.',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Salir',
+          handler: () => {
+            this.productosEscaneados = [];
+            this.router.navigate(['/tabs/tab1']);
+          }
+        }
+      ]
+    });
+  } else {
+    // Si no hay productos, navegar directamente
+    this.router.navigate(['/tabs/tab1']);
+  }
 }
 
   // public async scan(): Promise<void> {

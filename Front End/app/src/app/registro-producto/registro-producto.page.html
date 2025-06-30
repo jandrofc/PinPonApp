@@ -1,6 +1,11 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>Productos Escaneados</ion-title>
+    <ion-buttons slot="end">
+        <ion-button (click)="close()">
+          <ion-icon name="close-circle" color="light" class="close-icon"></ion-icon>
+        </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -53,7 +58,7 @@
       size="large"
       (click)="guardarProductosEscaneados()"
       class="confirm-button">
-      <ion-icon name="checkmark-sharp"></ion-icon>
+      <ion-icon name="checkmark-sharp" slot="start"></ion-icon>
       Confirmar productos escaneados
     </ion-button>
   </div>

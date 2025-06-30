@@ -414,7 +414,7 @@ ion-list {
 
 // Tarjeta principal
 .main-card {
-  --background: rgba(255, 255, 255, 0.95);
+  --background: transparent;
   backdrop-filter: blur(10px);
   border-radius: 20px;
   box-shadow: var(--card-shadow);
@@ -530,6 +530,10 @@ ion-list {
     gap: 1rem;
 
     .save-button {
+      ion-icon[slot="start"]{
+        margin-right: 8px !important;
+        margin-left: 0 !important;
+      }
       --background: #4361ee;
       --color: #fff;
       --border-width: 0;
@@ -539,6 +543,10 @@ ion-list {
     }
 
     .cancel-button {
+      ion-icon[slot="start"]{
+        margin-right: 3px !important;
+        margin-left: 0 !important;
+      }
       --background: #b3e1ff;
       --color: #4361ee;
       --border-width: 0;
