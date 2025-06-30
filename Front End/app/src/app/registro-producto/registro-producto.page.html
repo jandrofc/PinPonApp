@@ -23,6 +23,20 @@
         </div>
         <!-- Segunda fila: Nombre, marca, formato y badge -->
         <div class="product-row product-row-middle" *ngIf="producto.nombre || producto.marca || producto.formato">
+          <div class="product-content">
+            <!-- Imagen del producto -->
+            <div class="product-image" *ngIf="producto.imagen_url && getImageSrc(producto.imagen_url); else imagePlaceholder">
+              <img [src]="getImageSrc(producto.imagen_url)" 
+                alt="Producto" 
+                (error)="onImageError($event)"
+                (load)="onImageLoad($event)" />
+            </div>
+            <ng-template #imagePlaceholder>
+              <div class="product-image-placeholder">
+                <ion-icon name="image-outline" size="large" color="medium"></ion-icon>
+              </div>
+            </ng-template>
+          </div>
           <h3>
             <span *ngIf="producto.nombre">{{ producto.nombre }}</span>
             <span *ngIf="producto.nombre && (producto.marca || producto.formato)"> - </span>

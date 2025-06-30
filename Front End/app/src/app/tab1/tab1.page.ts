@@ -26,7 +26,7 @@ export interface Producto {
   codigo: string;
   fecha_creacion: string;
   fecha_actualizacion: string;
-  imagen: string;
+  imagen_url: string;
 }
 
 @Component({
@@ -143,7 +143,7 @@ async ipv4_modal(){
   stock_min: '',
   fecha_creacion: '',
   fecha_actualizacion: '',
-  imagen: '',
+  imagen_url: '',
 };
   searchQuery: string = '';
 
@@ -286,5 +286,23 @@ guardarCambios() {
   cancelarEdicion() {
     this.modoEdicion = false; // Cancela la edición y vuelve a la lista
     this.iniciarAutoRefresh(); // Reinicia el auto-refresh al cerrar el modal
+  }
+
+  getImageSrc(imagenUrl: string): string {
+    console.log('🖼️ [TAB1] Imagen URL:', imagenUrl); // Para debug
+    
+    if (!imagenUrl) return '';
+    
+    if (imagenUrl.startsWith('http')) return imagenUrl;
+    
+    // Construir URL directamente
+    const fullUrl = `http://localhost:3000${imagenUrl}`;
+    console.log('🖼️ [TAB1] URL final:', fullUrl); // Para debug
+    
+    return fullUrl;
+  }
+
+  onImageError(event: any) {
+    event.target.style.display = 'none';
   }
 }

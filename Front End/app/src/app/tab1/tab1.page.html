@@ -171,9 +171,17 @@
           <div class="product-info">
             <div class="product-image-wrapper">
               <img
-                [src]="producto.imagen"
+                *ngIf="producto.imagen_url; else placeholderImage"
+                [src]="getImageSrc(producto.imagen_url)"
+                (error)="onImageError($event)"
                 class="product-image"
+                alt="Producto"
               />
+              <ng-template #placeholderImage>
+                <div class="product-image-placeholder">
+                  <ion-icon name="image-outline" size="large" color="medium"></ion-icon>
+                </div>
+              </ng-template>
             </div>
             <div class="product-text">
               <p class="product-name">{{ producto.nombre_producto }} - {{ producto.marca }} - {{ producto.formato }}</p>

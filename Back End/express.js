@@ -4,9 +4,41 @@ const mysql = require('mysql2');
 const cors = require('cors');
 const admin = require('firebase-admin');
 const serviceAccount = require('./.pinponClaveCuenta.json');
+const path = require('path');
+const fs = require('fs');
+const multer = require('multer');
 require('dotenv').config();
 
+// Crear directorio
+const uploadDir = './uploads/productos';
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
+// Configurar multer
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/productos/');
+  },
+  filename: (req, file, cb) => {
+    // Usar código de barras + timestamp para evitar duplicados
+    const codigoBarra = req.body.codigo_barra || Date.now();
+    const extension = path.extname(file.originalname) || '.jpg';
+    cb(null, `${codigoBarra}_${Date.now()}${extension}`);
+  }
+});
+
+const upload = multer({ 
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB máximo
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Solo se permiten imágenes'));
+    }
+  }
+});
 
 // Crear la conexión a la base de datos
 const db = mysql.createPool({
@@ -82,7 +114,42 @@ function getIPv4Address() {
 //   console.log(`Servidor escuchando en https://${getIPv4Address()}:3000`);
 // });
 
+// Servir archivos estáticos
+app.use('/uploads', express.static('uploads'));
 
+// Endpoint para subir imagen individual
+app.post('/upload/imagen-producto', upload.single('imagen'), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No se subió ninguna imagen' });
+    }
+
+    const imageUrl = `/uploads/productos/${req.file.filename}`;
+    
+    res.json({
+      success: true,
+      imageUrl: imageUrl,
+      filename: req.file.filename
+    });
+  } catch (error) {
+    console.error('Error subiendo imagen:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Endpoint para eliminar imagen
+app.delete('/api/delete/imagen-producto/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const filepath = path.join(__dirname, 'uploads', 'productos', filename);
+  
+  fs.unlink(filepath, (err) => {
+    if (err) {
+      console.error('Error eliminando imagen:', err);
+      return res.status(500).json({ error: 'Error eliminando imagen' });
+    }
+    res.json({ success: true, message: 'Imagen eliminada' });
+  });
+});
 
 app.get('/api/get/lista_productos', (request, response) => {
   const marca =  request.query.marca || 'any';
@@ -99,7 +166,8 @@ app.get('/api/get/lista_productos', (request, response) => {
                     FP.stock_min,
                     FP.codigo_barra,
                     FP.fecha_creacion,
-                    FP.fecha_actualizado
+                    FP.fecha_actualizado,
+                    FP.imagen_url
               FROM formato_producto AS FP
               INNER JOIN producto AS P
               ON FP.producto_id = P.id `;
@@ -146,7 +214,7 @@ app.post('/api/post/producto', async (req, res) => {
     try {
         for (let idx = 0; idx < productos.length; idx++) {
             const productoObj = productos[idx];
-            const { producto, marca, formato, cantidad, codigo_barra, precio, stock_min } = productoObj;
+            const { producto, marca, formato, cantidad, codigo_barra, precio, stock_min, imagen_url } = productoObj;
 
             // Validar campos obligatorios
             if (!producto || !marca || !formato || cantidad == null || !codigo_barra || precio == null || stock_min == null) {
@@ -237,10 +305,10 @@ app.post('/api/post/producto', async (req, res) => {
                 // Insertar formato
                 const nuevoFormato = await new Promise((resolve, reject) => {
                     const insertFmtQ = `
-                        INSERT INTO formato_producto (producto_id, formato, cantidad, codigo_barra, precio, stock_min)
-                        VALUES (?, ?, ?, ?, ?, ?)
+                      INSERT INTO formato_producto (producto_id, formato, cantidad, codigo_barra, precio, stock_min, imagen_url)
+                      VALUES (?, ?, ?, ?, ?, ?, ?)
                     `;
-                    db.query(insertFmtQ, [productoId, formato, cantidad, codigo_barra, precio, stock_min], (err, result) => {
+                    db.query(insertFmtQ, [productoId, formato, cantidad, codigo_barra, precio, stock_min, imagen_url || null], (err, result) => {
                         if (err) reject(err);
                         else resolve(result);
                     });
@@ -470,7 +538,8 @@ app.get('/api/get/producto_por_codigo/:codigo', (req, res) => {
       P.marca,
       FP.cantidad,
       FP.precio,
-      FP.codigo_barra
+      FP.codigo_barra,
+      FP.imagen_url
     FROM formato_producto FP
     INNER JOIN producto P ON FP.producto_id = P.id
     WHERE FP.codigo_barra = ? AND FP.habilitado = 1 AND P.habilitado = 1

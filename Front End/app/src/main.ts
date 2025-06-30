@@ -22,6 +22,9 @@ import { registerLocaleData } from '@angular/common';
 import localeEsCL from '@angular/common/locales/es-CL';
 registerLocaleData(localeEsCL);
 import { LOCALE_ID } from '@angular/core';
+import { defineCustomElements } from '@ionic/pwa-elements/loader';
+
+defineCustomElements(window);
 
 bootstrapApplication(AppComponent, {
   providers: [

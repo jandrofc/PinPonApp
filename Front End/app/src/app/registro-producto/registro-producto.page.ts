@@ -14,7 +14,7 @@ import { BarcodeScanner, Barcode } from '@capacitor-mlkit/barcode-scanning';
 import { OutputsEmergentesService } from '../services/outputs-emergentes/outputs-emergentes.service';
 
 import { CameraScannerModalComponent } from '../modales/camera-scanner-modal/camera-scanner-modal.component';
-import { camera, checkmarkSharp, closeCircle, createOutline,  } from 'ionicons/icons';
+import { camera, checkmarkSharp, closeCircle, createOutline, imageOutline,  } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { ModalController } from '@ionic/angular';
 import { FormularioRegistroProductoModalComponent } from '../modales/formulario-registro-producto-modal/formulario-registro-producto-modal.component';
@@ -35,6 +35,7 @@ export interface ProductoEscaneado {
   stock_min: number | null;
   nuevo: boolean;
   existente: number;
+  imagen_url?: string;
 }
 
 @Component({
@@ -77,7 +78,8 @@ export class RegistroProductoPage implements OnInit {
   ) { addIcons({ createOutline,
       closeCircle,
       camera,
-      checkmarkSharp
+      checkmarkSharp,
+      imageOutline
    }) }
 
 
@@ -197,7 +199,7 @@ export class RegistroProductoPage implements OnInit {
     element.onDidDismiss().then((result) => {
       const barcode: Barcode | undefined = result.data?.barcode;
       if (barcode && !this.productosEscaneados.some(p => p.codigo === barcode.rawValue)) {
-        this.conexionBackendService.getProductoPorCodigo(barcode.rawValue).subscribe({
+        this.conexionBackendService.obtenerProductoPorCodigo(barcode.rawValue).subscribe({
           next: (resp) => {
             if (resp && resp.producto) {
               const producto = resp.producto;
@@ -210,7 +212,8 @@ export class RegistroProductoPage implements OnInit {
                 precio: producto.precio,
                 stock_min: producto.stock_min ?? 5,
                 nuevo: false,
-                existente: producto.cantidad ?? 0
+                existente: producto.cantidad ?? 0,
+                imagen_url: producto.imagen_url
               });
             } else {
               this.productosEscaneados.push({
@@ -222,7 +225,8 @@ export class RegistroProductoPage implements OnInit {
                 precio: null,
                 stock_min: null,
                 nuevo: true,
-                existente: 0
+                existente: 0,
+                imagen_url: ''
               });
             }
           },
@@ -236,7 +240,8 @@ export class RegistroProductoPage implements OnInit {
               precio: null,
               stock_min: null,
               nuevo: true,
-              existente: 0
+              existente: 0,
+              imagen_url: ''
             });
           }
         });
@@ -271,7 +276,8 @@ public guardarProductosEscaneados() {
     cantidad: p.cantidad,
     codigo_barra: p.codigo,
     precio: p.precio,
-    stock_min: p.stock_min
+    stock_min: p.stock_min,
+    imagen_url: p.imagen_url
   }));
 
   this.conexionBackendService.registrarProductos(productos).subscribe({
@@ -315,6 +321,39 @@ close() {
   } else {
     // Si no hay productos, navegar directamente
     this.router.navigate(['/tabs/tab1']);
+  }
+}
+
+getImageSrc(imagenUrl: string): string {
+  console.log('🖼️ Imagen URL recibida:', imagenUrl); // Para debug
+  
+  if (!imagenUrl) return '';
+  
+  if (imagenUrl.startsWith('http')) return imagenUrl;
+  
+  // Si imagen_url es "/uploads/productos/archivo.jpg"
+  // La URL final debe ser "http://localhost:3000/uploads/productos/archivo.jpg"
+  const fullUrl = `http://localhost:3000${imagenUrl}`;
+  console.log('🖼️ URL final construida:', fullUrl); // Para debug
+  
+  return fullUrl;
+}
+
+onImageError(event: any) {
+  // Ocultar la imagen y mostrar un placeholder
+  event.target.style.display = 'none';
+  
+  // Opcional: agregar una clase para mostrar un ícono de placeholder
+  const parent = event.target.parentElement;
+  if (parent) {
+    parent.classList.add('image-error');
+  }
+}
+
+onImageLoad(event: any) {
+  const parent = event.target.parentElement;
+  if (parent) {
+    parent.classList.remove('image-error');
   }
 }
 

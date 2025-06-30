@@ -41,6 +41,30 @@
           <h3>Información Básica</h3>
         </div>
 
+        <ion-item>
+          <ion-label position="stacked">Imagen del Producto</ion-label>
+          <div class="image-container">
+            <div class="image-preview" *ngIf="imagePreview">
+              <img [src]="imagePreview" alt="Producto" />
+              <ion-button 
+                fill="clear" 
+                color="danger" 
+                class="remove-image-btn"
+                (click)="removeImage()">
+                <ion-icon name="close-circle"></ion-icon>
+              </ion-button>
+            </div>
+            
+            <ion-button 
+              expand="block" 
+              fill="outline" 
+              (click)="selectImage()"
+              [disabled]="isUploading">
+              <ion-icon name="camera" slot="start"></ion-icon>
+              {{ isUploading ? 'Subiendo...' : (imagePreview ? 'Cambiar Imagen' : 'Agregar Imagen') }}
+            </ion-button>
+          </div>
+        </ion-item>
         <ion-item lines="full" class="form-item" [class.error]="productForm.get('name')?.touched && productForm.get('name')?.errors?.['required']">
           <ion-icon name="pricetag-outline" slot="start" color="medium"></ion-icon>
           <ion-label position="stacked" color="dark">

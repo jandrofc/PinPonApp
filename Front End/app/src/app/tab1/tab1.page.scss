@@ -637,3 +637,26 @@ ion-input {
 .label-icon.stockmin-icon {
   font-size: 2.4rem !important;
 }
+
+.product-image-placeholder {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  border: 1px solid var(--ion-color-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--ion-color-light-tint);
+  
+  ion-icon {
+    opacity: 0.5;
+  }
+}
+
+.product-image {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid var(--ion-color-light);
+}

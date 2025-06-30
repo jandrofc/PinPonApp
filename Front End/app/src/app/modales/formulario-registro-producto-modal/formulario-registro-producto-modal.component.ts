@@ -5,8 +5,12 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import {  arrowBack, search, notifications, camera, bag, cubeOutline, cartOutline, barChartOutline, createOutline, trashOutline, trendingUp, trendingDown, logoUsd, alertCircleOutline, informationCircle, barcodeOutline, documentTextOutline, pricetagOutline, alertCircle, businessOutline, resizeOutline, layersOutline, warningOutline, cashOutline, cardOutline, save, close } from 'ionicons/icons';
+import {  arrowBack, search, notifications, camera, bag, cubeOutline, cartOutline, barChartOutline, createOutline, trashOutline, trendingUp, trendingDown, logoUsd, alertCircleOutline, informationCircle, barcodeOutline, documentTextOutline, pricetagOutline, alertCircle, businessOutline, resizeOutline, layersOutline, warningOutline, cashOutline, cardOutline, save, close, imageOutline } from 'ionicons/icons';
 import { ConexionBackendService } from 'src/app/services/conexion-backend.service';
+import { FilePicker } from '@capawesome/capacitor-file-picker';
+import { ActionSheetController } from '@ionic/angular';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+
 @Component({
   selector: 'app-formulario-registro-producto-modal',
   imports: [IonicModule, CommonModule, ReactiveFormsModule],
@@ -17,12 +21,16 @@ import { ConexionBackendService } from 'src/app/services/conexion-backend.servic
 export class FormularioRegistroProductoModalComponent  implements OnInit {
   @Input() producto: any;
   productForm!: FormGroup;
+  imagePreview: string | null = null;
+  selectedImageUrl: string | null = null;
+  isUploading = false;
 
   constructor(
     private fb: FormBuilder,
     private modalController: ModalController,
-    private conexionBackend: ConexionBackendService // Inyecta el servicio aquí
-    )
+    private conexionBackend: ConexionBackendService, // Inyecta el servicio aquí
+    private actionSheetController: ActionSheetController
+  )
    {
     addIcons({
           "arrowBack":arrowBack,
@@ -51,8 +59,127 @@ export class FormularioRegistroProductoModalComponent  implements OnInit {
           "cash-outline":cashOutline,
           "card-outline":cardOutline,
           "save":save,
-          "close":close });
+          "close":close,
+          "image-outline":imageOutline
+        });
    }
+
+   async selectImage() {
+    const actionSheet = await this.actionSheetController.create({
+      header: 'Seleccionar imagen',
+      buttons: [
+        {
+          text: 'Tomar foto',
+          icon: 'camera',
+          handler: () => {
+            this.takePicture(CameraSource.Camera);
+          }
+        },
+        {
+          text: 'Elegir de galería',
+          icon: 'images',
+          handler: () => {
+            this.takePicture(CameraSource.Photos);
+          }
+        },
+        {
+          text: 'Cancelar',
+          icon: 'close',
+          role: 'cancel'
+        }
+      ]
+    });
+
+    await actionSheet.present();
+  }
+
+  private async takePicture(source: CameraSource) {
+    try {
+      this.isUploading = true;
+
+      const image = await Camera.getPhoto({
+        quality: 70,
+        allowEditing: true, // Permite recortar la imagen
+        resultType: CameraResultType.Base64,
+        source: source,
+        width: 600,
+        height: 600,
+        correctOrientation: true // Corrige la orientación automáticamente
+      });
+
+      if (image.base64String) {
+        // Mostrar preview inmediato
+        this.imagePreview = `data:image/jpeg;base64,${image.base64String}`;
+        
+        // Subir al servidor
+        await this.uploadImageToServer(image.base64String, 'image/jpeg');
+      }
+    } catch (error) {
+      console.error('Error capturando imagen:', error);
+      
+      // Manejar error de permisos o cancelación
+      if (error === 'User cancelled photos app') {
+        // Usuario canceló, no mostrar error
+        return;
+      }
+      
+      // Mostrar mensaje de error
+      this.showErrorMessage('Error al capturar imagen. Verifica los permisos de cámara.');
+    } finally {
+      this.isUploading = false;
+    }
+  }
+
+  private async uploadImageToServer(base64Data: string, mimeType: string): Promise<void> {
+    try {
+      // Convertir base64 a blob
+      const response = await fetch(`data:${mimeType};base64,${base64Data}`);
+      const blob = await response.blob();
+      
+      // Crear FormData
+      const formData = new FormData();
+      formData.append('imagen', blob, `${this.producto?.codigo || Date.now()}.jpg`);
+      formData.append('codigo_barra', this.producto?.codigo || '');
+
+      // Subir usando fetch
+      const baseUrl = this.conexionBackend.getIPFILE().replace('/api/', '/');
+      const uploadResponse = await fetch(`${baseUrl}upload/imagen-producto`, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (uploadResponse.ok) {
+        const result = await uploadResponse.json();
+        this.selectedImageUrl = result.imageUrl;
+        console.log('Imagen subida:', result.imageUrl);
+      } else {
+        throw new Error('Error subiendo imagen');
+      }
+    } catch (error) {
+      console.error('Error subiendo imagen:', error);
+      this.imagePreview = null;
+      this.showErrorMessage('Error subiendo imagen al servidor');
+    }
+  }
+
+  private showErrorMessage(message: string) {
+    // Aquí puedes usar tu servicio de alertas
+    console.error(message);
+    // Ejemplo: this.outputsEmergentesService.showErrorAlert({...});
+  }
+
+  removeImage() {
+    // Si hay una imagen ya subida, eliminarla del servidor
+    if (this.selectedImageUrl && this.selectedImageUrl !== this.producto?.imagen_url) {
+      const filename = this.selectedImageUrl.split('/').pop();
+      fetch(`${this.conexionBackend.getIPFILE()}delete/imagen-producto/${filename}`, {
+        method: 'DELETE'
+      }).catch(err => console.error('Error eliminando imagen:', err));
+    }
+    
+    this.imagePreview = null;
+    this.selectedImageUrl = null;
+  }
 
   ngOnInit() {
     // Inicializa el formulario
@@ -77,6 +204,12 @@ export class FormularioRegistroProductoModalComponent  implements OnInit {
         price: this.producto.precio ?? 0,
         stock_min: this.producto.stock_min ?? 1
       });
+    }
+
+    // Si el producto ya tiene imagen, mostrarla
+    if (this.producto?.imagen_url) {
+      this.selectedImageUrl = this.producto.imagen_url;
+      this.imagePreview = `${this.conexionBackend.getIPFILE()}${this.producto.imagen_url}`;
     }
   }
 
@@ -119,7 +252,8 @@ export class FormularioRegistroProductoModalComponent  implements OnInit {
       precio: valores.price,
       stock_min: valores.stock_min,
       nuevo: this.producto?.nuevo ?? false,
-      existente: this.producto?.existente ?? 0 // Preserva el valor original
+      existente: this.producto?.existente ?? 0, // Preserva el valor original
+      imagen_url: this.selectedImageUrl
     };
     await this.modalController.dismiss(productoActualizado);
     console.log('Producto actualizado:', productoActualizado);

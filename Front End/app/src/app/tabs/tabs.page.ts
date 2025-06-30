@@ -3,7 +3,7 @@ import { RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import {  arrowBack, search, notifications, camera, bag, cubeOutline, cartOutline, barChartOutline, createOutline, trashOutline, trendingUp, trendingDown, logoUsd, alertCircleOutline, informationCircle, barcodeOutline, documentTextOutline, pricetagOutline, alertCircle, businessOutline, resizeOutline, layersOutline, warningOutline, cashOutline, cardOutline, saveOutline, closeOutline, pricetag, ribbon, layers, cube, alert, cash, downloadOutline, funnel, checkmarkSharp, closeCircle, save, close } from 'ionicons/icons';
+import {  arrowBack, search, notifications, camera, bag, cubeOutline, cartOutline, barChartOutline, createOutline, trashOutline, trendingUp, trendingDown, logoUsd, alertCircleOutline, informationCircle, barcodeOutline, documentTextOutline, pricetagOutline, alertCircle, businessOutline, resizeOutline, layersOutline, warningOutline, cashOutline, cardOutline, saveOutline, closeOutline, pricetag, ribbon, layers, cube, alert, cash, downloadOutline, funnel, checkmarkSharp, closeCircle, save, close, imageOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-tabs',
@@ -56,7 +56,8 @@ export class TabsPage {
       "checkmark-sharp":checkmarkSharp,
       "close-circle":closeCircle,
       "save":save,
-      "close":close
+      "close":close,
+      "image-outline":imageOutline
     });
   }
 }
