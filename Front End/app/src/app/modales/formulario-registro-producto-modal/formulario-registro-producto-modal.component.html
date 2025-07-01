@@ -24,7 +24,7 @@
           <ion-label position="stacked" color="dark">
             <strong>Código del Producto</strong>
           </ion-label>
-          <!-- CAMBIO: El input ahora es editable y llama a onCodigoEscaneado al cambiar -->
+          
           <ion-input
             formControlName="code"
             [readonly]="true"
@@ -41,17 +41,21 @@
           <h3>Información Básica</h3>
         </div>
 
-        <ion-item>
-          <ion-label position="stacked">Imagen del Producto</ion-label>
-          <div class="image-container">
+        <ion-item lines="full" class="form-item">
+          <ion-icon name="image" slot="start" color="medium"></ion-icon>
+          <ion-label position="stacked" color="dark">
+            <strong>Imagen del Producto</strong>
+          </ion-label>
+        <div class="image-container">
             <div class="image-preview" *ngIf="imagePreview">
               <img [src]="imagePreview" alt="Producto" />
               <ion-button 
+                class="remove-image-btn" 
                 fill="clear" 
-                color="danger" 
-                class="remove-image-btn"
-                (click)="removeImage()">
-                <ion-icon name="close-circle"></ion-icon>
+                size="small"
+                (click)="removeImage()"
+              >
+                <ion-icon name="close-circle" slot="icon-only"></ion-icon>
               </ion-button>
             </div>
             
@@ -65,6 +69,7 @@
             </ion-button>
           </div>
         </ion-item>
+
         <ion-item lines="full" class="form-item" [class.error]="productForm.get('name')?.touched && productForm.get('name')?.errors?.['required']">
           <ion-icon name="pricetag-outline" slot="start" color="medium"></ion-icon>
           <ion-label position="stacked" color="dark">

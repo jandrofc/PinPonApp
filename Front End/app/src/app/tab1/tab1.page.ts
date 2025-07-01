@@ -237,19 +237,34 @@ async guardarCambios() {
       alert('Precio inválido');
       return;
     }
-    if (this.imagePreview) {
-      const loading = await this.outputsEmergentesService.showLoading({
-        message: 'Subiendo imagen...'
-      });
 
+    let loading: HTMLIonLoadingElement | null = null;
+
+    if (this.imagePreview) {
       try {
-        await this.uploadImageToServer(this.imagePreview, p.codigo);
+        loading = await this.outputsEmergentesService.showLoading({
+          message: 'Subiendo imagen...'
+        });
+
+        await this.uploadImageToServer(this.imagePreview, this.productoSeleccionado.codigo);
         if (this.selectedImageUrl) {
           this.productoSeleccionado.imagen_url = this.selectedImageUrl;
         }
-        loading.dismiss();
+
+        if (loading) {
+          await loading.dismiss();
+          loading = null;
+        }
       } catch (error) {
-        loading.dismiss();
+        console.error('Error subiendo imagen:', error);
+        this.outputsEmergentesService.showErrorAlert({
+          message: 'Error subiendo la imagen'
+        });
+        if (loading) {
+          await loading.dismiss();
+          loading = null;
+        }
+        
         this.outputsEmergentesService.showErrorAlert({
           message: 'Error subiendo la imagen'
         });
@@ -257,19 +272,36 @@ async guardarCambios() {
       }
     }
 
+    // Mostrar loading para guardar cambios
+    loading = await this.outputsEmergentesService.showLoading({
+      message: 'Guardando cambios...'
+    });
+
     // Llamamos al PUT
     this.apiService.putData('put/formato', this.productoSeleccionado)
       .subscribe({
-        next: (res: any) => {
+        next: async (res: any) => {
+          if (loading) {
+            await loading.dismiss();
+          }
+
           if (res.success) {
-            this.obtenerProductos();
             const idx = this.productos.findIndex(p => p.id_formato === this.productoSeleccionado.id_formato);
-            if (idx > -1) this.productos[idx] = { ...this.productoSeleccionado };
+            if (idx > -1) {
+              this.productos[idx] = { ...this.productoSeleccionado };
+              console.log(' Producto actualizado en lista local:', this.productos[idx]);
+            }
+            
+            // RECARGAR productos desde servidor
+            this.obtenerProductos();
+            
             this.modoEdicion = false;
             this.imagePreview = null;
             this.selectedImageUrl = null;
-            alert('Cambios realizados con éxito'); // Mensaje de éxito
-            console.log('Formato actualizado correctamente');
+    
+            console.log(' Formato actualizado correctamente');
+          } else {
+            console.error('Error al actualizar formato:', res);
           }
         },
         error: err => {
@@ -347,9 +379,15 @@ async selectImage() {
       formData.append('imagen', blob, `${codigoProducto || Date.now()}.jpg`);
       formData.append('codigo_barra', codigoProducto || '');
 
+      if (this.productoSeleccionado.imagen_url) {
+        formData.append('imagen_anterior', this.productoSeleccionado.imagen_url);
+      }
+
       // Subir al servidor
       const baseUrl = this.apiService.getIPFILE().replace('/api/', '');
-      const uploadResponse = await fetch(`${baseUrl}upload/imagen-producto`, {
+      const fullUrl = `${baseUrl}/upload/imagen-producto`;
+      
+      const uploadResponse = await fetch(fullUrl, {
         method: 'POST',
         body: formData
       });
@@ -373,7 +411,6 @@ async selectImage() {
   }
 
   getImageSrc(imagenUrl: string): string {
-    console.log('🖼️ [TAB1] Imagen URL:', imagenUrl); // Para debug
 
     if (!imagenUrl) return '';
 

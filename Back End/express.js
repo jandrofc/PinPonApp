@@ -124,16 +124,63 @@ app.post('/upload/imagen-producto', upload.single('imagen'), (req, res) => {
       return res.status(400).json({ error: 'No se subió ninguna imagen' });
     }
 
-    const imageUrl = `/uploads/productos/${req.file.filename}`;
+    const codigoBarra = req.body.codigo_barra;
+    const imagenAnterior = req.body.imagen_anterior;
     
-    res.json({
-      success: true,
-      imageUrl: imageUrl,
-      filename: req.file.filename
-    });
+    // Construir la ruta relativa de la nueva imagen
+    const nuevaImagenUrl = `/uploads/productos/${req.file.filename}`;
+    
+    if (imagenAnterior && imagenAnterior !== nuevaImagenUrl) {
+      const rutaImagenAnterior = path.join(__dirname, 'uploads', 'productos', path.basename(imagenAnterior));
+      
+      if (fs.existsSync(rutaImagenAnterior)) {
+        try {
+          fs.unlinkSync(rutaImagenAnterior);
+        } catch (deleteError) {
+          console.warn('No se pudo eliminar imagen anterior:', deleteError);
+        }
+      }
+    }
+
+    // ACTUALIZAR base de datos
+    if (codigoBarra) {
+      const updateQuery = `
+        UPDATE formato_producto 
+        SET imagen_url = ? 
+        WHERE codigo_barra = ?
+      `;
+      
+      db.query(updateQuery, [nuevaImagenUrl, codigoBarra], (err, result) => {
+        if (err) {
+          console.error(' Error actualizando BD:', err);
+          return res.status(500).json({ 
+            error: 'Error actualizando base de datos',
+            imageUrl: nuevaImagenUrl // Devolver URL aunque haya error en BD
+          });
+        }
+        
+        console.log(' Base de datos actualizada');
+        console.log(' Filas afectadas:', result.affectedRows);
+        
+        res.json({
+          success: true,
+          message: 'Imagen subida y actualizada correctamente',
+          imageUrl: nuevaImagenUrl,
+          affectedRows: result.affectedRows
+        });
+      });
+    } else {
+      // Si no hay código de barras, solo devolver la URL
+      res.json({
+        success: true,
+        message: 'Imagen subida correctamente',
+        imageUrl: nuevaImagenUrl
+      });
+    }
+
   } catch (error) {
-    console.error('Error subiendo imagen:', error);
-    res.status(500).json({ error: error.message });
+    console.error(' Error en upload:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
 
@@ -422,7 +469,8 @@ app.put('/api/put/formato', (req, res) => {
     cantidad,
     codigo_barra,
     precio,
-    stock_min
+    stock_min,
+    imagen_url
   } = req.body;
 
   // Validación de datos dependiendo de si esta vacio o no es String o numero negativos
@@ -463,7 +511,8 @@ app.put('/api/put/formato', (req, res) => {
       fp.precio            = ?,
       fp.stock_min         = ?,
       fp.fecha_actualizado = NOW(),
-      p.producto           = ?
+      p.producto           = ?,
+      fp.imagen_url        = ?
     WHERE fp.id = ?
   `;
 
@@ -475,6 +524,7 @@ app.put('/api/put/formato', (req, res) => {
     precio,
     stock_min,
     nombre_producto,
+    imagen_url || null, // Permitir que imagen_url sea nulo si no se proporciona
     id_formato
   ];
 

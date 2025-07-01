@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import {  arrowBack, search, notifications, camera, bag, cubeOutline, cartOutline, barChartOutline, createOutline, trashOutline, trendingUp, trendingDown, logoUsd, alertCircleOutline, informationCircle, barcodeOutline, documentTextOutline, pricetagOutline, alertCircle, businessOutline, resizeOutline, layersOutline, warningOutline, cashOutline, cardOutline, save, close, imageOutline } from 'ionicons/icons';
+import {  arrowBack, search, notifications, camera, bag, cubeOutline, cartOutline, barChartOutline, createOutline, trashOutline, trendingUp, trendingDown, logoUsd, alertCircleOutline, informationCircle, barcodeOutline, documentTextOutline, pricetagOutline, alertCircle, businessOutline, resizeOutline, layersOutline, warningOutline, cashOutline, cardOutline, save, close, imageOutline, image } from 'ionicons/icons';
 import { ConexionBackendService } from 'src/app/services/conexion-backend.service';
 import { FilePicker } from '@capawesome/capacitor-file-picker';
 import { ActionSheetController } from '@ionic/angular';
@@ -60,7 +60,8 @@ export class FormularioRegistroProductoModalComponent  implements OnInit {
           "card-outline":cardOutline,
           "save":save,
           "close":close,
-          "image-outline":imageOutline
+          "image-outline":imageOutline,
+          "image":image
         });
    }
 
@@ -142,8 +143,8 @@ export class FormularioRegistroProductoModalComponent  implements OnInit {
       formData.append('codigo_barra', this.producto?.codigo || '');
 
       // Subir usando fetch
-      const baseUrl = this.conexionBackend.getIPFILE().replace('/api/', '/');
-      const uploadResponse = await fetch(`${baseUrl}upload/imagen-producto`, {
+      const baseUrl = this.conexionBackend.getIPFILE().replace('/api/', '');
+      const uploadResponse = await fetch(`${baseUrl}/upload/imagen-producto`, {
         method: 'POST',
         body: formData
       });
@@ -209,7 +210,7 @@ export class FormularioRegistroProductoModalComponent  implements OnInit {
     // Si el producto ya tiene imagen, mostrarla
     if (this.producto?.imagen_url) {
       this.selectedImageUrl = this.producto.imagen_url;
-      this.imagePreview = `${this.conexionBackend.getIPFILE()}${this.producto.imagen_url}`;
+      this.imagePreview = `${this.conexionBackend.getIPFILE().replace('/api/', '')}${this.producto.imagen_url}`;
     }
   }
 
