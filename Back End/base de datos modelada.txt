@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS formato_producto (
     cantidad INT DEFAULT 0,
     codigo_barra VARCHAR(50) NOT NULL UNIQUE,
     precio INT NOT NULL,
+    imagen_url VARCHAR(255), 
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     fecha_actualizado TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (producto_id) REFERENCES producto(id) ON DELETE CASCADE
@@ -57,3 +58,7 @@ CREATE TABLE detalle_venta (
 CREATE TABLE IF NOT EXISTS fcm_tokens (
   token VARCHAR(255) PRIMARY KEY
 );
+
+-- Agregar campo 'imagen_url' a la tabla 'formato_producto'
+ALTER TABLE formato_producto
+ADD COLUMN imagen_url VARCHAR(255);
