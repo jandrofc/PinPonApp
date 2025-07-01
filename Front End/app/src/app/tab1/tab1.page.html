@@ -10,6 +10,16 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" class="custom-content">
+
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="chevron-down-circle-outline"
+      pullingText="Desliza para actualizar"
+      refreshingSpinner="circles"
+      refreshingText="Actualizando inventario...">
+    </ion-refresher-content>
+  </ion-refresher>
+
   <div class="content-wrapper">
     <div *ngIf="modoEdicion; else listaProductos" class="edit-form">
       <ion-card class="main-card">
@@ -29,36 +39,36 @@
                   Imagen del Producto
                 </ion-label>
               </ion-item>
-              
+
               <!-- Vista previa de imagen -->
               <div class="image-section">
                 <div class="image-preview" *ngIf="imagePreview || productoSeleccionado.imagen_url">
-                  <img 
-                    [src]="imagePreview || getImageSrc(productoSeleccionado.imagen_url)" 
-                    alt="Vista previa" 
+                  <img
+                    [src]="imagePreview || getImageSrc(productoSeleccionado.imagen_url)"
+                    alt="Vista previa"
                     (error)="onImageError($event)"
                   />
-                  <ion-button 
-                    class="remove-image-btn" 
-                    fill="clear" 
+                  <ion-button
+                    class="remove-image-btn"
+                    fill="clear"
                     size="small"
                     (click)="removeImage()"
                   >
                     <ion-icon name="close-circle" slot="icon-only"></ion-icon>
                   </ion-button>
                 </div>
-                
+
                 <!-- Placeholder cuando no hay imagen -->
                 <div class="image-placeholder" *ngIf="!imagePreview && !productoSeleccionado.imagen_url">
                   <ion-icon name="image-outline" size="large"></ion-icon>
                   <p>Sin imagen</p>
                 </div>
-                
+
                 <!-- Botones para agregar/cambiar imagen -->
                 <div class="image-actions">
-                  <ion-button 
-                    expand="block" 
-                    fill="outline" 
+                  <ion-button
+                    expand="block"
+                    fill="outline"
                     (click)="selectImage()"
                     class="image-button"
                   >

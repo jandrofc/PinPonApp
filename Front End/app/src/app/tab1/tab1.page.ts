@@ -264,7 +264,7 @@ async guardarCambios() {
           await loading.dismiss();
           loading = null;
         }
-        
+
         this.outputsEmergentesService.showErrorAlert({
           message: 'Error subiendo la imagen'
         });
@@ -291,14 +291,14 @@ async guardarCambios() {
               this.productos[idx] = { ...this.productoSeleccionado };
               console.log(' Producto actualizado en lista local:', this.productos[idx]);
             }
-            
+
             // RECARGAR productos desde servidor
             this.obtenerProductos();
-            
+
             this.modoEdicion = false;
             this.imagePreview = null;
             this.selectedImageUrl = null;
-    
+
             console.log(' Formato actualizado correctamente');
           } else {
             console.error('Error al actualizar formato:', res);
@@ -369,11 +369,11 @@ async selectImage() {
       // Extraer solo la parte base64 (sin el prefijo data:image/...)
       const base64Image = base64Data.split(',')[1];
       const mimeType = base64Data.split(',')[0].split(':')[1].split(';')[0];
-      
+
       // Convertir base64 a blob
       const response = await fetch(`data:${mimeType};base64,${base64Image}`);
       const blob = await response.blob();
-      
+
       // Crear FormData
       const formData = new FormData();
       formData.append('imagen', blob, `${codigoProducto || Date.now()}.jpg`);
@@ -386,7 +386,7 @@ async selectImage() {
       // Subir al servidor
       const baseUrl = this.apiService.getIPFILE().replace('/api/', '');
       const fullUrl = `${baseUrl}/upload/imagen-producto`;
-      
+
       const uploadResponse = await fetch(fullUrl, {
         method: 'POST',
         body: formData
@@ -425,5 +425,17 @@ async selectImage() {
 
   onImageError(event: any) {
     event.target.style.display = 'none';
+  }
+
+  async doRefresh(event: any) {
+    try{
+      await this.obtenerProductos();
+      console.log('Productos refrescados correctamente');
+    }
+  catch (error) {
+    console.error('Error al refrescar productos:', error);
+  } finally {
+      event.target.complete(); // Completa el evento de refresco
+  }
   }
 }
